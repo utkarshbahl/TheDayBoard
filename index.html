@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}.info-card{border-top:2px solid var(--ink);padding-top:16px}.info-card span{font-family:"DM Mono",monospace;color:#728077;font-size:12px}.info-card h3{font-size:17px;margin:24px 0 8px;letter-spacing:-.6px}.info-card p{font-size:13px;line-height:1.65;color:var(--muted);margin:0}.info-card .placeholder{display:inline-block;margin-top:4px;color:#77847a;font:11px "DM Mono",monospace;letter-spacing:.1px}@media(max-width:700px){.info-grid{grid-template-columns:repeat(2,1fr);gap:18px}.info-card h3{margin-top:16px;font-size:14px}.info-card p{font-size:11px}}
+    </style>
   </head>
   <body>
     <main>
@@ -33,15 +36,17 @@
         <p class="updated">Last updated <span id="updatedTime">loading…</span></p>
       </section>
 
-      <section class="how wrap">
+      <section class="how wrap" id="info">
         <div>
-          <p class="section-kicker">HOW IT WORKS</p>
-          <h2>One less call.<br />One less errand.</h2>
+          <p class="section-kicker">FIRST TIME HERE?</p>
+          <h2>Laundry info,<br />all in one place.</h2>
         </div>
-        <div class="steps">
-          <article><span>01</span><h3>Drop it off</h3><p>Hand over your laundry and keep your token number handy.</p></article>
-          <article><span>02</span><h3>Check here</h3><p>Open this page anytime to see the current ready token.</p></article>
-          <article><span>03</span><h3>Pick it up</h3><p>Once your number appears, collect it at the laundry counter.</p></article>
+        <div class="info-grid">
+          <article class="info-card"><span>01</span><h3>Laundry timings</h3><p>Opening and closing hours for drop-off and collection.</p><span class="placeholder">Add timings</span></article>
+          <article class="info-card"><span>02</span><h3>Normal laundry</h3><p>Expected time for regular wash, dry and fold service.</p><span class="placeholder">Add turnaround time</span></article>
+          <article class="info-card"><span>03</span><h3>Dry cleaning</h3><p>Expected time for clothes that need dry cleaning.</p><span class="placeholder">Add turnaround time</span></article>
+          <article class="info-card"><span>04</span><h3>Need help?</h3><p>Call the laundry desk for questions about your clothes.</p><span class="placeholder">Add mobile number</span></article>
+          <article class="info-card"><span>05</span><h3>Charges</h3><p>Item-wise prices for washing, ironing and dry cleaning.</p><span class="placeholder">Add price list</span></article>
         </div>
       </section>
 

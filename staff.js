@@ -26,7 +26,9 @@ $('updateForm').addEventListener('submit', async (event) => {
   const { error } = await supabase.from('laundry_status').update({ ready_token: Number($('newNumber').value) }).eq('id', 1);
   button.disabled = false; button.textContent = 'Update live board';
   $('updateMessage').style.color = error ? '#b94331' : '#438022';
-  $('updateMessage').textContent = error ? 'Could not update. Try again.' : 'Done! Students can see the new number.';
+  $('updateMessage').textContent = error
+    ? `Could not update: ${error.message}`
+    : 'Done! Students can see the new number.';
 });
 $('signOut').addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
 const { data: { session } } = await supabase.auth.getSession();
