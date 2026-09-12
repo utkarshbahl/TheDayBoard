@@ -3,7 +3,7 @@
 
 create table public.laundry_status (
   id integer primary key check (id = 1),
-  ready_token integer not null check (ready_token between 0 and 999),
+  ready_token integer not null check (ready_token >= 0),
   updated_at timestamptz not null default now()
 );
 
