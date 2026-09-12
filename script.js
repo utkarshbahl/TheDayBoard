@@ -17,10 +17,17 @@ function setStatus(value, timestamp) {
   range.textContent = `${display} or lower`;
   statusUpdatedAt = timestamp;
   $('updatedTime').textContent = timeAgo(timestamp);
+  $('tokenCard').setAttribute('aria-busy', 'false');
 }
 async function loadStatus() {
   const { data, error } = await supabase.from('laundry_status').select('ready_token, updated_at').eq('id', 1).single();
-  if (error) { console.warn('Laundry status could not be loaded.', error.message); return; }
+  if (error) {
+    console.warn('Laundry status could not be loaded.', error.message);
+    $('rangeText').textContent = 'temporarily unavailable';
+    $('updatedTime').textContent = 'unavailable';
+    $('tokenCard').setAttribute('aria-busy', 'false');
+    return;
+  }
   setStatus(data.ready_token, data.updated_at);
 }
 supabase.channel('laundry-status-live')
