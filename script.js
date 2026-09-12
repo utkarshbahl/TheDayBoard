@@ -1,59 +1,83 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const supabase = createClient(
+  'https://xlepegdbvdrtyvjzhgxm.supabase.co',
+  'sb_publishable_7ZGpCpVSNZsy0Y5D6pz7Ew_nPV-AJP2'
+);
 const $ = (id) => document.getElementById(id);
 const number = $('readyNumber');
 const range = $('rangeText');
-const saved = localStorage.getItem('lnmiitLaundryToken');
+let statusUpdatedAt;
 
 function padded(value) { return String(value).padStart(3, '0'); }
 function timeAgo(date) {
-  const diff = Math.floor((Date.now() - date) / 60000);
+  const diff = Math.floor((Date.now() - new Date(date)) / 60000);
   if (diff < 1) return 'just now';
   if (diff < 60) return `${diff} min ago`;
   return new Date(date).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 }
-function setStatus(value, timestamp = Date.now()) {
+function setStatus(value, timestamp) {
   const display = padded(value);
   number.textContent = display;
   range.textContent = `${display} or lower`;
+  statusUpdatedAt = timestamp;
   $('updatedTime').textContent = timeAgo(timestamp);
 }
-if (saved) {
-  const data = JSON.parse(saved);
-  setStatus(data.number, data.updatedAt);
+async function loadStatus() {
+  const { data, error } = await supabase.from('laundry_status').select('ready_token, updated_at').eq('id', 1).single();
+  if (error) { console.warn('Laundry status could not be loaded.', error.message); return; }
+  setStatus(data.ready_token, data.updated_at);
 }
-
-$('loginForm').addEventListener('submit', (event) => {
-  event.preventDefault();
-  const name = $('staffName').value.trim();
-  const password = $('staffPassword').value;
-  // Demo-only authentication. Replace with server-side authentication before production use.
-  if (password !== 'lnmiitlaundry') {
-    $('loginMessage').textContent = 'That password is not recognised.';
-    return;
-  }
-  sessionStorage.setItem('lnmiitLaundryStaff', name);
-  showUpdate(name);
-});
-function showUpdate(name) {
+function showUpdate(user) {
   $('loginPanel').classList.add('hidden');
   $('updatePanel').classList.remove('hidden');
-  $('signedInName').textContent = name;
+  $('signedInName').textContent = user.email.split('@')[0];
   $('newNumber').value = Number(number.textContent);
 }
-$('updateForm').addEventListener('submit', (event) => {
+
+$('loginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const button = event.submitter;
+  $('loginMessage').textContent = '';
+  button.disabled = true; button.textContent = 'Signing in…';
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: $('staffEmail').value.trim(), password: $('staffPassword').value
+  });
+  button.disabled = false; button.innerHTML = 'Sign in <span>→</span>';
+  if (error) { $('loginMessage').textContent = 'Could not sign in. Check your email and password.'; return; }
+  showUpdate(data.user);
+});
+
+$('updateForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const value = Number($('newNumber').value);
-  localStorage.setItem('lnmiitLaundryToken', JSON.stringify({ number: value, updatedAt: Date.now() }));
-  setStatus(value);
+  const button = event.submitter;
+  $('updateMessage').textContent = '';
+  button.disabled = true; button.textContent = 'Publishing…';
+  const { error } = await supabase.from('laundry_status').update({ ready_token: value }).eq('id', 1);
+  button.disabled = false; button.innerHTML = 'Publish update <span>→</span>';
+  if (error) {
+    $('updateMessage').style.color = '#e65a43';
+    $('updateMessage').textContent = 'Update failed. Please try again.';
+    return;
+  }
   $('updateMessage').style.color = '#438022';
   $('updateMessage').textContent = 'Live status published successfully.';
-  setTimeout(() => { $('updateMessage').textContent = ''; }, 3000);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
-$('signOut').addEventListener('click', () => {
-  sessionStorage.removeItem('lnmiitLaundryStaff');
+
+$('signOut').addEventListener('click', async () => {
+  await supabase.auth.signOut();
   $('updatePanel').classList.add('hidden');
   $('loginPanel').classList.remove('hidden');
   $('staffPassword').value = '';
 });
-const activeStaff = sessionStorage.getItem('lnmiitLaundryStaff');
-if (activeStaff) showUpdate(activeStaff);
+
+supabase.channel('laundry-status-live')
+  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'laundry_status', filter: 'id=eq.1' },
+    (payload) => setStatus(payload.new.ready_token, payload.new.updated_at))
+  .subscribe();
+
+const { data: { session } } = await supabase.auth.getSession();
+if (session) showUpdate(session.user);
+loadStatus();
+setInterval(() => statusUpdatedAt && ($('updatedTime').textContent = timeAgo(statusUpdatedAt)), 60000);
