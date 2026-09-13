@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .coming-soon{min-height:calc(100vh - 176px);display:grid;place-items:center;text-align:center;padding:60px 32px}.coming-soon-card{max-width:650px}.coming-soon h1{font-size:clamp(45px,7vw,78px);letter-spacing:-4px;line-height:.98;margin:20px 0}.coming-soon p{color:var(--muted);font-size:16px;line-height:1.6;margin:0}.back-home{display:inline-block;margin-top:32px;padding:12px 17px;border-radius:5px;background:var(--ink);color:var(--paper);font-size:13px;font-weight:800;text-decoration:none}.back-home:hover{background:#294534}
+      .service-page{padding:42px 32px 88px}.service-heading{margin-bottom:34px}.service-heading h1{font-size:clamp(38px,6vw,64px);letter-spacing:-3px;line-height:1;margin:12px 0}.service-heading p{color:var(--muted);margin:0;font-size:14px}.schedule-section{margin-top:40px}.schedule-section h2{font-size:24px;letter-spacing:-1px;margin:0 0 7px}.schedule-note{color:var(--muted);font:12px "DM Mono",monospace;margin:0 0 16px}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:#fff}.schedule{width:100%;min-width:650px;border-collapse:collapse;text-align:left}.schedule th{background:var(--ink);color:#fff;font-size:12px;letter-spacing:.4px}.schedule td,.schedule th{padding:13px 18px;border-bottom:1px solid #e3e2dc}.schedule td{font-size:14px}.schedule tbody tr:last-child td{border-bottom:0}.schedule tbody tr:nth-child(even){background:#faf9f5}.route{font-weight:800}.route-arrow{color:#7b8b80;margin:0 5px}@media(max-width:700px){.service-page{padding:29px 21px 60px}.schedule td,.schedule th{padding:11px 14px}}
     </style>
   </head>
   <body>
@@ -28,12 +28,23 @@
         <a class="staff-link" href="staff.html">Staff update <span>↗</span></a>
       </div>
     </nav>
-    <main class="coming-soon wrap">
-      <section class="coming-soon-card">
+    <main class="service-page wrap">
+      <header class="service-heading">
         <p class="section-kicker">LNMIIT CAMPUS SERVICES</p>
-        <h1>Bus timings</h1>
-        <p>Campus bus routes and departure times will be added here soon.</p>
-        <a class="back-home" href="index.html">Campus home</a>
+        <h1>Bus timetable</h1>
+        <p>Routes between LNMIIT, Raja Park and Ajmeri Gate.</p>
+      </header>
+      <section class="schedule-section">
+        <h2>Monday to Friday</h2><p class="schedule-note">EFFECTIVE 31 OCTOBER 2025</p>
+        <div class="table-wrap"><table class="schedule"><thead><tr><th>Route</th><th>From</th><th>To</th><th>Time</th><th>Runs on</th></tr></thead><tbody>
+          <tr><td>1</td><td>LNMIIT</td><td>Raja Park</td><td>6:00 AM</td><td>Monday to Friday</td></tr><tr><td>1</td><td>Raja Park</td><td>LNMIIT</td><td>7:00 AM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>7:00 AM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>8:00 AM</td><td>Monday to Friday</td></tr><tr><td>3</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>7:00 AM</td><td>Monday</td></tr><tr><td>3</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>8:00 AM</td><td>Monday</td></tr><tr><td>4</td><td>LNMIIT</td><td>Raja Park</td><td>10:00 AM</td><td>Monday to Friday</td></tr><tr><td>4</td><td>Raja Park</td><td>LNMIIT</td><td>11:00 AM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>LNMIIT</td><td>Raja Park</td><td>2:00 PM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>Raja Park</td><td>LNMIIT</td><td>4:00 PM</td><td>Monday to Friday</td></tr><tr><td>3</td><td>LNMIIT</td><td>Raja Park</td><td>4:30 PM</td><td>Monday to Friday</td></tr><tr><td>1</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>6:05 PM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>6:45 PM</td><td>Monday to Friday</td></tr><tr><td>3</td><td>Raja Park</td><td>LNMIIT</td><td>5:30 PM</td><td>Friday</td></tr><tr><td>3</td><td>LNMIIT</td><td>Raja Park</td><td>7:30 PM</td><td>Friday</td></tr><tr><td>1</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>8:15 PM</td><td>Monday to Friday</td></tr><tr><td>3</td><td>Raja Park</td><td>LNMIIT</td><td>9:00 PM</td><td>Monday to Friday</td></tr><tr><td>2</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>9:00 PM</td><td>Monday to Friday</td></tr>
+        </tbody></table></div>
+      </section>
+      <section class="schedule-section">
+        <h2>Saturday, Sunday &amp; holidays</h2><p class="schedule-note">EFFECTIVE 31 OCTOBER 2025</p>
+        <div class="table-wrap"><table class="schedule"><thead><tr><th>Route</th><th>From</th><th>To</th><th>Time</th></tr></thead><tbody>
+          <tr><td>1</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>7:00 AM</td></tr><tr><td>1</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>8:00 AM</td></tr><tr><td>2</td><td>LNMIIT</td><td>Raja Park</td><td>10:00 AM</td></tr><tr><td>2</td><td>Raja Park</td><td>LNMIIT</td><td>12:00 noon</td></tr><tr><td>3</td><td>LNMIIT</td><td>Raja Park</td><td>1:00 PM</td></tr><tr><td>3</td><td>Raja Park</td><td>LNMIIT</td><td>3:00 PM</td></tr><tr><td>2</td><td>LNMIIT</td><td>Raja Park</td><td>4:00 PM</td></tr><tr><td>3</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>4:30 PM</td></tr><tr><td>2</td><td>Raja Park</td><td>LNMIIT</td><td>5:15 PM</td></tr><tr><td>1</td><td>LNMIIT</td><td>Raja Park</td><td>5:00 PM</td></tr><tr><td>2</td><td>LNMIIT</td><td>Ajmeri Gate</td><td>6:00 PM</td></tr><tr><td>3</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>8:15 PM</td></tr><tr><td>1</td><td>Raja Park</td><td>LNMIIT</td><td>9:00 PM</td></tr><tr><td>2</td><td>Ajmeri Gate</td><td>LNMIIT</td><td>9:00 PM</td></tr>
+        </tbody></table></div>
       </section>
     </main>
     <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Made for an easier campus day</span></footer>

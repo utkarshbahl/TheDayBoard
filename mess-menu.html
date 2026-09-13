@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .coming-soon{min-height:calc(100vh - 176px);display:grid;place-items:center;text-align:center;padding:60px 32px}.coming-soon-card{max-width:650px}.coming-soon h1{font-size:clamp(45px,7vw,78px);letter-spacing:-4px;line-height:.98;margin:20px 0}.coming-soon p{color:var(--muted);font-size:16px;line-height:1.6;margin:0}.back-home{display:inline-block;margin-top:32px;padding:12px 17px;border-radius:5px;background:var(--ink);color:var(--paper);font-size:13px;font-weight:800;text-decoration:none}.back-home:hover{background:#294534}
+      .service-page{padding:42px 32px 88px}.service-heading{margin-bottom:34px}.service-heading h1{font-size:clamp(38px,6vw,64px);letter-spacing:-3px;line-height:1;margin:12px 0}.service-heading p{color:var(--muted);margin:0;font-size:14px}.meal-note{border:1px solid var(--line);border-radius:8px;padding:14px 17px;color:var(--muted);font-size:13px;margin-bottom:22px}.menu-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:#fff}.menu{width:100%;min-width:1000px;border-collapse:collapse;table-layout:fixed}.menu th{background:var(--ink);color:#fff;font-size:12px}.menu th,.menu td{border:1px solid #deded8;padding:12px;text-align:left;vertical-align:top}.menu tbody th{width:110px;color:var(--ink);background:#f1f0ea;font-size:13px}.menu td{font-size:12px;line-height:1.45}.menu .shared{background:#faf9f5;text-align:center;color:#46534b;font-size:12px}.menu strong{font-weight:800}@media(max-width:700px){.service-page{padding:29px 21px 60px}}
     </style>
   </head>
   <body>
@@ -28,13 +28,19 @@
         <a class="staff-link" href="staff.html">Staff update <span>↗</span></a>
       </div>
     </nav>
-    <main class="coming-soon wrap">
-      <section class="coming-soon-card">
-        <p class="section-kicker">LNMIIT CAMPUS SERVICES</p>
-        <h1>Mess menu</h1>
-        <p>The meal schedule and menu will be added here soon.</p>
-        <a class="back-home" href="index.html">Campus home</a>
-      </section>
+    <main class="service-page wrap">
+      <header class="service-heading"><p class="section-kicker">LNMIIT CAMPUS SERVICES</p><h1>Mess menu</h1><p>Weekly dining menu.</p></header>
+      <p class="meal-note">Items marked <strong>(L)</strong> are limited. The menu is subject to change by the mess administration.</p>
+      <div class="menu-wrap"><table class="menu"><thead><tr><th>Meal</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th><th>Sunday</th></tr></thead><tbody>
+        <tr><th>Breakfast</th><td class="shared" colspan="7">Bread (brown/white), butter (normal/peanut)* (L), jam (L), tea/coffee/milk (hot/cold), Bournvita, sugar, fruit (one piece), cornflakes/oats</td></tr>
+        <tr><th></th><td>Sprouts, omelette (L) / idli sambar, coconut chutney</td><td>Boiled chana chaat, aloo paratha, curd, garlic chutney, ketchup</td><td>Sprouts, boiled eggs (L) / sambar vada, coconut chutney</td><td>Sprouts, omelette (L) / upma, coconut chutney / moong dal chilla, green chutney (alternate)</td><td>Boiled moong chaat, boiled eggs (L) / matar kulcha</td><td>Sprouts, omelette (L) / dosa sambar, coconut chutney</td><td>Sprouts, omelette (L) / samosa (L), jalebi, green chutney, imli chutney</td></tr>
+        <tr><th>Lunch</th><td class="shared" colspan="7">Salad (any two of cucumber, onion, tomato, beetroot, radish, carrot), plain &amp; butter roti, missi roti</td></tr>
+        <tr><th></th><td>Matar paneer, dal arhar, boondi raita (L), vegetable pulao, lemon pickle, fryums (L)</td><td>Mixed vegetables, dal makhani, vegetable raita (L), pudina rice, mixed pickle, coconut burfi (L), papad (L)</td><td>Dry chole masala, dal fry, boondi raita (L), Szechuan rice, mixed pickle, angoori petha (L), papad (L)</td><td>Aloo bhujia, kadhi pakora, roti, jeera rice, lemon pickle, fryums (L)</td><td>Lauki tamatar, rajma, boondi raita (L), plain rice, mixed pickle, besan burfi (L), fryums (L)</td><td>Bati, mixed dal, mirch ka salan, chhach (L), vegetable biryani, lemon pickle, papad (L)</td><td>Punjabi chole, masala mirch, lassi (L), lemon rice, butter, mixed pickle, papad (L)</td></tr>
+        <tr><th>Snacks</th><td class="shared" colspan="7">Tea</td></tr>
+        <tr><th></th><td>Namkeen poha, thandai</td><td>White sauce pasta, ketchup, Rasna</td><td>Vegetable puff, ketchup, nimbu pani</td><td>Stuffed kulcha, vanilla shake</td><td>Vegetable Maggi, cold coffee</td><td>Pani puri with aloo (6 pieces), jaljeera</td><td>Corn chaat, milk rose</td></tr>
+        <tr><th>Dinner</th><td class="shared" colspan="7">Salad (any one of cucumber, tomato, beetroot, radish, carrot, onion), plain &amp; butter roti, roasted papad (L)</td></tr>
+        <tr><th></th><td>Achaari aloo, dal moong tadka, curd rice, mixed pickle, ice cream (L)</td><td>Black chana curry, dal urad tadka, peas pulao, puri, lemon pickle, boondi (L)</td><td>Shahi paneer, dal moong tadka, fried rice, lemon pickle, gulab jamun (L)</td><td>Soya chili, panchratan dal, dum biryani, lemon pickle, rasgulla (L)</td><td>Dry tinda masala, arhar dal, tawa pulao, mixed pickle, milk rose (L)</td><td>Matar mushroom, dal urad fry, jeera rice, lemon pickle, fruit custard (L)</td><td>Mixed vegetables, dal makhani, pudina rice, mixed pickle, sama rice kheer (L)</td></tr>
+      </tbody></table></div>
     </main>
     <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Made for an easier campus day</span></footer>
   </body>
