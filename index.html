@@ -18,10 +18,23 @@
     <main>
       <nav class="nav wrap">
         <div class="nav-start">
-          <a class="brand" href="#top" aria-label="LNMIIT Laundry home">
+          <a class="brand brand-desktop" href="#top" aria-label="LNMIIT Laundry home">
             <span class="brand-mark">L</span>
-          <span>LNMIIT <b>Campus</b></span>
+            <span>LNMIIT <b>Campus</b></span>
           </a>
+          <details class="campus-menu">
+            <summary class="campus-trigger" aria-label="Open LNMIIT Campus services">
+              <span class="brand-mark" aria-hidden="true">L</span>
+              <span>LNMIIT <b>Campus</b></span>
+              <span class="campus-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <nav class="campus-dropdown" aria-label="Campus services">
+              <span class="campus-dropdown-label">Campus services</span>
+              <a class="campus-nav-link" href="index.html" aria-current="page"><span>Laundry <b>Status</b></span><span class="campus-link-arrow" aria-hidden="true">↗</span></a>
+              <a class="campus-nav-link" href="mess-menu.html"><span>Mess <b>Menu</b></span><span class="campus-link-arrow" aria-hidden="true">↗</span></a>
+              <a class="campus-nav-link" href="bus-timings.html"><span>Bus <b>Timings</b></span><span class="campus-link-arrow" aria-hidden="true">↗</span></a>
+            </nav>
+          </details>
           <div class="nav-links" aria-label="Campus services">
             <a class="nav-link" href="index.html" aria-current="page">Laundry <b>Status</b></a>
             <a class="nav-link" href="mess-menu.html">Mess <b>Menu</b></a>
@@ -65,6 +78,7 @@
 
     </main>
     <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Made for an easier campus day</span></footer>
+    <script type="module" src="nav.js"></script>
     <script type="module" src="script.js"></script>
   </body>
 </html>
