@@ -19,7 +19,7 @@ body { margin: 0; background: var(--paper); font-family: Manrope, Arial, sans-se
 .nav { height: 94px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 30; }
 .brand { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 500; letter-spacing: -.5px; }
 .brand b { font-weight: 800; }
-.brand-mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--lime); font-weight: 800; }
+.brand-mark { display: block; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 9px; background: #121212; object-fit: cover; object-position: center; }
 .staff-link { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
 .staff-link span { font-size: 18px; margin-left: 4px; }
 .hero { text-align: center; padding-top: 65px; padding-bottom: 116px; }
@@ -93,7 +93,7 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .theme-toggle { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 99px; padding: 7px 10px; background: transparent; color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
 .theme-toggle:hover { background: var(--ink); color: var(--paper); }
 .customer-dark { --ink: #eef3ec; --paper: #11211a; --muted: #afbbb4; --line: #405149; --menu-hover: #294331; --nav-shadow: 0 14px 30px rgba(0, 0, 0, .32); }
-.customer-dark .brand-mark { background: #d7fa52; color: #14281f; }
+.customer-dark .brand-mark { background: #121212; }
 .customer-dark .eyebrow, .customer-dark .section-kicker { color: #b7c3bc; }
 .customer-dark .eyebrow i { box-shadow: 0 0 0 4px #294331; }
 .customer-dark .theme-toggle:hover { background: #eef3ec; color: #11211a; }
@@ -110,14 +110,17 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .menu-meal-shared { padding-bottom: 8px; color: var(--muted); }
 .menu-meal-detail { color: var(--ink); }
 
-.schedule-card { padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
-.schedule-card-route { display: flex; align-items: center; gap: 9px; }
-.schedule-card-place { font-size: 13px; font-weight: 800; line-height: 1.25; }
-.schedule-route-arrow { display: block; flex: 0 0 7px; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; color: var(--muted); transform: rotate(45deg); }
-.schedule-card-time { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line); }
-.schedule-card-time-label { color: var(--muted); font: 800 10px/1.2 "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
-.schedule-card-time-value { color: var(--ink); font: 700 18px/1 "DM Mono", monospace; }
-.schedule-card-meta { margin: 9px 0 0; color: var(--muted); font: 11px/1.3 "DM Mono", monospace; }
+.schedule-source { display: none; }
+.route-schedule { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.route-group { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.route-group-header { display: flex; align-items: center; gap: 11px; margin: 0; padding: 15px 16px; background: var(--ink); color: var(--surface); font-size: 16px; letter-spacing: -.35px; line-height: 1.2; }
+.route-group-header > span { display: inline-block; }
+.route-group-arrow { width: 7px; height: 7px; flex: 0 0 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; opacity: .68; transform: rotate(45deg); }
+.route-group-list { margin: 0; padding: 0; list-style: none; }
+.route-group-entry { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: baseline; gap: 9px; padding: 13px 16px; border-top: 1px solid var(--line); }
+.route-group-day { min-width: 0; color: var(--muted); font: 11px/1.35 "DM Mono", monospace; }
+.route-group-dash { color: var(--muted); }
+.route-group-time { color: var(--ink); font: 700 15px/1 "DM Mono", monospace; white-space: nowrap; }
 
 @media (max-width: 700px) {
   .wrap { padding-left: 21px; padding-right: 21px; }
@@ -135,9 +138,11 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   footer { font-size: 8px; }
   .pickup-note { font-size: 14px; }
   .menu-desktop, .schedule-desktop { display: none; }
-  .menu-mobile, .schedule-mobile { display: grid; gap: 12px; }
-  .schedule-mobile { gap: 10px; }
-  .schedule-section + .schedule-section { margin-top: 32px; }
+  .menu-mobile { display: grid; gap: 12px; }
+  .route-schedule { grid-template-columns: 1fr; gap: 12px; }
+  .route-group-header { padding: 14px 15px; }
+  .route-group-entry { padding: 12px 15px; }
+  .route-group-time { font-size: 14px; }
   .brand-desktop, .nav-links { display: none; }
   .campus-menu { display: block; }
   .campus-trigger { font-size: 14px; white-space: nowrap; }

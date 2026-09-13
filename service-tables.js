@@ -61,47 +61,66 @@ function renderMessMenu(target, table) {
   });
 }
 
-function renderSchedule(target, table) {
-  const headers = [...table.tHead.rows[0].cells].map(normalizeCellText);
-  const rows = [...table.tBodies[0].rows];
-  const fromIndex = headers.indexOf('From');
-  const toIndex = headers.indexOf('To');
-  const timeIndex = headers.indexOf('Time');
-  const runsOnIndex = headers.indexOf('Runs on');
+function renderRouteSchedule(target) {
+  const sourceIds = (target.dataset.sourceTables ?? '').split(/\s+/).filter(Boolean);
+  const groups = new Map();
 
-  rows.forEach((row) => {
-    const values = [...row.cells].map(normalizeCellText);
-    const from = values[fromIndex];
-    const to = values[toIndex];
-    const time = values[timeIndex];
-    const runsOn = runsOnIndex >= 0 ? values[runsOnIndex] : '';
+  sourceIds.forEach((sourceId) => {
+    const table = document.getElementById(sourceId);
+    if (!table) return;
 
-    const card = document.createElement('article');
-    card.className = 'schedule-card';
-    card.setAttribute('aria-label', [from, to, time, runsOn].filter(Boolean).join(', '));
+    const headers = [...table.tHead.rows[0].cells].map(normalizeCellText);
+    const rows = [...table.tBodies[0].rows];
+    const fromIndex = headers.indexOf('From');
+    const toIndex = headers.indexOf('To');
+    const timeIndex = headers.indexOf('Time');
+    const runsOnIndex = headers.indexOf('Runs on');
+    const defaultDay = table.dataset.scheduleLabel ?? 'Schedule';
 
-    const route = document.createElement('div');
-    route.className = 'schedule-card-route';
-    route.append(
-      createTextElement('span', 'schedule-card-place', from),
-      createTextElement('span', 'schedule-route-arrow', ''),
-      createTextElement('span', 'schedule-card-place', to),
+    rows.forEach((row) => {
+      const values = [...row.cells].map(normalizeCellText);
+      const from = values[fromIndex];
+      const to = values[toIndex];
+      const time = values[timeIndex];
+      const day = runsOnIndex >= 0 && values[runsOnIndex] ? values[runsOnIndex] : defaultDay;
+      const key = `${from}::${to}`;
+
+      if (!groups.has(key)) groups.set(key, { from, to, entries: [] });
+      groups.get(key).entries.push({ day, time });
+    });
+  });
+
+  groups.forEach(({ from, to, entries }) => {
+    const headingId = `route-${from}-${to}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const group = document.createElement('article');
+    group.className = 'route-group';
+    group.setAttribute('aria-labelledby', headingId);
+
+    const heading = createTextElement('h2', 'route-group-header', '');
+    heading.id = headingId;
+    heading.append(
+      createTextElement('span', 'route-group-place', from),
+      createTextElement('span', 'route-group-arrow', ''),
+      createTextElement('span', 'route-group-place', to),
     );
-    card.append(route);
+    group.append(heading);
 
-    const timeBlock = document.createElement('div');
-    timeBlock.className = 'schedule-card-time';
-    timeBlock.append(
-      createTextElement('span', 'schedule-card-time-label', 'Departure'),
-      createTextElement('strong', 'schedule-card-time-value', time),
-    );
-    card.append(timeBlock);
+    const list = document.createElement('ul');
+    list.className = 'route-group-list';
+    entries.forEach(({ day, time }) => {
+      const item = document.createElement('li');
+      item.className = 'route-group-entry';
+      item.setAttribute('aria-label', `${day} - ${time}`);
+      item.append(
+        createTextElement('span', 'route-group-day', day),
+        createTextElement('span', 'route-group-dash', '-'),
+        createTextElement('strong', 'route-group-time', time),
+      );
+      list.append(item);
+    });
 
-    if (runsOn) {
-      card.append(createTextElement('p', 'schedule-card-meta', `Runs ${runsOn}`));
-    }
-
-    target.append(card);
+    group.append(list);
+    target.append(group);
   });
 }
 
@@ -110,5 +129,8 @@ document.querySelectorAll('[data-mobile-view]').forEach((target) => {
   if (!table) return;
 
   if (target.dataset.mobileView === 'mess') renderMessMenu(target, table);
-  if (target.dataset.mobileView === 'schedule') renderSchedule(target, table);
+});
+
+document.querySelectorAll('[data-service-view]').forEach((target) => {
+  if (target.dataset.serviceView === 'route-schedule') renderRouteSchedule(target);
 });
