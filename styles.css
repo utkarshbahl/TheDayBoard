@@ -5,6 +5,8 @@
   --muted: #637067;
   --line: #d7d3c9;
   --red: #e65a43;
+  --surface: #ffffff;
+  --surface-muted: #faf9f5;
   --menu-hover: #eef5d0;
   --active-ink: #14281f;
   --nav-shadow: 0 14px 30px rgba(20, 40, 31, .14);
@@ -76,8 +78,9 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .campus-trigger:hover, .campus-menu[open] .campus-trigger { border-color: var(--ink); background: var(--menu-hover); }
 .campus-trigger:active { transform: translateY(1px); }
 .campus-trigger:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
-.campus-chevron { display: block; width: 7px; height: 7px; margin: -3px 2px 0 4px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; color: var(--muted); transform: rotate(45deg); transition: transform .18s cubic-bezier(.16, 1, .3, 1); }
-.campus-menu[open] .campus-chevron { transform: rotate(225deg); }
+.campus-chevron { display: grid; place-items: center; width: 22px; height: 22px; margin-left: 2px; border: 1px solid var(--line); border-radius: 50%; background: var(--paper); color: var(--muted); transition: border-color .18s ease, background-color .18s ease, color .18s ease, transform .18s cubic-bezier(.16, 1, .3, 1); }
+.campus-chevron::before { content: ""; position: relative; top: -1px; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); }
+.campus-menu[open] .campus-chevron { border-color: var(--lime); background: var(--lime); color: var(--active-ink); transform: rotate(180deg); }
 .campus-dropdown { position: absolute; top: calc(100% + 8px); left: 0; z-index: 20; width: min(246px, calc(100vw - 42px)); padding: 9px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: var(--nav-shadow); }
 .campus-dropdown-label { display: block; margin: 4px 10px 7px; color: var(--muted); font: 800 10px "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
 .campus-nav-link { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 44px; padding: 10px 11px; border-radius: 7px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.2; text-decoration: none; }
@@ -97,6 +100,25 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .customer-dark footer { color: #aebbb3; }
 .customer-dark .token-card { background: #1d3a2c; }
 
+.menu-mobile, .schedule-mobile { display: none; }
+
+.menu-day-card { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.menu-day-header { margin: 0; padding: 13px 15px; background: var(--ink); color: var(--surface); font-size: 16px; letter-spacing: -.4px; line-height: 1.2; }
+.menu-meal { padding: 14px 15px 15px; border-top: 1px solid var(--line); }
+.menu-meal-name { margin: 0 0 8px; color: var(--muted); font: 800 10px/1.2 "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
+.menu-meal-shared, .menu-meal-detail { margin: 0; font-size: 13px; line-height: 1.55; }
+.menu-meal-shared { padding-bottom: 8px; color: var(--muted); }
+.menu-meal-detail { color: var(--ink); }
+
+.schedule-card { padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.schedule-card-route { display: flex; align-items: center; gap: 9px; }
+.schedule-card-place { font-size: 13px; font-weight: 800; line-height: 1.25; }
+.schedule-route-arrow { display: block; flex: 0 0 7px; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; color: var(--muted); transform: rotate(45deg); }
+.schedule-card-time { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line); }
+.schedule-card-time-label { color: var(--muted); font: 800 10px/1.2 "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
+.schedule-card-time-value { color: var(--ink); font: 700 18px/1 "DM Mono", monospace; }
+.schedule-card-meta { margin: 9px 0 0; color: var(--muted); font: 11px/1.3 "DM Mono", monospace; }
+
 @media (max-width: 700px) {
   .wrap { padding-left: 21px; padding-right: 21px; }
   .nav { height: 75px; }
@@ -112,6 +134,10 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   .panel { padding: 27px; min-height: auto; }
   footer { font-size: 8px; }
   .pickup-note { font-size: 14px; }
+  .menu-desktop, .schedule-desktop { display: none; }
+  .menu-mobile, .schedule-mobile { display: grid; gap: 12px; }
+  .schedule-mobile { gap: 10px; }
+  .schedule-section + .schedule-section { margin-top: 32px; }
   .brand-desktop, .nav-links { display: none; }
   .campus-menu { display: block; }
   .campus-trigger { font-size: 14px; white-space: nowrap; }
@@ -124,7 +150,8 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 @media (max-width: 360px) {
   .campus-trigger { gap: 7px; min-height: 38px; padding: 3px 7px 3px 4px; font-size: 13px; }
   .campus-trigger .brand-mark { width: 30px; height: 30px; font-size: 13px; }
-  .campus-chevron { width: 6px; height: 6px; margin: -2px 1px 0 2px; }
+  .campus-chevron { width: 20px; height: 20px; margin-left: 1px; }
+  .campus-chevron::before { width: 5px; height: 5px; }
   .nav-actions { gap: 8px; }
   .theme-toggle { padding: 5px 6px; }
   .staff-link { font-size: 10px; white-space: nowrap; }
