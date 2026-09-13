@@ -14,8 +14,12 @@ alter table public.laundry_status enable row level security;
 create policy "Anyone can view the current laundry status"
 on public.laundry_status for select using (true);
 
-create policy "Signed-in staff can update the laundry status"
-on public.laundry_status for update to authenticated using (true) with check (true);
+-- Only accounts whose app metadata contains { "role": "laundry_staff" }
+-- may change the board. Do not use user_metadata for authorization: users can edit it.
+create policy "Laundry staff can update the laundry status"
+on public.laundry_status for update to authenticated
+using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'laundry_staff')
+with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'laundry_staff');
 
 create or replace function public.set_laundry_updated_at()
 returns trigger language plpgsql as $$
