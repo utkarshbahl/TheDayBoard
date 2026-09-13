@@ -76,8 +76,8 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .campus-trigger:hover, .campus-menu[open] .campus-trigger { border-color: var(--ink); background: var(--menu-hover); }
 .campus-trigger:active { transform: translateY(1px); }
 .campus-trigger:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
-.campus-chevron { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; margin-left: 1px; color: var(--muted); font: 700 13px/1 Manrope, sans-serif; transform: translateY(1px); transition: transform .18s cubic-bezier(.16, 1, .3, 1); }
-.campus-menu[open] .campus-chevron { transform: translateY(1px) rotate(180deg); }
+.campus-chevron { display: block; width: 7px; height: 7px; margin: -3px 2px 0 4px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; color: var(--muted); transform: rotate(45deg); transition: transform .18s cubic-bezier(.16, 1, .3, 1); }
+.campus-menu[open] .campus-chevron { transform: rotate(225deg); }
 .campus-dropdown { position: absolute; top: calc(100% + 8px); left: 0; z-index: 20; width: min(246px, calc(100vw - 42px)); padding: 9px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: var(--nav-shadow); }
 .campus-dropdown-label { display: block; margin: 4px 10px 7px; color: var(--muted); font: 800 10px "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
 .campus-nav-link { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 44px; padding: 10px 11px; border-radius: 7px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.2; text-decoration: none; }
@@ -85,7 +85,7 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .campus-nav-link:hover { background: var(--menu-hover); }
 .campus-nav-link:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; }
 .campus-nav-link[aria-current="page"] { background: var(--lime); color: var(--active-ink); }
-.campus-link-arrow { display: grid; flex: 0 0 18px; width: 18px; place-items: center; color: var(--muted); font-size: 22px; line-height: 1; transform: translateY(-1px); }
+.campus-link-arrow { display: block; flex: 0 0 7px; width: 7px; height: 7px; margin-right: 3px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; color: var(--muted); transform: rotate(45deg); }
 .campus-nav-link[aria-current="page"] .campus-link-arrow { color: var(--active-ink); opacity: .62; }
 .theme-toggle { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 99px; padding: 7px 10px; background: transparent; color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
 .theme-toggle:hover { background: var(--ink); color: var(--paper); }
@@ -124,7 +124,7 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 @media (max-width: 360px) {
   .campus-trigger { gap: 7px; min-height: 38px; padding: 3px 7px 3px 4px; font-size: 13px; }
   .campus-trigger .brand-mark { width: 30px; height: 30px; font-size: 13px; }
-  .campus-chevron { width: 12px; height: 12px; font-size: 11px; }
+  .campus-chevron { width: 6px; height: 6px; margin: -2px 1px 0 2px; }
   .nav-actions { gap: 8px; }
   .theme-toggle { padding: 5px 6px; }
   .staff-link { font-size: 10px; white-space: nowrap; }
