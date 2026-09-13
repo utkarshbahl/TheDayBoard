@@ -2,23 +2,7 @@ import { supabase } from './supabase.js';
 const $ = (id) => document.getElementById(id);
 const number = $('readyNumber');
 const range = $('rangeText');
-const themeToggle = $('themeToggle');
 let statusUpdatedAt;
-
-function setTheme(isDark) {
-  document.body.classList.toggle('customer-dark', isDark);
-  themeToggle.setAttribute('aria-pressed', String(isDark));
-  themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-  themeToggle.querySelector('[aria-hidden="true"]').textContent = isDark ? '☀' : '☾';
-  themeToggle.querySelector('.theme-toggle-text').textContent = isDark ? 'Light' : 'Dark';
-}
-
-setTheme(localStorage.getItem('customer-theme') === 'dark');
-themeToggle.addEventListener('click', () => {
-  const isDark = !document.body.classList.contains('customer-dark');
-  localStorage.setItem('customer-theme', isDark ? 'dark' : 'light');
-  setTheme(isDark);
-});
 
 function padded(value) { return String(value).padStart(3, '0'); }
 function timeAgo(date) {
