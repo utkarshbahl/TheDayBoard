@@ -82,7 +82,8 @@ function renderRouteSchedule(target) {
       const from = values[fromIndex];
       const to = values[toIndex];
       const time = values[timeIndex];
-      const day = runsOnIndex >= 0 && values[runsOnIndex] ? values[runsOnIndex] : defaultDay;
+      const rawDay = runsOnIndex >= 0 && values[runsOnIndex] ? values[runsOnIndex] : defaultDay;
+      const day = rawDay === 'Friday' ? 'Fridays' : rawDay;
       const key = `${from}::${to}`;
 
       if (!groups.has(key)) groups.set(key, { from, to, entries: [] });
