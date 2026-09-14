@@ -12,6 +12,40 @@ function getSourceTable(target) {
   return sourceId ? document.getElementById(sourceId) : null;
 }
 
+function createMessDayCard(day, dayIndex, meals, headingPrefix) {
+  const headingId = `${headingPrefix}-${day.toLowerCase()}`;
+  const card = document.createElement('article');
+  card.className = 'menu-day-card';
+  card.setAttribute('aria-labelledby', headingId);
+
+  const heading = createTextElement('h2', 'menu-day-header', day);
+  heading.id = headingId;
+  card.append(heading);
+
+  meals.forEach((meal) => {
+    const mealSection = document.createElement('section');
+    mealSection.className = 'menu-meal';
+    mealSection.append(createTextElement('h3', 'menu-meal-name', meal.name));
+
+    if (meal.shared) {
+      mealSection.append(createTextElement('p', 'menu-meal-shared', meal.shared));
+    }
+
+    const dailyItem = meal.dailyItems[dayIndex];
+    if (dailyItem) {
+      mealSection.append(createTextElement('p', 'menu-meal-detail', dailyItem));
+    }
+
+    card.append(mealSection);
+  });
+
+  return card;
+}
+
+function getTodayMenuIndex() {
+  return (new Date().getDay() + 6) % 7;
+}
+
 function renderMessMenu(target, table) {
   const headerCells = [...table.tHead.rows[0].cells];
   const days = headerCells.slice(1).map(normalizeCellText);
@@ -30,34 +64,43 @@ function renderMessMenu(target, table) {
     });
   }
 
+  const todayIndex = getTodayMenuIndex();
+  const today = days[todayIndex] ?? days[0];
+  const todayTarget = document.getElementById(target.dataset.todayTarget);
+
+  if (todayTarget && today) {
+    todayTarget.replaceChildren(createMessDayCard(today, todayIndex, meals, 'today-menu-day'));
+
+    const todayTitle = document.getElementById('todayMenuTitle');
+    if (todayTitle) todayTitle.textContent = `${today}'s menu`;
+
+    const todayDate = document.getElementById('todayMenuDate');
+    if (todayDate) {
+      todayDate.textContent = new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(new Date());
+    }
+  }
+
+  target.replaceChildren();
   days.forEach((day, dayIndex) => {
-    const headingId = `menu-day-${day.toLowerCase()}`;
-    const card = document.createElement('article');
-    card.className = 'menu-day-card';
-    card.setAttribute('aria-labelledby', headingId);
+    target.append(createMessDayCard(day, dayIndex, meals, 'menu-day'));
+  });
+}
 
-    const heading = createTextElement('h2', 'menu-day-header', day);
-    heading.id = headingId;
-    card.append(heading);
+function setupMessMenuToggle() {
+  const toggle = document.getElementById('menuToggle');
+  const weeklyMenu = document.getElementById('weeklyMenu');
+  const label = toggle?.querySelector('[data-menu-toggle-label]');
+  if (!toggle || !weeklyMenu || !label) return;
 
-    meals.forEach((meal) => {
-      const mealSection = document.createElement('section');
-      mealSection.className = 'menu-meal';
-      mealSection.append(createTextElement('h3', 'menu-meal-name', meal.name));
-
-      if (meal.shared) {
-        mealSection.append(createTextElement('p', 'menu-meal-shared', meal.shared));
-      }
-
-      const dailyItem = meal.dailyItems[dayIndex];
-      if (dailyItem) {
-        mealSection.append(createTextElement('p', 'menu-meal-detail', dailyItem));
-      }
-
-      card.append(mealSection);
-    });
-
-    target.append(card);
+  toggle.addEventListener('click', () => {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isExpanded));
+    weeklyMenu.hidden = isExpanded;
+    label.textContent = isExpanded ? 'See full weekly menu' : 'Hide full weekly menu';
   });
 }
 
@@ -135,3 +178,5 @@ document.querySelectorAll('[data-mobile-view]').forEach((target) => {
 document.querySelectorAll('[data-service-view]').forEach((target) => {
   if (target.dataset.serviceView === 'route-schedule') renderRouteSchedule(target);
 });
+
+setupMessMenuToggle();
