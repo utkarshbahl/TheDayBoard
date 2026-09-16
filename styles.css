@@ -105,6 +105,9 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .next-meal-time { margin: 13px 0 0; color: #b7c3bc; font: 12px "DM Mono", monospace; }
 .next-meal-menu { background: rgba(255,255,255,.04); }
 .next-meal-menu p:last-child { margin: 0; color: #e5ebe6; font-size: 13px; line-height: 1.65; }
+.next-meal-shared, .next-meal-detail { display: block; }
+.next-meal-shared { margin-bottom: 8px; color: #aebbb3; font-size: 11px; }
+.next-meal-detail { color: #f5f7f5; font-size: 13px; }
 
 .map-page { padding-top: 48px; padding-bottom: 88px; }
 .map-heading { max-width: 620px; }

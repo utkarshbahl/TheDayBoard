@@ -111,11 +111,13 @@ function updateNextMeal(table) {
   }
 
   const mealMenu = getMessMeals(table).find((entry) => entry.name === meal.name);
-  const details = [mealMenu?.shared, mealMenu?.dailyItems[dayIndex]].filter(Boolean).join(' · ');
   kicker.textContent = isServing ? 'NOW SERVING' : 'UP NEXT';
   heading.textContent = isServing ? `${meal.name} is being served` : `${meal.name} ${formatTimeUntil(startsIn)}`;
   time.textContent = `${formatMealTime(meal.start)}–${formatMealTime(meal.end)}${dayIndex !== todayIndex ? ' tomorrow' : ''}`;
-  menu.textContent = details || 'Menu details are unavailable.';
+  menu.replaceChildren();
+  if (mealMenu?.shared) menu.append(createTextElement('span', 'next-meal-shared', mealMenu.shared));
+  if (mealMenu?.dailyItems[dayIndex]) menu.append(createTextElement('span', 'next-meal-detail', mealMenu.dailyItems[dayIndex]));
+  if (!menu.childElementCount) menu.textContent = 'Menu details are unavailable.';
   card.setAttribute('aria-busy', 'false');
 }
 
