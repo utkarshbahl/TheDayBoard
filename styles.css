@@ -143,8 +143,6 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .course-table td:last-child { width: 105px; font: 500 13px "DM Mono", monospace; }
 .course-note { min-height: 19px; margin: 0; padding: 15px 30px; border-top: 1px solid var(--line); background: var(--menu-hover); color: var(--muted); font-size: 12px; }
 .course-note:empty { display: none; }
-.curriculum-source { margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.curriculum-source a { color: var(--ink); font-weight: 800; }
 
 .about-page { padding-top: 54px; padding-bottom: 58px; }
 .about-measure { width: min(100%, var(--about-measure)); margin-left: auto; margin-right: auto; }
