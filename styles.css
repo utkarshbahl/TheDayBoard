@@ -26,9 +26,8 @@ body { margin: 0; background: var(--paper); font-family: Manrope, Arial, sans-se
 .brand-mark { display: block; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; background: #121212; object-fit: cover; object-position: center; }
 .staff-link { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
 .staff-link span { font-size: 18px; margin-left: 4px; }
-.hero { display: none; text-align: center; padding-top: 65px; padding-bottom: 116px; }
-.hero:target { display: block; }
-.campus-dashboard { padding-top: 65px; padding-bottom: 87px; }
+.hero { text-align: center; padding-top: 65px; padding-bottom: 116px; }
+.campus-dashboard { display: none; }
 .dashboard-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .dashboard-heading .section-kicker { margin-bottom: 12px; }
 .dashboard-heading h2 { margin: 0; font-size: clamp(29px, 4vw, 42px); letter-spacing: -2px; line-height: 1; }
@@ -245,7 +244,6 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 @media (max-width: 700px) {
   .wrap { padding-left: 21px; padding-right: 21px; }
   .nav { height: 75px; }
-  .campus-dashboard { padding-top: 47px; padding-bottom: 61px; }
   .dashboard-heading { align-items: flex-start; flex-direction: column; gap: 7px; margin-bottom: 18px; }
   .dashboard-grid { grid-template-columns: 1fr; gap: 10px; }
   .dashboard-card { min-height: 137px; padding: 18px; }
