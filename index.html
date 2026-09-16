@@ -69,6 +69,15 @@
         <p class="updated">Last updated <span id="updatedTime">loading…</span></p>
       </section>
 
+      <section class="campus-dashboard wrap" aria-labelledby="dashboardTitle">
+        <div class="dashboard-heading"><div><p class="section-kicker">CAMPUS DASHBOARD</p><h2 id="dashboardTitle">What you need now.</h2></div><p>Live campus essentials in one place.</p></div>
+        <div class="dashboard-grid">
+          <a class="dashboard-card" href="#top"><span class="dashboard-label">LAUNDRY STATUS</span><strong id="dashboardToken">Checking…</strong><span class="dashboard-detail">Ready through token</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
+          <a class="dashboard-card" href="mess-menu.html"><span class="dashboard-label" id="dashboardMealLabel">MESS</span><strong id="dashboardMeal">Checking…</strong><span class="dashboard-detail" id="dashboardMealDetail">Loading today’s meal</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
+          <a class="dashboard-card" href="bus-timings.html"><span class="dashboard-label">NEXT BUS FROM LNMIIT</span><strong id="dashboardBus">Checking…</strong><span class="dashboard-detail" id="dashboardBusDetail">Loading departures</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
       <section class="how wrap" id="info">
         <div>
           <p class="section-kicker">FIRST TIME HERE?</p>
@@ -87,6 +96,7 @@
     <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Made for an easier campus day</span></footer>
     <script type="module" src="nav.js"></script>
     <script type="module" src="script.js"></script>
+    <script type="module" src="dashboard.js"></script>
     <script type="module" src="traffic.js"></script>
   </body>
 </html>

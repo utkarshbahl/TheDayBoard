@@ -27,6 +27,19 @@ body { margin: 0; background: var(--paper); font-family: Manrope, Arial, sans-se
 .staff-link { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
 .staff-link span { font-size: 18px; margin-left: 4px; }
 .hero { text-align: center; padding-top: 65px; padding-bottom: 116px; }
+.campus-dashboard { padding-bottom: 87px; }
+.dashboard-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.dashboard-heading .section-kicker { margin-bottom: 12px; }
+.dashboard-heading h2 { margin: 0; font-size: clamp(29px, 4vw, 42px); letter-spacing: -2px; line-height: 1; }
+.dashboard-heading > p { margin: 0; color: var(--muted); font-size: 13px; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dashboard-card { position: relative; min-height: 187px; padding: 22px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink); text-decoration: none; transition: transform .18s ease, border-color .18s ease; }
+.dashboard-card:hover { border-color: var(--ink); transform: translateY(-2px); }
+.dashboard-card:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+.dashboard-label { display: block; color: var(--muted); font: 800 10px "DM Mono", monospace; letter-spacing: 1px; }
+.dashboard-card strong { display: block; margin: 25px 0 8px; font-size: clamp(20px, 2.3vw, 28px); letter-spacing: -1.2px; line-height: 1.12; }
+.dashboard-detail { display: block; max-width: 33ch; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.dashboard-arrow { position: absolute; right: 20px; bottom: 16px; color: var(--muted); font-size: 18px; }
 .eyebrow, .section-kicker { font-size: 11px; font-weight: 800; letter-spacing: 1.6px; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: #526057; }
 .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: #6eae29; box-shadow: 0 0 0 4px #dcebcf; }
@@ -232,6 +245,11 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   .wrap { padding-left: 21px; padding-right: 21px; }
   .nav { height: 75px; }
   .hero { padding-top: 47px; padding-bottom: 75px; }
+  .campus-dashboard { padding-bottom: 61px; }
+  .dashboard-heading { align-items: flex-start; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+  .dashboard-grid { grid-template-columns: 1fr; gap: 10px; }
+  .dashboard-card { min-height: 137px; padding: 18px; }
+  .dashboard-card strong { margin-top: 16px; font-size: 22px; }
   .token-card { height: 210px; box-shadow: 6px 7px 0 var(--lime); }
   .token-card strong { letter-spacing: -7px; }
   .how, .staff-inner { grid-template-columns: 1fr; gap: 42px; }
