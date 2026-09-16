@@ -58,14 +58,5 @@ async function loadBusCard() {
   } catch { byId('dashboardBus').textContent = 'Bus timetable'; byId('dashboardBusDetail').textContent = 'See the full schedule'; }
 }
 
-const laundryCard = document.querySelector('.dashboard-card[href="#top"]');
-laundryCard?.addEventListener('click', (event) => {
-  event.preventDefault();
-  const hero = document.querySelector('.hero');
-  if (!hero) return;
-  hero.style.display = 'block';
-  hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-
 syncLaundryCard(); loadMealCard(); loadBusCard();
 setInterval(() => { loadMealCard(); loadBusCard(); }, 60000);
