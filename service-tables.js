@@ -104,6 +104,20 @@ function setupMessMenuToggle() {
   });
 }
 
+function setupBusScheduleToggle() {
+  const toggle = document.getElementById('busScheduleToggle');
+  const schedule = document.getElementById('fullBusSchedule');
+  const label = toggle?.querySelector('[data-bus-toggle-label]');
+  if (!toggle || !schedule || !label) return;
+
+  toggle.addEventListener('click', () => {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isExpanded));
+    schedule.hidden = isExpanded;
+    label.textContent = isExpanded ? 'See full bus schedule' : 'Hide full bus schedule';
+  });
+}
+
 function getScheduleEntries(target) {
   const sourceIds = (target.dataset.sourceTables ?? '').split(/\s+/).filter(Boolean);
   const entries = [];
@@ -171,8 +185,8 @@ function parseScheduleTime(timeText) {
   return hour * 60 + minute;
 }
 
-function getNextDeparture(target, now = new Date()) {
-  const entries = getScheduleEntries(target);
+function getNextDeparture(target, now = new Date(), routeFilter = () => true) {
+  const entries = getScheduleEntries(target).filter(routeFilter);
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   let next = null;
@@ -208,16 +222,12 @@ function formatCountdown(milliseconds) {
   return minutes ? `${hours} hr ${minutes} min` : `${hours} hr`;
 }
 
-function updateNextBus(target) {
-  const heading = document.getElementById('nextBusHeading');
-  const detail = document.getElementById('nextBusDetail');
-  if (!heading || !detail) return;
-
-  const next = getNextDeparture(target);
+function updateNextBusCard(heading, detail, next) {
+  const card = heading.closest('.next-bus');
   if (!next) {
     heading.textContent = 'No upcoming bus found';
-    detail.textContent = 'Check the timetable for the next available departure.';
-    heading.closest('.next-bus')?.setAttribute('aria-busy', 'false');
+    detail.textContent = 'No departure is scheduled for this direction.';
+    card?.setAttribute('aria-busy', 'false');
     return;
   }
 
@@ -228,7 +238,24 @@ function updateNextBus(target) {
     heading.textContent = `Next bus in ${formatCountdown(millisecondsUntilDeparture)}`;
   }
   detail.textContent = `${next.from} → ${next.to} · departs at ${next.timeText}`;
-  heading.closest('.next-bus')?.setAttribute('aria-busy', 'false');
+  card?.setAttribute('aria-busy', 'false');
+}
+
+function updateNextBus(target) {
+  const fromHeading = document.getElementById('nextBusFromLnmiitHeading');
+  const fromDetail = document.getElementById('nextBusFromLnmiitDetail');
+  const toHeading = document.getElementById('nextBusToLnmiitHeading');
+  const toDetail = document.getElementById('nextBusToLnmiitDetail');
+  if (!fromHeading || !fromDetail || !toHeading || !toDetail) return;
+
+  const now = new Date();
+  const fromLnmiit = (entry) => entry.from === 'LNMIIT' && (entry.to === 'Raja Park' || entry.to === 'Ajmeri Gate');
+  const toLnmiit = (entry) => entry.to === 'LNMIIT' && (entry.from === 'Raja Park' || entry.from === 'Ajmeri Gate');
+  const nextFromLnmiit = getNextDeparture(target, now, fromLnmiit);
+  const nextToLnmiit = getNextDeparture(target, now, toLnmiit);
+
+  updateNextBusCard(fromHeading, fromDetail, nextFromLnmiit);
+  updateNextBusCard(toHeading, toDetail, nextToLnmiit);
 }
 
 function renderRouteSchedule(target) {
@@ -311,3 +338,4 @@ document.querySelectorAll('[data-service-view]').forEach((target) => {
 });
 
 setupMessMenuToggle();
+setupBusScheduleToggle();
