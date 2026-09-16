@@ -117,6 +117,35 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 .landmark-card h3 { margin: 3px 0 7px; font-size: 15px; letter-spacing: -.4px; }
 .landmark-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
+.curriculum-page { padding-top: 48px; padding-bottom: 88px; }
+.curriculum-heading { max-width: 650px; }
+.curriculum-heading h1 { margin: 0; font-size: clamp(42px, 6vw, 62px); letter-spacing: -3px; line-height: 1; }
+.curriculum-heading > p:last-child { max-width: 54ch; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+.curriculum-controls { display: grid; gap: 20px; margin-top: 46px; }
+.branch-tabs, .semester-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-tab, .semester-tab { border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink); font: 700 13px Manrope; cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease; }
+.filter-tab { min-width: 88px; padding: 12px 17px; }
+.semester-tab { padding: 9px 13px; font-size: 12px; }
+.filter-tab:hover, .semester-tab:hover { border-color: var(--ink); }
+.filter-tab.is-active, .semester-tab.is-active { border-color: var(--ink); background: var(--ink); color: var(--surface); }
+.filter-tab:focus-visible, .semester-tab:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.course-panel { margin-top: 26px; overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
+.course-panel-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 27px 30px; background: var(--ink); color: var(--surface); }
+.course-panel-heading .section-kicker { color: var(--lime); margin-bottom: 8px; }
+.course-panel-heading h2 { margin: 0; font-size: clamp(25px, 3vw, 35px); letter-spacing: -1.5px; line-height: 1; }
+.credit-total { margin: 0; color: var(--lime); font: 500 13px "DM Mono", monospace; white-space: nowrap; }
+.course-table-wrap { overflow-x: auto; }
+.course-table { width: 100%; border-collapse: collapse; text-align: left; }
+.course-table th { padding: 13px 30px; background: var(--surface-muted); color: var(--muted); font: 800 10px "DM Mono", monospace; letter-spacing: 1px; text-transform: uppercase; }
+.course-table th:last-child, .course-table td:last-child { text-align: right; }
+.course-table td { padding: 17px 30px; border-top: 1px solid var(--line); font-size: 14px; }
+.course-table td:first-child { width: 145px; color: var(--muted); font: 12px "DM Mono", monospace; }
+.course-table td:last-child { width: 105px; font: 500 13px "DM Mono", monospace; }
+.course-note { min-height: 19px; margin: 0; padding: 15px 30px; border-top: 1px solid var(--line); background: var(--menu-hover); color: var(--muted); font-size: 12px; }
+.course-note:empty { display: none; }
+.curriculum-source { margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.curriculum-source a { color: var(--ink); font-weight: 800; }
+
 .about-page { padding-top: 54px; padding-bottom: 58px; }
 .about-measure { width: min(100%, var(--about-measure)); margin-left: auto; margin-right: auto; }
 .about-kicker, .about-creator, .about-rail, .about-return p { color: var(--muted); font: 500 11px/1.35 "DM Mono", monospace; letter-spacing: 1.2px; text-transform: uppercase; }
@@ -230,6 +259,19 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   .landmark-list { grid-template-columns: 1fr; }
   .landmark-card { min-height: 0; padding: 17px 4px; }
   .landmark-card:nth-child(odd) { border-right: 0; }
+  .curriculum-page { padding-top: 31px; padding-bottom: 62px; }
+  .curriculum-heading > p:last-child { font-size: 14px; }
+  .curriculum-controls { margin-top: 32px; gap: 14px; }
+  .filter-tab { min-width: 0; flex: 1; padding: 10px 12px; }
+  .semester-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; }
+  .semester-tab { flex: 0 0 auto; }
+  .course-panel { margin-top: 20px; }
+  .course-panel-heading { align-items: flex-start; flex-direction: column; gap: 11px; padding: 22px 18px; }
+  .course-table th, .course-table td { padding-left: 18px; padding-right: 18px; }
+  .course-table td { font-size: 13px; }
+  .course-table td:first-child { width: 91px; font-size: 10px; }
+  .course-table td:last-child { width: 57px; font-size: 11px; }
+  .course-note { padding: 13px 18px; }
   .menu-today { margin-top: 28px; gap: 14px; }
   .menu-today-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
   .menu-today-heading .section-kicker { margin-bottom: 8px; }
