@@ -46,9 +46,7 @@ function getTodayMenuIndex() {
   return (new Date().getDay() + 6) % 7;
 }
 
-function renderMessMenu(target, table) {
-  const headerCells = [...table.tHead.rows[0].cells];
-  const days = headerCells.slice(1).map(normalizeCellText);
+function getMessMeals(table) {
   const rows = [...table.tBodies[0].rows];
   const meals = [];
 
@@ -56,13 +54,75 @@ function renderMessMenu(target, table) {
     const sharedRow = rows[index];
     const detailsRow = rows[index + 1];
     if (!sharedRow || !detailsRow) continue;
-
-    meals.push({
-      name: normalizeCellText(sharedRow.cells[0]),
-      shared: normalizeCellText(sharedRow.cells[1]),
-      dailyItems: [...detailsRow.cells].slice(1).map(normalizeCellText),
-    });
+    meals.push({ name: normalizeCellText(sharedRow.cells[0]), shared: normalizeCellText(sharedRow.cells[1]), dailyItems: [...detailsRow.cells].slice(1).map(normalizeCellText) });
   }
+  return meals;
+}
+
+function formatMealTime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHour = hours % 12 || 12;
+  return `${displayHour}:${String(mins).padStart(2, '0')} ${period}`;
+}
+
+function formatTimeUntil(minutes) {
+  if (minutes <= 0) return 'now';
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours && mins) return `in ${hours}h ${mins}m`;
+  if (hours) return `in ${hours}h`;
+  return `in ${mins}m`;
+}
+
+function updateNextMeal(table) {
+  const card = document.getElementById('nextMealCard');
+  const kicker = document.getElementById('nextMealKicker');
+  const heading = document.getElementById('nextMealHeading');
+  const time = document.getElementById('nextMealTime');
+  const menu = document.getElementById('nextMealMenu');
+  if (!card || !kicker || !heading || !time || !menu) return;
+
+  const now = new Date();
+  const todayIndex = getTodayMenuIndex();
+  const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const mealTimes = [
+    { name: 'Breakfast', start: isWeekend ? 480 : 450, end: isWeekend ? 600 : 540 },
+    { name: 'Lunch', start: isWeekend ? 750 : 720, end: isWeekend ? 870 : 840 },
+    { name: 'Snacks', start: 1035, end: 1095 },
+    { name: 'Dinner', start: 1170, end: 1290 },
+  ];
+  let meal = mealTimes.find(({ start, end }) => currentMinutes >= start && currentMinutes < end);
+  let isServing = Boolean(meal);
+  let dayIndex = todayIndex;
+  let startsIn = 0;
+
+  if (!meal) {
+    meal = mealTimes.find(({ start }) => currentMinutes < start);
+    if (meal) {
+      startsIn = meal.start - currentMinutes;
+    } else {
+      meal = mealTimes[0];
+      dayIndex = (todayIndex + 1) % 7;
+      startsIn = (24 * 60 - currentMinutes) + meal.start;
+    }
+  }
+
+  const mealMenu = getMessMeals(table).find((entry) => entry.name === meal.name);
+  const details = [mealMenu?.shared, mealMenu?.dailyItems[dayIndex]].filter(Boolean).join(' · ');
+  kicker.textContent = isServing ? 'NOW SERVING' : 'UP NEXT';
+  heading.textContent = isServing ? `${meal.name} is being served` : `${meal.name} ${formatTimeUntil(startsIn)}`;
+  time.textContent = `${formatMealTime(meal.start)}–${formatMealTime(meal.end)}${dayIndex !== todayIndex ? ' tomorrow' : ''}`;
+  menu.textContent = details || 'Menu details are unavailable.';
+  card.setAttribute('aria-busy', 'false');
+}
+
+function renderMessMenu(target, table) {
+  const headerCells = [...table.tHead.rows[0].cells];
+  const days = headerCells.slice(1).map(normalizeCellText);
+  const meals = getMessMeals(table);
 
   const todayIndex = getTodayMenuIndex();
   const today = days[todayIndex] ?? days[0];
@@ -328,6 +388,12 @@ document.querySelectorAll('[data-mobile-view]').forEach((target) => {
 
   if (target.dataset.mobileView === 'mess') renderMessMenu(target, table);
 });
+
+const messSource = document.getElementById('messMenuSource');
+if (messSource) {
+  updateNextMeal(messSource);
+  setInterval(() => updateNextMeal(messSource), 60000);
+}
 
 document.querySelectorAll('[data-service-view]').forEach((target) => {
   if (target.dataset.serviceView === 'route-schedule') {

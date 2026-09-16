@@ -97,6 +97,15 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
 
 .menu-mobile, .schedule-mobile { display: none; }
 
+.next-meal-card { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); margin: 0 0 35px; overflow: hidden; border-radius: 10px; background: var(--ink); color: var(--surface); box-shadow: 7px 8px 0 var(--lime); }
+.next-meal-copy, .next-meal-menu { padding: 25px 27px; }
+.next-meal-copy { border-right: 1px solid rgba(255,255,255,.16); }
+.next-meal-kicker, .next-meal-menu-label { margin: 0 0 10px; color: var(--lime); font: 800 10px "DM Mono", monospace; letter-spacing: 1.3px; }
+.next-meal-copy h2 { margin: 0; font-size: clamp(22px, 3vw, 31px); letter-spacing: -1.4px; line-height: 1.05; }
+.next-meal-time { margin: 13px 0 0; color: #b7c3bc; font: 12px "DM Mono", monospace; }
+.next-meal-menu { background: rgba(255,255,255,.04); }
+.next-meal-menu p:last-child { margin: 0; color: #e5ebe6; font-size: 13px; line-height: 1.65; }
+
 .map-page { padding-top: 48px; padding-bottom: 88px; }
 .map-heading { max-width: 620px; }
 .map-heading h1 { margin: 0; font-size: clamp(42px, 6vw, 62px); letter-spacing: -3px; line-height: 1; }
@@ -257,6 +266,9 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   .landmark-list { grid-template-columns: 1fr; }
   .landmark-card { min-height: 0; padding: 17px 4px; }
   .landmark-card:nth-child(odd) { border-right: 0; }
+  .next-meal-card { grid-template-columns: 1fr; margin-bottom: 30px; box-shadow: 5px 6px 0 var(--lime); }
+  .next-meal-copy, .next-meal-menu { padding: 20px 19px; }
+  .next-meal-copy { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.16); }
   .curriculum-page { padding-top: 31px; padding-bottom: 62px; }
   .curriculum-heading > p:last-child { font-size: 14px; }
   .curriculum-controls { margin-top: 32px; gap: 14px; }
