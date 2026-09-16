@@ -1,6 +1,6 @@
 -- Run this once in Supabase SQL Editor.
--- This stores anonymous page views: page path, timestamp and a random browser ID.
--- The browser ID is stored only in that browser's local storage; it is not a login or identity.
+-- This stores anonymous page views: page path, timestamp and a random session ID.
+-- The session ID is kept only while a visitor has the site open; it is not a login or identity.
 
 create table if not exists public.site_page_views (
   id bigint generated always as identity primary key,

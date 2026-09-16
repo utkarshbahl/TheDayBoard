@@ -3,20 +3,20 @@ import { supabase } from './supabase.js';
 const trackedPages = new Set(['/', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum']);
 const path = location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/') || '/';
 
-function getVisitorId() {
+function getSessionId() {
   try {
-    const storedId = localStorage.getItem('lnmiit-campus-visitor-id');
+    const storedId = sessionStorage.getItem('lnmiit-campus-session-id');
     if (storedId) return storedId;
     if (!crypto.randomUUID) return null;
-    const visitorId = crypto.randomUUID();
-    localStorage.setItem('lnmiit-campus-visitor-id', visitorId);
-    return visitorId;
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem('lnmiit-campus-session-id', sessionId);
+    return sessionId;
   } catch {
     return null;
   }
 }
 
-const visitorId = getVisitorId();
-if (trackedPages.has(path) && visitorId) {
-  supabase.from('site_page_views').insert({ page_path: path, visitor_id: visitorId }).then(() => {});
+const sessionId = getSessionId();
+if (trackedPages.has(path) && sessionId) {
+  supabase.from('site_page_views').insert({ page_path: path, visitor_id: sessionId }).then(() => {});
 }
