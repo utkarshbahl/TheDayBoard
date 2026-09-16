@@ -1,19 +1,16 @@
 import { supabase } from './supabase.js';
 
 const $ = (id) => document.getElementById(id);
-const pageNames = { '/': 'Laundry status', '/about': 'About', '/mess-menu': 'Mess menu', '/bus-timings': 'Bus timings', '/campus-map': 'Campus map', '/curriculum': 'B.Tech curriculum' };
+const pageNames = { '/': 'Laundry status', '/mess-menu': 'Mess menu', '/bus-timings': 'Bus timings', '/campus-map': 'Campus map', '/curriculum': 'B.Tech curriculum' };
 
 function showLogin(message = '') { $('adminLogin').classList.remove('hidden'); $('analyticsPanel').classList.add('hidden'); $('adminMessage').textContent = message; }
 function showDashboard() { $('adminLogin').classList.add('hidden'); $('analyticsPanel').classList.remove('hidden'); }
-function startOfDay(daysAgo = 0) { const date = new Date(); date.setHours(0, 0, 0, 0); date.setDate(date.getDate() - daysAgo); return date.toISOString(); }
-async function countViews(from) { const query = supabase.from('site_page_views').select('id', { count: 'exact', head: true }); if (from) query.gte('created_at', from); const { count, error } = await query; if (error) throw error; return count ?? 0; }
 async function loadDashboard() {
   try {
-    const weekStart = startOfDay(6);
-    const [today, week, all, recent] = await Promise.all([countViews(startOfDay()), countViews(weekStart), countViews(), supabase.from('site_page_views').select('page_path').gte('created_at', weekStart)]);
-    if (recent.error) throw recent.error;
-    $('todayViews').textContent = today; $('weekViews').textContent = week; $('allViews').textContent = all;
-    const counts = recent.data.reduce((result, { page_path }) => ({ ...result, [page_path]: (result[page_path] ?? 0) + 1 }), {});
+    const { data, error } = await supabase.rpc('get_site_traffic_analytics');
+    if (error) throw error;
+    $('todayViews').textContent = data.today ?? 0; $('weekViews').textContent = data.week ?? 0; $('allViews').textContent = data.all ?? 0;
+    const counts = data.breakdown ?? {};
     $('trafficBreakdown').replaceChildren(...Object.entries(pageNames).map(([path, name]) => { const row = document.createElement('div'); row.className = 'traffic-row'; row.innerHTML = `<span>${name}</span><span>${counts[path] ?? 0} views</span>`; return row; }));
   } catch { showLogin('This account is not allowed to view analytics.'); }
 }
