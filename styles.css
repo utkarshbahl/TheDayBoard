@@ -26,7 +26,7 @@ body { margin: 0; background: var(--paper); font-family: Manrope, Arial, sans-se
 .brand-mark { display: block; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; background: #121212; object-fit: cover; object-position: center; }
 .staff-link { color: var(--ink); font-size: 14px; font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
 .staff-link span { font-size: 18px; margin-left: 4px; }
-.hero { display: none; }
+.hero { display: none; text-align: center; padding-top: 65px; padding-bottom: 116px; }
 .campus-dashboard { padding-top: 65px; padding-bottom: 87px; }
 .dashboard-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .dashboard-heading .section-kicker { margin-bottom: 12px; }
