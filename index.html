@@ -1,101 +1,17 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LNMIIT Campus | Laundry Status</title>
-    <meta name="description" content="Everyday campus services for LNMIIT students." />
-    <link rel="icon" href="assets/ethers-club-icon.png" type="image/png" sizes="1000x1000" />
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="assets/ethers-club-icon.png" />
-    <meta name="theme-color" content="#14281f" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="LNMIIT Campus" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}.info-card{border-top:2px solid var(--ink);padding-top:16px}.info-card span{font-family:"DM Mono",monospace;color:#728077;font-size:12px}.info-card h3{font-size:17px;margin:24px 0 8px;letter-spacing:-.6px}.info-card p{font-size:13px;line-height:1.65;color:var(--muted);margin:0}.info-card .placeholder{display:inline-block;margin-top:4px;color:#77847a;font:11px "DM Mono",monospace;letter-spacing:.1px}@media(max-width:700px){.info-grid{grid-template-columns:repeat(2,1fr);gap:18px}.info-card h3{margin-top:16px;font-size:14px}.info-card p{font-size:11px}}
-    </style>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LNMIIT Campus | Everyday student services</title><meta name="description" content="Live campus services and essential resources for LNMIIT students." />
+    <link rel="icon" href="assets/ethers-club-icon.png" type="image/png" sizes="1000x1000" /><link rel="manifest" href="manifest.webmanifest" /><link rel="apple-touch-icon" href="assets/ethers-club-icon.png" /><meta name="theme-color" content="#14281f" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" /><link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <main>
-      <nav class="nav wrap">
-        <div class="nav-start">
-          <a class="brand brand-desktop" href="index.html" aria-label="LNMIIT Campus home">
-            <img class="brand-mark" src="assets/ethers-club-icon.png" alt="" aria-hidden="true" />
-            <span>LNMIIT <b>Campus</b></span>
-          </a>
-          <details class="campus-menu">
-            <summary class="campus-trigger" aria-label="Open LNMIIT Campus services">
-              <img class="brand-mark" src="assets/ethers-club-icon.png" alt="" aria-hidden="true" />
-              <span>LNMIIT <b>Campus</b></span>
-              <span class="campus-chevron" aria-hidden="true"></span>
-            </summary>
-            <nav class="campus-dropdown" aria-label="Campus services">
-              <span class="campus-dropdown-label">Campus services</span>
-              <a class="campus-nav-link" href="index.html" aria-current="page"><span>Laundry <b>Status</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a>
-              <a class="campus-nav-link" href="mess-menu.html"><span>Mess <b>Menu</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a>
-              <a class="campus-nav-link" href="bus-timings.html"><span>Bus <b>Timings</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a>
-              <a class="campus-nav-link" href="campus-map.html"><span>Campus <b>Map</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a>
-              <a class="campus-nav-link" href="curriculum.html"><span>B.Tech <b>Curriculum</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a>
-            </nav>
-          </details>
-          <div class="nav-links" aria-label="Campus services">
-            <a class="nav-link" href="index.html" aria-current="page">Laundry <b>Status</b></a>
-            <a class="nav-link" href="mess-menu.html">Mess <b>Menu</b></a>
-            <a class="nav-link" href="bus-timings.html">Bus <b>Timings</b></a>
-            <a class="nav-link" href="campus-map.html">Campus <b>Map</b></a>
-            <a class="nav-link" href="curriculum.html">B.Tech <b>Curriculum</b></a>
-          </div>
-        </div>
-        <div class="nav-actions">
-          <a class="staff-link" href="staff.html">Staff update <span>↗</span></a>
-        </div>
-      </nav>
-
-      <section class="hero wrap" id="top">
-        <div class="eyebrow"><i></i> Live collection counter</div>
-        <p class="intro">Your clothes are ready for collection up to token</p>
-        <div class="token-card" aria-live="polite" aria-busy="true" id="tokenCard">
-          <span class="token-label">CURRENTLY READY</span>
-          <strong id="readyNumber">···</strong>
-          <span class="token-word">TOKEN NUMBER</span>
-          <div class="shine"></div>
-        </div>
-        <p class="pickup-note"><span class="check">✓</span> If your token is <b id="rangeText">loading…</b>, please collect your laundry.</p>
-        <p class="updated">Last updated <span id="updatedTime">loading…</span></p>
-      </section>
-
-      <section class="campus-dashboard wrap" aria-labelledby="dashboardTitle">
-        <div class="dashboard-heading"><div><p class="section-kicker">CAMPUS DASHBOARD</p><h2 id="dashboardTitle">What you need now.</h2></div><p>Live campus essentials in one place.</p></div>
-        <div class="dashboard-grid">
-          <a class="dashboard-card" href="#top"><span class="dashboard-label">LAUNDRY STATUS</span><strong id="dashboardToken">Checking…</strong><span class="dashboard-detail">Ready through token</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
-          <a class="dashboard-card" href="mess-menu.html"><span class="dashboard-label" id="dashboardMealLabel">MESS</span><strong id="dashboardMeal">Checking…</strong><span class="dashboard-detail" id="dashboardMealDetail">Loading today’s meal</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
-          <a class="dashboard-card" href="bus-timings.html"><span class="dashboard-label">NEXT BUS FROM LNMIIT</span><strong id="dashboardBus">Checking…</strong><span class="dashboard-detail" id="dashboardBusDetail">Loading departures</span><span class="dashboard-arrow" aria-hidden="true">↗</span></a>
-        </div>
-      </section>
-
-      <section class="how wrap" id="info">
-        <div>
-          <p class="section-kicker">FIRST TIME HERE?</p>
-          <h2>Laundry info,<br />all in one place.</h2>
-        </div>
-        <div class="info-grid">
-          <article class="info-card"><span>01</span><h3>Laundry timings</h3><p>Opening and closing hours for drop-off and collection.</p><span class="placeholder">Add timings</span></article>
-          <article class="info-card"><span>02</span><h3>Normal laundry</h3><p>Expected time for regular wash, dry and fold service.</p><span class="placeholder">Add turnaround time</span></article>
-          <article class="info-card"><span>03</span><h3>Dry cleaning</h3><p>Expected time for clothes that need dry cleaning.</p><span class="placeholder">Add turnaround time</span></article>
-          <article class="info-card"><span>04</span><h3>Need help?</h3><p>Call the laundry desk for questions about your clothes.</p><span class="placeholder">Add mobile number</span></article>
-          <article class="info-card"><span>05</span><h3>Charges</h3><p>Item-wise prices for washing, ironing and dry cleaning.</p><span class="placeholder">Add price list</span></article>
-        </div>
-      </section>
-
-    </main>
-    <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Made for an easier campus day</span></footer>
-    <script type="module" src="nav.js"></script>
-    <script type="module" src="script.js"></script>
-    <script type="module" src="traffic.js"></script>
+  <body class="campus-home">
+    <header class="home-shell"><nav class="nav wrap"><div class="nav-start"><a class="brand brand-desktop" href="index.html" aria-label="LNMIIT Campus home"><img class="brand-mark" src="assets/ethers-club-icon.png" alt="" /><span>LNMIIT <b>Campus</b></span></a><details class="campus-menu"><summary class="campus-trigger" aria-label="Open LNMIIT Campus services"><img class="brand-mark" src="assets/ethers-club-icon.png" alt="" /><span>LNMIIT <b>Campus</b></span><span class="campus-chevron" aria-hidden="true"></span></summary><nav class="campus-dropdown" aria-label="Campus services"><span class="campus-dropdown-label">Campus services</span><a class="campus-nav-link" href="index.html" aria-current="page"><span>Laundry <b>Status</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="mess-menu.html"><span>Mess <b>Menu</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="bus-timings.html"><span>Bus <b>Timings</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="campus-map.html"><span>Campus <b>Map</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="curriculum.html"><span>B.Tech <b>Curriculum</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="resources.html"><span>Student <b>Resources</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a><a class="campus-nav-link" href="campus-life.html"><span>Campus <b>Life</b></span><span class="campus-link-arrow" aria-hidden="true"></span></a></nav></details><div class="nav-links" aria-label="Campus services"><a class="nav-link" href="mess-menu.html">Mess <b>Menu</b></a><a class="nav-link" href="bus-timings.html">Bus <b>Timings</b></a><a class="nav-link" href="campus-map.html">Campus <b>Map</b></a><a class="nav-link" href="resources.html">Resources</a></div></div><div class="nav-actions"><a class="staff-link" href="staff.html">Staff update <span>↗</span></a></div></nav>
+      <section class="home-hero wrap" id="top"><div class="home-hero-copy"><p class="eyebrow"><i></i> LIVE CAMPUS UTILITY</p><h1>Your day,<br /><em>less scattered.</em></h1><p>One practical place for the things LNMIIT students check most.</p><a class="hero-jump" href="#services">Explore campus services <span aria-hidden="true">↓</span></a></div><div class="live-status" aria-live="polite" aria-busy="true" id="tokenCard"><span class="live-label">LAUNDRY READY THROUGH</span><strong id="readyNumber">...</strong><span class="live-unit">TOKEN NUMBER</span><p>Collect your laundry if your token is <b id="rangeText">loading...</b></p><span class="live-updated">Updated <span id="updatedTime">loading...</span></span></div></section><div class="hero-marquee" aria-hidden="true"><span>LNMIIT CAMPUS</span><span>STUDENT UTILITY</span><span>JAIPUR</span><span>ONE PLACE</span></div></header>
+    <main><section class="priority-strip wrap" aria-label="Today at a glance"><p class="section-kicker">RIGHT NOW</p><div class="priority-grid"><a href="mess-menu.html"><span>MESS</span><strong>Today’s menu</strong><small>See meals and serving time</small></a><a href="bus-timings.html"><span>TRAVEL</span><strong>Next bus</strong><small>LNMIIT, Raja Park and Ajmeri Gate</small></a><a href="campus-map.html"><span>NAVIGATE</span><strong>Find a place</strong><small>Open the campus map</small></a></div></section>
+      <section class="service-library wrap" id="services" aria-labelledby="serviceTitle"><div class="section-heading"><div><p class="section-kicker">CAMPUS TOOLKIT</p><h2 id="serviceTitle">Useful without the hunt.</h2></div><p>Built for the ordinary questions that interrupt an otherwise good day.</p></div><div class="service-grid"><a class="service-tile featured" href="mess-menu.html"><span class="tile-index">01</span><h3>Mess menu</h3><p>Today’s meals, serving windows and the full weekly plan.</p><span class="tile-arrow">↗</span></a><a class="service-tile" href="bus-timings.html"><span class="tile-index">02</span><h3>Bus timings</h3><p>Campus departures and return routes in one view.</p><span class="tile-arrow">↗</span></a><a class="service-tile" href="campus-map.html"><span class="tile-index">03</span><h3>Campus map</h3><p>Get oriented before you set off across campus.</p><span class="tile-arrow">↗</span></a><a class="service-tile" href="curriculum.html"><span class="tile-index">04</span><h3>Curriculum</h3><p>Browse the B.Tech structure semester by semester.</p><span class="tile-arrow">↗</span></a><a class="service-tile" href="resources.html"><span class="tile-index">05</span><h3>Student resources</h3><p>Contacts, academic links, forms and essentials.</p><span class="tile-arrow">↗</span></a><a class="service-tile" href="campus-life.html"><span class="tile-index">06</span><h3>Campus life</h3><p>Clubs, events, spaces and useful community links.</p><span class="tile-arrow">↗</span></a></div></section>
+      <section class="home-note"><div class="wrap home-note-inner"><img src="assets/ethers-club-logo.png" alt="Ethers Club" /><div><p class="section-kicker">MADE ON CAMPUS</p><h2>Useful information belongs in the open.</h2><p>This is a living student utility. New links, schedules and campus information can be added as they are verified.</p></div><a href="about.html">About this project <span aria-hidden="true">↗</span></a></div></section></main>
+    <footer class="wrap"><span>LNMIIT CAMPUS SERVICES</span><span>Built by Ethers Club</span></footer><script type="module" src="nav.js"></script><script type="module" src="script.js"></script><script type="module" src="traffic.js"></script>
   </body>
 </html>

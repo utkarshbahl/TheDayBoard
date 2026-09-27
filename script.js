@@ -30,7 +30,8 @@ function setStatus(value, timestamp) {
   range.textContent = `${display} or lower`;
   statusUpdatedAt = timestamp;
   $('updatedTime').textContent = timeAgo(timestamp);
-  $('dashboardToken').textContent = display;
+  const dashboardToken = $('dashboardToken');
+  if (dashboardToken) dashboardToken.textContent = display;
   $('tokenCard').setAttribute('aria-busy', 'false');
 }
 
