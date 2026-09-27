@@ -1,4 +1,17 @@
-import { supabase } from './supabase.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { doc, getFirestore, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+
+// This is the public live-status record used by laundry-lnm.web.app.
+const laundrySource = initializeApp({
+  apiKey: 'AIzaSyCtvIAHZs-8Dx-5E0tawonsIOCFF9P4uRs',
+  authDomain: 'laundry-lnm.firebaseapp.com',
+  projectId: 'laundry-lnm',
+  storageBucket: 'laundry-lnm.firebasestorage.app',
+  messagingSenderId: '133361113684',
+  appId: '1:133361113684:web:dfec439cc08d55c9edebc1',
+});
+const laundryStatus = doc(getFirestore(laundrySource), 'laundry', 'status');
+
 const $ = (id) => document.getElementById(id);
 const number = $('readyNumber');
 const range = $('rangeText');
@@ -17,23 +30,26 @@ function setStatus(value, timestamp) {
   range.textContent = `${display} or lower`;
   statusUpdatedAt = timestamp;
   $('updatedTime').textContent = timeAgo(timestamp);
+  $('dashboardToken').textContent = display;
   $('tokenCard').setAttribute('aria-busy', 'false');
 }
-async function loadStatus() {
-  const { data, error } = await supabase.from('laundry_status').select('ready_token, updated_at').eq('id', 1).single();
-  if (error) {
-    console.warn('Laundry status could not be loaded.', error.message);
+
+onSnapshot(laundryStatus, (snapshot) => {
+  const readyToken = Number(snapshot.data()?.readyThrough);
+  if (!snapshot.exists() || !Number.isInteger(readyToken) || readyToken < 0) {
+    console.warn('Laundry status is unavailable or invalid.');
     $('rangeText').textContent = 'temporarily unavailable';
     $('updatedTime').textContent = 'unavailable';
     $('tokenCard').setAttribute('aria-busy', 'false');
     return;
   }
-  setStatus(data.ready_token, data.updated_at);
-}
-supabase.channel('laundry-status-live')
-  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'laundry_status', filter: 'id=eq.1' },
-    (payload) => setStatus(payload.new.ready_token, payload.new.updated_at))
-  .subscribe();
 
-loadStatus();
+  setStatus(readyToken, snapshot.updateTime?.toDate() ?? new Date());
+}, (error) => {
+  console.warn('Laundry status could not be loaded.', error.message);
+  $('rangeText').textContent = 'temporarily unavailable';
+  $('updatedTime').textContent = 'unavailable';
+  $('tokenCard').setAttribute('aria-busy', 'false');
+});
+
 setInterval(() => statusUpdatedAt && ($('updatedTime').textContent = timeAgo(statusUpdatedAt)), 60000);
