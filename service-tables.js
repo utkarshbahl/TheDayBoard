@@ -1,3 +1,5 @@
+import { supabase } from './supabase.js';
+
 const normalizeCellText = (cell) => cell?.textContent.replace(/\s+/g, ' ').trim() ?? '';
 
 function createTextElement(tagName, className, text) {
@@ -57,6 +59,26 @@ function getMessMeals(table) {
     meals.push({ name: normalizeCellText(sharedRow.cells[0]), shared: normalizeCellText(sharedRow.cells[1]), dailyItems: [...detailsRow.cells].slice(1).map(normalizeCellText) });
   }
   return meals;
+}
+
+function applyPublishedMessMenu(table, menu) {
+  if (!Array.isArray(menu?.meals)) return;
+  const rows = [...table.tBodies[0].rows];
+  menu.meals.forEach((meal, index) => {
+    const sharedRow = rows[index * 2];
+    const detailsRow = rows[index * 2 + 1];
+    if (!sharedRow || !detailsRow || !Array.isArray(meal.dailyItems)) return;
+    sharedRow.cells[1].textContent = meal.shared ?? '';
+    [...detailsRow.cells].slice(1).forEach((cell, dayIndex) => { cell.textContent = meal.dailyItems[dayIndex] ?? ''; });
+  });
+}
+
+async function loadPublishedMessMenu(table) {
+  const { data, error } = await supabase.from('mess_menu').select('menu').eq('id', 1).maybeSingle();
+  if (error || !data?.menu) return;
+  applyPublishedMessMenu(table, data.menu);
+  renderMessMenu(document.getElementById('messMenuMobile'), table);
+  updateNextMeal(table);
 }
 
 function formatMealTime(minutes) {
@@ -394,6 +416,14 @@ document.querySelectorAll('[data-mobile-view]').forEach((target) => {
 const messSource = document.getElementById('messMenuSource');
 if (messSource) {
   updateNextMeal(messSource);
+  loadPublishedMessMenu(messSource);
+  supabase.channel('mess-menu-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'mess_menu', filter: 'id=eq.1' }, ({ new: record }) => {
+      applyPublishedMessMenu(messSource, record.menu);
+      renderMessMenu(document.getElementById('messMenuMobile'), messSource);
+      updateNextMeal(messSource);
+    })
+    .subscribe();
   setInterval(() => updateNextMeal(messSource), 60000);
 }
 
