@@ -53,6 +53,17 @@ body { margin: 0; background: var(--paper); font-family: Manrope, Arial, sans-se
 .pickup-note { margin: 37px 0 13px; font-size: 16px; }
 .check { display: inline-grid; place-items: center; width: 19px; height: 19px; margin-right: 7px; border-radius: 50%; background: var(--lime); font-size: 12px; font-weight: 800; }
 .updated { color: var(--muted); font-family: "DM Mono", monospace; font-size: 12px; margin: 0; }
+.laundry-checker { width: min(100%, 650px); margin: 42px auto 0; padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); text-align: left; }
+.laundry-checker label { display: block; margin-bottom: 11px; font-size: 14px; font-weight: 800; letter-spacing: -.3px; }
+.laundry-checker-row { display: flex; gap: 9px; }
+.laundry-checker input { min-width: 0; flex: 1; border: 1px solid #cbd2cc; border-radius: 5px; background: var(--surface-muted); padding: 12px 13px; color: var(--ink); font: 14px Manrope, sans-serif; outline-color: #789f23; }
+.laundry-checker button { flex: 0 0 auto; border: 0; border-radius: 5px; background: var(--ink); color: var(--surface); padding: 0 16px; font: 800 13px Manrope, sans-serif; cursor: pointer; }
+.laundry-checker button span { color: var(--lime); margin-left: 10px; font-size: 17px; }
+.laundry-checker button:hover { background: #244233; }
+.laundry-checker button:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.laundry-result { min-height: 20px; margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.laundry-result.is-ready { color: #367323; font-weight: 700; }
+.laundry-result.is-waiting { color: var(--ink); }
 .how { border-top: 1px solid var(--line); padding-top: 75px; padding-bottom: 88px; display: grid; grid-template-columns: .75fr 1.25fr; gap: 70px; }
 .section-kicker { color: #6e7a71; margin: 0 0 17px; }
 .how h2, .staff-copy h2 { font-size: clamp(31px, 4vw, 47px); letter-spacing: -2.6px; line-height: 1.04; margin: 0; }
@@ -250,6 +261,9 @@ footer { height: 82px; display: flex; justify-content: space-between; align-item
   .dashboard-card strong { margin-top: 16px; font-size: 22px; }
   .token-card { height: 210px; box-shadow: 6px 7px 0 var(--lime); }
   .token-card strong { letter-spacing: -7px; }
+  .laundry-checker { margin-top: 32px; padding: 18px; }
+  .laundry-checker-row { flex-direction: column; }
+  .laundry-checker button { min-height: 45px; }
   .how, .staff-inner { grid-template-columns: 1fr; gap: 42px; }
   .how { padding-top: 60px; padding-bottom: 62px; }
   .steps { gap: 18px; }

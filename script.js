@@ -16,6 +16,7 @@ const $ = (id) => document.getElementById(id);
 const number = $('readyNumber');
 const range = $('rangeText');
 let statusUpdatedAt;
+let readyThrough;
 
 function padded(value) { return String(value).padStart(3, '0'); }
 function timeAgo(date) {
@@ -29,10 +30,34 @@ function setStatus(value, timestamp) {
   number.textContent = display;
   range.textContent = `${display} or lower`;
   statusUpdatedAt = timestamp;
+  readyThrough = value;
   $('updatedTime').textContent = timeAgo(timestamp);
   $('dashboardToken').textContent = display;
   $('tokenCard').setAttribute('aria-busy', 'false');
 }
+
+$('laundryChecker').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const token = Number($('laundryNumber').value);
+  const result = $('laundryResult');
+  result.className = 'laundry-result';
+
+  if (!Number.isInteger(token) || token < 0) {
+    result.textContent = 'Please enter a valid laundry token number.';
+    return;
+  }
+  if (!Number.isInteger(readyThrough)) {
+    result.textContent = 'The live laundry status is still loading. Please try again shortly.';
+    return;
+  }
+  if (token <= readyThrough) {
+    result.textContent = `Good news — token ${padded(token)} is ready for collection.`;
+    result.classList.add('is-ready');
+    return;
+  }
+  result.textContent = `Token ${padded(token)} is not ready yet. The desk has completed through ${padded(readyThrough)}.`;
+  result.classList.add('is-waiting');
+});
 
 onSnapshot(laundryStatus, (snapshot) => {
   const readyToken = Number(snapshot.data()?.readyThrough);

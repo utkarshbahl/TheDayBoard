@@ -67,6 +67,14 @@
         </div>
         <p class="pickup-note"><span class="check">✓</span> If your token is <b id="rangeText">loading…</b>, please collect your laundry.</p>
         <p class="updated">Last updated <span id="updatedTime">loading…</span></p>
+        <form class="laundry-checker" id="laundryChecker">
+          <label for="laundryNumber">Have a laundry number?</label>
+          <div class="laundry-checker-row">
+            <input id="laundryNumber" name="laundryNumber" type="number" min="0" inputmode="numeric" placeholder="Enter your token number" required />
+            <button type="submit">Check status <span aria-hidden="true">&rarr;</span></button>
+          </div>
+          <p class="laundry-result" id="laundryResult" aria-live="polite">Enter your token number to check whether it is ready.</p>
+        </form>
       </section>
 
       <section class="campus-dashboard wrap" aria-labelledby="dashboardTitle">
