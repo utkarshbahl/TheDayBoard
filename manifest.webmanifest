@@ -1,7 +1,7 @@
 {
   "name": "LNMIIT Campus Services",
   "short_name": "LNMIIT Campus",
-  "description": "Everyday campus services and student resources for LNMIIT.",
+  "description": "Laundry, mess menu and bus timings for LNMIIT campus.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

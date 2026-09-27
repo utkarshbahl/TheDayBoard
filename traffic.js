@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js';
 
-const trackedPages = new Set(['/', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum', '/resources', '/campus-life']);
+const trackedPages = new Set(['/', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum']);
 const path = location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/') || '/';
 
 function getSessionId() {
