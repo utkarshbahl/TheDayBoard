@@ -10,11 +10,25 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function sortNotices(notices) {
+  const now = Date.now();
+  return [...notices].sort((left, right) => {
+    const leftEvent = left.event_at ? new Date(left.event_at).getTime() : Number.POSITIVE_INFINITY;
+    const rightEvent = right.event_at ? new Date(right.event_at).getTime() : Number.POSITIVE_INFINITY;
+    const leftUpcoming = leftEvent >= now;
+    const rightUpcoming = rightEvent >= now;
+
+    if (leftUpcoming !== rightUpcoming) return leftUpcoming ? -1 : 1;
+    if (leftUpcoming && leftEvent !== rightEvent) return leftEvent - rightEvent;
+    return new Date(right.created_at).getTime() - new Date(left.created_at).getTime();
+  });
+}
+
 function render(notices) {
   board.replaceChildren();
   empty.classList.toggle("hidden", notices.length > 0);
 
-  notices.forEach((notice) => {
+  sortNotices(notices).forEach((notice) => {
     const article = document.createElement("article");
     article.className = "notice-card";
 
@@ -28,7 +42,7 @@ function render(notices) {
     heading.append(title, posted);
     article.append(heading);
 
-    if (notice.image_url) {
+    if (typeof notice.image_url === "string" && notice.image_url.trim()) {
       const image = document.createElement("img");
       image.src = notice.image_url;
       image.alt = notice.title;
