@@ -26,6 +26,7 @@ function sortNotices(notices) {
 
 function render(notices) {
   board.replaceChildren();
+  board.dataset.noticeCount = String(notices.length);
   empty.classList.toggle("hidden", notices.length > 0);
 
   sortNotices(notices).forEach((notice) => {
@@ -43,6 +44,7 @@ function render(notices) {
     article.append(heading);
 
     if (typeof notice.image_url === "string" && notice.image_url.trim()) {
+      article.classList.add("has-image");
       const image = document.createElement("img");
       image.src = notice.image_url;
       image.alt = notice.title;
