@@ -19,6 +19,21 @@ const sections = [
 const themeToggle = byId("adminThemeToggle");
 const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 const themeRoot = document.documentElement;
+const adminStyle = document.createElement("style");
+adminStyle.textContent = `
+  .user-management { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .user-management h2 { margin: 0 0 8px; font-size: 18px; }
+  .user-management > p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .user-management-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 13px; }
+  .user-management-row strong, .user-management-row span { display: block; }
+  .user-management-row span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+  .user-management-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .user-management-actions button { padding: 8px 9px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 700 10px Manrope; cursor: pointer; }
+  .user-management-actions button[data-user-action="delete"] { background: var(--red); }
+  .user-management-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
+  @media (max-width: 700px) { .user-management-row { align-items: flex-start; flex-direction: column; } .user-management-actions { justify-content: flex-start; } }
+`;
+document.head.append(adminStyle);
 
 function initializeTheme() {
   if (!themeToggle || !themeLabel) return;
@@ -165,6 +180,92 @@ function bindVisibilityPanel(panel) {
   });
 }
 
+function createUsersPanel() {
+  const panel = document.createElement("section");
+  panel.className = "user-management";
+  panel.id = "userManagementPanel";
+  panel.innerHTML = `
+    <h2>User accounts</h2>
+    <p>View and manage registered campus accounts.</p>
+    <div class="user-management-list"></div>
+    <p class="user-management-message" role="status"></p>
+  `;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+async function loadUsers(panel) {
+  const { data, error } = await supabase.rpc("admin_list_user_profiles");
+  if (error) throw error;
+  const list = panel.querySelector(".user-management-list");
+  list.replaceChildren(
+    ...(data ?? []).map((user) => {
+      const row = document.createElement("div");
+      row.className = "user-management-row";
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div class="user-management-actions">
+          <button type="button" data-user-action="active"></button>
+          <button type="button" data-user-action="reset">Reset password</button>
+          <button type="button" data-user-action="delete">Delete</button>
+        </div>
+      `;
+      row.querySelector("strong").textContent = user.full_name;
+      row.querySelector("span").textContent = `${user.email} · ${new Date(user.created_at).toLocaleDateString()}`;
+      const activeButton = row.querySelector('[data-user-action="active"]');
+      activeButton.textContent = user.is_active ? "Disable" : "Enable";
+      activeButton.dataset.userId = user.id;
+      activeButton.dataset.active = String(user.is_active);
+      row.querySelector('[data-user-action="reset"]').dataset.email = user.email;
+      row.querySelector('[data-user-action="delete"]').dataset.userId = user.id;
+      return row;
+    }),
+  );
+}
+
+async function manageUser(panel, button) {
+  const action = button.dataset.userAction;
+  button.disabled = true;
+  let error;
+  if (action === "active") {
+    ({ error } = await supabase.rpc("admin_set_user_active", {
+      target_user_id: button.dataset.userId,
+      active: button.dataset.active !== "true",
+    }));
+  } else if (action === "delete") {
+    if (!window.confirm("Delete this account permanently?")) {
+      button.disabled = false;
+      return;
+    }
+    ({ error } = await supabase.rpc("admin_delete_user", {
+      target_user_id: button.dataset.userId,
+    }));
+  } else {
+    ({ error } = await supabase.auth.resetPasswordForEmail(button.dataset.email, {
+      redirectTo: `${location.origin}/admin.html`,
+    }));
+  }
+  button.disabled = false;
+  if (error) {
+    panel.querySelector(".user-management-message").textContent =
+      "That account action could not be completed.";
+    console.error("User account action failed.", error);
+    return;
+  }
+  panel.querySelector(".user-management-message").textContent =
+    action === "reset" ? "Password reset email sent." : "Account updated.";
+  await loadUsers(panel);
+}
+
+function bindUsersPanel(panel) {
+  if (panel.dataset.bound === "true") return;
+  panel.dataset.bound = "true";
+  panel.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-user-action]");
+    if (button) manageUser(panel, button);
+  });
+}
+
 async function initializeAdmin() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return showLogin();
@@ -176,6 +277,8 @@ async function initializeAdmin() {
   showAdmin();
   const panel = createVisibilityPanel();
   bindVisibilityPanel(panel);
+  const usersPanel = byId("userManagementPanel") || createUsersPanel();
+  bindUsersPanel(usersPanel);
   try {
     await loadAnalytics();
   } catch (error) {
@@ -187,6 +290,13 @@ async function initializeAdmin() {
     panel.querySelector(".section-visibility-message").textContent =
       "Visibility settings could not be loaded.";
     console.error("Section visibility could not be loaded.", error);
+  }
+  try {
+    await loadUsers(usersPanel);
+  } catch (error) {
+    usersPanel.querySelector(".user-management-message").textContent =
+      "User accounts could not be loaded.";
+    console.error("User accounts could not be loaded.", error);
   }
 }
 

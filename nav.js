@@ -1,4 +1,5 @@
 import "./section-visibility.js";
+import "./user-auth.js";
 
 document.querySelectorAll(".campus-menu").forEach((menu) => {
   const trigger = menu.querySelector("summary");
