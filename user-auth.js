@@ -2,9 +2,13 @@ import { supabase } from "./supabase.js";
 
 const style = document.createElement("style");
 style.textContent = `
-  .user-auth-link { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; margin-left: 24px; padding: 7px 12px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 800; text-decoration: none; white-space: nowrap; transition: background-color .18s,color .18s,border-color .18s; }
-  .user-auth-link:hover, .user-auth-link:focus-visible { border-color: var(--lime); background: var(--lime); color: var(--ink); }
+  .user-auth-link { margin-left: 24px; color: inherit; text-decoration: none; opacity: .62; }
+  .user-auth-link:hover, .user-auth-link:focus-visible { opacity: 1; color: var(--ink); }
   .user-auth-link:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+  .user-auth-button { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-left: 10px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; transition: background-color .18s,color .18s,border-color .18s; }
+  .user-auth-button:hover, .user-auth-button:focus-visible { border-color: var(--lime); background: var(--lime); }
+  .user-auth-button:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+  .user-auth-button svg { width: 21px; height: 21px; }
   .user-auth-dialog { border: 0; border-radius: 12px; padding: 0; color: var(--ink); background: transparent; }
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
   .user-auth-card { position: relative; width: min(420px, calc(100vw - 42px)); padding: 30px; border-radius: 12px; background: var(--paper); box-shadow: 8px 9px 0 var(--lime); }
@@ -18,7 +22,7 @@ style.textContent = `
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
-  @media (max-width: 600px) { .user-auth-link { margin-left: 10px; padding: 7px 9px; } }
+  @media (max-width: 600px) { .user-auth-link { margin-left: 10px; } .user-auth-button { width: 32px; height: 32px; margin-left: 7px; } }
 `;
 document.head.append(style);
 
@@ -26,7 +30,17 @@ const authLink = document.createElement("a");
 authLink.className = "user-auth-link";
 authLink.href = "#account";
 authLink.textContent = "Log in";
-document.querySelector(".nav-actions")?.append(authLink);
+const authButton = document.createElement("button");
+authButton.className = "user-auth-button";
+authButton.type = "button";
+authButton.setAttribute("aria-label", "Open account login");
+authButton.innerHTML = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <circle cx="12" cy="8" r="3.5"></circle>
+    <path d="M5 20c.8-3.7 3.1-5.7 7-5.7s6.2 2 7 5.7"></path>
+  </svg>
+`;
+document.querySelector(".nav-actions")?.append(authLink, authButton);
 
 const dialog = document.createElement("dialog");
 dialog.className = "user-auth-dialog";
@@ -101,6 +115,10 @@ async function loadSession() {
 
 authLink.addEventListener("click", (event) => {
   event.preventDefault();
+  if (typeof dialog.showModal === "function") dialog.showModal();
+});
+
+authButton.addEventListener("click", () => {
   if (typeof dialog.showModal === "function") dialog.showModal();
 });
 
