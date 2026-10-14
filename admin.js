@@ -21,6 +21,8 @@ const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 const themeRoot = document.documentElement;
 
 function initializeTheme() {
+  if (!themeToggle || !themeLabel) return;
+
   let theme = "lime";
   try {
     theme = localStorage.getItem("lnmiit-theme") || "lime";
@@ -29,14 +31,23 @@ function initializeTheme() {
   }
 
   const applyTheme = (nextTheme) => {
-    themeRoot.dataset.theme = nextTheme;
+    if (nextTheme === "dusk") {
+      themeRoot.setAttribute("data-theme", "dusk");
+    } else {
+      themeRoot.removeAttribute("data-theme");
+    }
     themeToggle.setAttribute("aria-pressed", String(nextTheme === "dusk"));
+    themeToggle.setAttribute(
+      "aria-label",
+      `Switch to ${nextTheme === "dusk" ? "lime" : "dusk"} colour scheme`,
+    );
     themeLabel.textContent = nextTheme === "dusk" ? "Dusk" : "Lime";
   };
 
   applyTheme(theme === "dusk" ? "dusk" : "lime");
   themeToggle.addEventListener("click", () => {
-    const nextTheme = themeRoot.dataset.theme === "dusk" ? "lime" : "dusk";
+    const nextTheme =
+      themeRoot.getAttribute("data-theme") === "dusk" ? "lime" : "dusk";
     try {
       localStorage.setItem("lnmiit-theme", nextTheme);
     } catch (error) {
