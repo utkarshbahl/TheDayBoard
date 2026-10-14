@@ -26,7 +26,7 @@ const authLink = document.createElement("a");
 authLink.className = "user-auth-link";
 authLink.href = "#account";
 authLink.textContent = "Log in";
-document.querySelector(".site-footer-update")?.append(authLink);
+document.querySelector(".nav-actions")?.append(authLink);
 
 const dialog = document.createElement("dialog");
 dialog.className = "user-auth-dialog";
