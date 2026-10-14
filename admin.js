@@ -16,6 +16,36 @@ const sections = [
   ["campus-map", "Campus map"],
 ];
 
+const themeToggle = byId("adminThemeToggle");
+const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
+const themeRoot = document.documentElement;
+
+function initializeTheme() {
+  let theme = "lime";
+  try {
+    theme = localStorage.getItem("lnmiit-theme") || "lime";
+  } catch (error) {
+    console.error("Theme preference could not be read.", error);
+  }
+
+  const applyTheme = (nextTheme) => {
+    themeRoot.dataset.theme = nextTheme;
+    themeToggle.setAttribute("aria-pressed", String(nextTheme === "dusk"));
+    themeLabel.textContent = nextTheme === "dusk" ? "Dusk" : "Lime";
+  };
+
+  applyTheme(theme === "dusk" ? "dusk" : "lime");
+  themeToggle.addEventListener("click", () => {
+    const nextTheme = themeRoot.dataset.theme === "dusk" ? "lime" : "dusk";
+    try {
+      localStorage.setItem("lnmiit-theme", nextTheme);
+    } catch (error) {
+      console.error("Theme preference could not be saved.", error);
+    }
+    applyTheme(nextTheme);
+  });
+}
+
 function showLogin(message = "") {
   byId("adminLogin").classList.remove("hidden");
   byId("analyticsPanel").classList.add("hidden");
@@ -152,6 +182,7 @@ byId("adminLoginForm").addEventListener("submit", async (event) => {
   });
   button.disabled = false;
   if (error) return showLogin("Check the email and password, then try again.");
+  initializeTheme();
   initialize();
 });
 
