@@ -2,8 +2,8 @@ import { supabase } from "./supabase.js";
 
 const style = document.createElement("style");
 style.textContent = `
-  .user-auth-link { margin-left: 24px; color: inherit; text-decoration: none; opacity: .62; }
-  .user-auth-link:hover, .user-auth-link:focus-visible { opacity: 1; color: var(--ink); }
+  .user-auth-link { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; margin-left: 24px; padding: 7px 12px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 800; text-decoration: none; white-space: nowrap; transition: background-color .18s,color .18s,border-color .18s; }
+  .user-auth-link:hover, .user-auth-link:focus-visible { border-color: var(--lime); background: var(--lime); color: var(--ink); }
   .user-auth-link:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
   .user-auth-dialog { border: 0; border-radius: 12px; padding: 0; color: var(--ink); background: transparent; }
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
@@ -18,7 +18,7 @@ style.textContent = `
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
-  @media (max-width: 600px) { .user-auth-link { margin-left: 12px; } }
+  @media (max-width: 600px) { .user-auth-link { margin-left: 10px; padding: 7px 9px; } }
 `;
 document.head.append(style);
 
