@@ -34,13 +34,35 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.create_user_profile();
 
-create or replace function public.admin_list_user_profiles()
-returns table (id uuid, full_name text, email text, is_active boolean, created_at timestamptz)
+drop function if exists public.admin_list_user_profiles();
+create function public.admin_list_user_profiles()
+returns table (id uuid, full_name text, email text, is_active boolean, is_admin boolean, created_at timestamptz)
 language sql security definer set search_path = public as $$
-  select id, full_name, email, is_active, created_at
-  from public.user_profiles
+  select p.id, p.full_name, p.email, p.is_active,
+    (u.raw_app_meta_data ->> 'role') = 'admin' as is_admin,
+    p.created_at
+  from public.user_profiles p
+  join auth.users u on u.id = p.id
   where (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
-  order by created_at desc;
+  order by p.created_at desc;
+$$;
+
+create or replace function public.admin_set_user_admin(target_user_id uuid, make_admin boolean)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' then
+    raise exception 'Only admins can manage user accounts';
+  end if;
+  if target_user_id = auth.uid() and not make_admin then
+    raise exception 'Admins cannot remove their own admin access';
+  end if;
+  update auth.users
+  set raw_app_meta_data = case
+    when make_admin then coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'::jsonb
+    else coalesce(raw_app_meta_data, '{}'::jsonb) - 'role'
+  end
+  where id = target_user_id;
+end;
 $$;
 
 create or replace function public.admin_set_user_active(target_user_id uuid, active boolean)
@@ -69,5 +91,6 @@ end;
 $$;
 
 grant execute on function public.admin_list_user_profiles() to authenticated;
+grant execute on function public.admin_set_user_admin(uuid, boolean) to authenticated;
 grant execute on function public.admin_set_user_active(uuid, boolean) to authenticated;
 grant execute on function public.admin_delete_user(uuid) to authenticated;

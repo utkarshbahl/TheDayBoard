@@ -30,6 +30,7 @@ adminStyle.textContent = `
   .user-management-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
   .user-management-actions button { padding: 8px 9px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 700 10px Manrope; cursor: pointer; }
   .user-management-actions button[data-user-action="delete"] { background: var(--red); }
+  .user-management-actions button[data-user-action="admin"] { background: var(--lime); color: var(--ink); }
   .user-management-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
   .admin-request-management { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
   .admin-request-management h2 { margin: 0 0 8px; font-size: 18px; }
@@ -317,6 +318,7 @@ async function loadUsers(panel) {
         <div class="user-management-actions">
           <button type="button" data-user-action="active"></button>
           <button type="button" data-user-action="reset">Reset password</button>
+          <button type="button" data-user-action="admin"></button>
           <button type="button" data-user-action="delete">Delete</button>
         </div>
       `;
@@ -327,6 +329,11 @@ async function loadUsers(panel) {
       activeButton.dataset.userId = user.id;
       activeButton.dataset.active = String(user.is_active);
       row.querySelector('[data-user-action="reset"]').dataset.email = user.email;
+      const adminButton = row.querySelector('[data-user-action="admin"]');
+      adminButton.textContent = user.is_admin ? "Admin" : "Make admin";
+      adminButton.dataset.userId = user.id;
+      adminButton.dataset.admin = String(user.is_admin);
+      adminButton.disabled = user.is_admin;
       row.querySelector('[data-user-action="delete"]').dataset.userId = user.id;
       return row;
     }),
@@ -341,6 +348,11 @@ async function manageUser(panel, button) {
     ({ error } = await supabase.rpc("admin_set_user_active", {
       target_user_id: button.dataset.userId,
       active: button.dataset.active !== "true",
+    }));
+  } else if (action === "admin") {
+    ({ error } = await supabase.rpc("admin_set_user_admin", {
+      target_user_id: button.dataset.userId,
+      make_admin: button.dataset.admin !== "true",
     }));
   } else if (action === "delete") {
     if (!window.confirm("Delete this account permanently?")) {
