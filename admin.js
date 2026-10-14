@@ -41,6 +41,12 @@ adminStyle.textContent = `
   .admin-request-actions button { padding: 8px 9px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 700 10px Manrope; cursor: pointer; }
   .admin-request-actions button[data-request-action="reject"] { background: var(--red); }
   .admin-request-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
+  .admin-list { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .admin-list h2 { margin: 0 0 8px; font-size: 18px; }
+  .admin-list > p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .admin-list-row { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 13px; }
+  .admin-list-row span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+  .admin-list-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
   .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
   .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -154,11 +160,33 @@ function setAdminSection(section) {
     "is-admin-section-hidden",
     section !== "users",
   );
+  document.querySelector("#adminListPanel")?.classList.toggle(
+    "is-admin-section-hidden",
+    section !== "users",
+  );
   document.querySelectorAll("[data-admin-section-target]").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.adminSectionTarget === section);
   });
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
+  if (section === "users") {
+    const requestsPanel = byId("adminRequestPanel");
+    if (requestsPanel) {
+      loadRequests(requestsPanel).catch((error) => {
+        requestsPanel.querySelector(".admin-request-message").textContent =
+          "Admin access requests could not be refreshed.";
+        console.error("Admin access requests could not be refreshed.", error);
+      });
+    }
+    const adminsPanel = byId("adminListPanel");
+    if (adminsPanel) {
+      loadAdmins(adminsPanel).catch((error) => {
+        adminsPanel.querySelector(".admin-list-message").textContent =
+          "Current admins could not be refreshed.";
+        console.error("Current admins could not be refreshed.", error);
+      });
+    }
+  }
 }
 
 async function loadAnalytics() {
@@ -355,6 +383,7 @@ function createRequestsPanel() {
   panel.innerHTML = `
     <h2>Admin access requests</h2>
     <p>Approve or reject requests from registered users who want admin access.</p>
+    <button type="button" class="admin-request-refresh">Refresh requests</button>
     <div class="admin-request-list"></div>
     <p class="admin-request-message" role="status"></p>
   `;
@@ -404,15 +433,54 @@ async function reviewRequest(panel, button) {
   }
   panel.querySelector(".admin-request-message").textContent = "Access request updated.";
   await loadRequests(panel);
+  const adminsPanel = byId("adminListPanel");
+  if (adminsPanel) await loadAdmins(adminsPanel);
 }
 
 function bindRequestsPanel(panel) {
   if (panel.dataset.bound === "true") return;
   panel.dataset.bound = "true";
+  panel.querySelector(".admin-request-refresh").addEventListener("click", () => {
+    loadRequests(panel).catch((error) => {
+      panel.querySelector(".admin-request-message").textContent =
+        "Admin access requests could not be refreshed.";
+      console.error("Admin access requests could not be refreshed.", error);
+    });
+  });
   panel.addEventListener("click", (event) => {
     const button = event.target.closest("[data-request-action]");
     if (button) reviewRequest(panel, button);
   });
+}
+
+function createAdminsPanel() {
+  const panel = document.createElement("section");
+  panel.className = "admin-list";
+  panel.id = "adminListPanel";
+  panel.innerHTML = `
+    <h2>Current admins</h2>
+    <p>Accounts that currently have administrator access.</p>
+    <div class="admin-list-items"></div>
+    <p class="admin-list-message" role="status"></p>
+  `;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+async function loadAdmins(panel) {
+  const { data, error } = await supabase.rpc("admin_list_admins");
+  if (error) throw error;
+  panel.querySelector(".admin-list-items").replaceChildren(
+    ...(data ?? []).map((admin) => {
+      const row = document.createElement("div");
+      row.className = "admin-list-row";
+      row.innerHTML = "<div><strong></strong><span></span></div>";
+      row.querySelector("strong").textContent = admin.full_name;
+      row.querySelector("span").textContent =
+        `${admin.email} · Admin since ${new Date(admin.created_at).toLocaleDateString()}`;
+      return row;
+    }),
+  );
 }
 
 async function initializeAdmin() {
@@ -431,6 +499,7 @@ async function initializeAdmin() {
   bindUsersPanel(usersPanel);
   const requestsPanel = byId("adminRequestPanel") || createRequestsPanel();
   bindRequestsPanel(requestsPanel);
+  const adminsPanel = byId("adminListPanel") || createAdminsPanel();
   setAdminSection("traffic");
   try {
     await loadAnalytics();
@@ -457,6 +526,13 @@ async function initializeAdmin() {
     requestsPanel.querySelector(".admin-request-message").textContent =
       "Admin access requests could not be loaded. Run the admin access migration.";
     console.error("Admin access requests could not be loaded.", error);
+  }
+  try {
+    await loadAdmins(adminsPanel);
+  } catch (error) {
+    adminsPanel.querySelector(".admin-list-message").textContent =
+      "Current admins could not be loaded. Run the updated admin access migration.";
+    console.error("Current admins could not be loaded.", error);
   }
 }
 
