@@ -6,6 +6,10 @@ style.textContent = `
   .user-auth-button:hover, .user-auth-button:focus-visible { border-color: var(--lime); background: var(--lime); }
   .user-auth-button:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
   .user-auth-button svg { width: 21px; height: 21px; }
+  .user-auth-menu { position: relative; margin-left: 10px; }
+  .user-auth-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 40; min-width: 190px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 5px 6px 0 var(--lime); }
+  .user-auth-dropdown p { margin: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
+  .user-auth-signout { margin-top: 12px; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
   .user-auth-dialog { border: 0; border-radius: 12px; padding: 0; color: var(--ink); background: transparent; }
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
   .user-auth-card { position: relative; width: min(420px, calc(100vw - 42px)); padding: 30px; border-radius: 12px; background: var(--paper); box-shadow: 8px 9px 0 var(--lime); }
@@ -20,7 +24,7 @@ style.textContent = `
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
-  @media (max-width: 600px) { .user-auth-button { width: 32px; height: 32px; margin-left: 7px; } }
+  @media (max-width: 600px) { .user-auth-menu { margin-left: 7px; } .user-auth-button { width: 32px; height: 32px; margin-left: 0; } }
 `;
 document.head.append(style);
 
@@ -34,7 +38,16 @@ authButton.innerHTML = `
     <path d="M5 20c.8-3.7 3.1-5.7 7-5.7s6.2 2 7 5.7"></path>
   </svg>
 `;
-document.querySelector(".nav-actions")?.append(authButton);
+const authMenu = document.createElement("div");
+authMenu.className = "user-auth-menu";
+authMenu.innerHTML = `
+  <div class="user-auth-dropdown" hidden>
+    <p class="user-auth-dropdown-greeting"></p>
+    <button type="button" class="user-auth-signout">Sign out</button>
+  </div>
+`;
+authMenu.prepend(authButton);
+document.querySelector(".nav-actions")?.append(authMenu);
 
 const dialog = document.createElement("dialog");
 dialog.className = "user-auth-dialog";
@@ -84,6 +97,8 @@ function greeting(name) {
 function showLoggedIn(user) {
   const name = user.user_metadata?.full_name || "there";
   authButton.setAttribute("aria-label", `Open account for ${name}`);
+  authMenu.dataset.loggedIn = "true";
+  authMenu.querySelector(".user-auth-dropdown-greeting").textContent = greeting(name);
   const greetingElement = dialog.querySelector(".user-auth-greeting");
   greetingElement.textContent = greeting(name);
   greetingElement.classList.remove("is-hidden");
@@ -110,7 +125,23 @@ async function loadSession() {
 }
 
 authButton.addEventListener("click", () => {
-  if (typeof dialog.showModal === "function") dialog.showModal();
+  const dropdown = authMenu.querySelector(".user-auth-dropdown");
+  if (authMenu.dataset.loggedIn !== "true") {
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    return;
+  }
+  dropdown.hidden = !dropdown.hidden;
+});
+
+document.addEventListener("click", (event) => {
+  if (!authMenu.contains(event.target)) {
+    authMenu.querySelector(".user-auth-dropdown").hidden = true;
+  }
+});
+
+authMenu.querySelector(".user-auth-signout").addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  authMenu.querySelector(".user-auth-dropdown").hidden = true;
 });
 
 dialog.querySelectorAll("[data-auth-mode]").forEach((tab) => {
@@ -165,6 +196,8 @@ supabase.auth.onAuthStateChange((event, session) => {
     showLoggedIn(session.user);
   } else if (event === "SIGNED_OUT") {
     authButton.setAttribute("aria-label", "Open account login");
+    delete authMenu.dataset.loggedIn;
+    authMenu.querySelector(".user-auth-dropdown").hidden = true;
     dialog.querySelector(".user-auth-greeting").classList.add("is-hidden");
   }
 });
