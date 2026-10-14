@@ -86,8 +86,12 @@ async function loadAnalytics() {
 }
 
 function createVisibilityPanel() {
+  const existingPanel = byId("sectionVisibilityPanel");
+  if (existingPanel) return existingPanel;
+
   const panel = document.createElement("section");
   panel.className = "section-visibility";
+  panel.id = "sectionVisibilityPanel";
   panel.innerHTML = `
     <h2>Public section visibility</h2>
     <p>Temporarily hide any campus section from visitors. Hidden sections are removed from navigation and direct visits show an unavailable message.</p>
@@ -153,19 +157,22 @@ async function updateVisibility(panel, button) {
 }
 
 function bindVisibilityPanel(panel) {
+  if (panel.dataset.bound === "true") return;
+  panel.dataset.bound = "true";
   panel.addEventListener("click", (event) => {
     const button = event.target.closest(".visibility-toggle");
     if (button) updateVisibility(panel, button);
   });
 }
 
-async function initialize() {
+async function initializeAdmin() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return showLogin();
   if (session.user.app_metadata?.role !== "admin") {
     await supabase.auth.signOut();
     return showLogin("This account is not an admin account.");
   }
+
   showAdmin();
   const panel = createVisibilityPanel();
   bindVisibilityPanel(panel);
@@ -181,6 +188,10 @@ async function initialize() {
       "Visibility settings could not be loaded.";
     console.error("Section visibility could not be loaded.", error);
   }
+}
+
+function initialize() {
+  return initializeAdmin();
 }
 
 byId("adminLoginForm").addEventListener("submit", async (event) => {
