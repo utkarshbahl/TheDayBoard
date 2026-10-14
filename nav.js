@@ -1,3 +1,54 @@
-document.querySelectorAll(".campus-menu").forEach(e=>{const t=e.querySelector("summary"),n=e.querySelectorAll(".campus-nav-link"),c=()=>{e.removeAttribute("open")};document.addEventListener("click",t=>{e.contains(t.target)||c()}),document.addEventListener("keydown",n=>{"Escape"===n.key&&e.open&&(n.preventDefault(),c(),t.focus())}),n.forEach(e=>e.addEventListener("click",c))});
-document.querySelectorAll("[data-last-updated]").forEach(e=>{e.textContent="Last updated: October 14, 2026 at 8:20 AM IST"});
-(()=>{const e="lnmiit-theme",t=document.documentElement,n=document.querySelector(".theme-toggle"),c=n?.querySelector("[data-theme-toggle-label]");if(!n||!c)return;let o="lime";try{o=localStorage.getItem(e)||"lime"}catch(e){}const a=s=>{t.dataset.theme=s,n.setAttribute("aria-pressed",String(s==="dusk")),c.textContent=s==="dusk"?"Dusk":"Lime"};a(o==="dusk"?"dusk":"lime"),n.addEventListener("click",()=>{const e=document.documentElement.dataset.theme==="dusk"?"lime":"dusk";try{localStorage.setItem("lnmiit-theme",e)}catch(e){}a(e)})})();
+import "./section-visibility.js";
+
+document.querySelectorAll(".campus-menu").forEach((menu) => {
+  const trigger = menu.querySelector("summary");
+  const links = menu.querySelectorAll(".campus-nav-link");
+  const close = () => menu.removeAttribute("open");
+  document.addEventListener("click", (event) => {
+    if (!menu.contains(event.target)) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.open) {
+      event.preventDefault();
+      close();
+      trigger.focus();
+    }
+  });
+  links.forEach((link) => link.addEventListener("click", close));
+});
+
+document.querySelectorAll("[data-last-updated]").forEach((element) => {
+  element.textContent = "Last updated: October 14, 2026 at 8:20 AM IST";
+});
+
+(() => {
+  const themeKey = "lnmiit-theme";
+  const root = document.documentElement;
+  const toggle = document.querySelector(".theme-toggle");
+  const label = toggle?.querySelector("[data-theme-toggle-label]");
+  if (!toggle || !label) return;
+
+  let storedTheme = "lime";
+  try {
+    storedTheme = localStorage.getItem(themeKey) || "lime";
+  } catch (error) {
+    console.error("Theme preference could not be read.", error);
+  }
+
+  const applyTheme = (theme) => {
+    root.dataset.theme = theme;
+    toggle.setAttribute("aria-pressed", String(theme === "dusk"));
+    label.textContent = theme === "dusk" ? "Dusk" : "Lime";
+  };
+
+  applyTheme(storedTheme === "dusk" ? "dusk" : "lime");
+  toggle.addEventListener("click", () => {
+    const theme = root.dataset.theme === "dusk" ? "lime" : "dusk";
+    try {
+      localStorage.setItem(themeKey, theme);
+    } catch (error) {
+      console.error("Theme preference could not be saved.", error);
+    }
+    applyTheme(theme);
+  });
+})();

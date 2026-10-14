@@ -8,6 +8,13 @@ const pageNames = {
   "/campus-map": "Campus map",
   "/curriculum": "B.Tech curriculum",
 };
+const sections = [
+  ["laundry", "Laundry status"],
+  ["mess", "Mess menu"],
+  ["bus", "Bus timings"],
+  ["curriculum", "B.Tech curriculum"],
+  ["campus-map", "Campus map"],
+];
 
 function showLogin(message = "") {
   byId("adminLogin").classList.remove("hidden");
@@ -37,6 +44,80 @@ async function loadAnalytics() {
   );
 }
 
+function createVisibilityPanel() {
+  const panel = document.createElement("section");
+  panel.className = "section-visibility";
+  panel.innerHTML = `
+    <h2>Public section visibility</h2>
+    <p>Temporarily hide any campus section from visitors. Hidden sections are removed from navigation and direct visits show an unavailable message.</p>
+    <div class="section-visibility-list"></div>
+    <p class="section-visibility-message" role="status"></p>
+  `;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+function renderVisibilityRows(panel, rows) {
+  const visibility = new Map(rows.map((row) => [row.section_key, row.is_public]));
+  const list = panel.querySelector(".section-visibility-list");
+  list.replaceChildren(
+    ...sections.map(([key, label]) => {
+      const row = document.createElement("div");
+      row.className = "section-visibility-row";
+      const name = document.createElement("strong");
+      name.textContent = label;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "visibility-toggle";
+      button.dataset.sectionKey = key;
+      button.dataset.isPublic = String(visibility.get(key) !== false);
+      button.textContent = visibility.get(key) !== false ? "Public" : "Hidden";
+      button.setAttribute("aria-pressed", String(visibility.get(key) !== false));
+      row.append(name, button);
+      return row;
+    }),
+  );
+}
+
+async function loadVisibility(panel) {
+  const { data, error } = await supabase
+    .from("site_section_visibility")
+    .select("section_key, is_public")
+    .order("section_key");
+  if (error) throw error;
+  renderVisibilityRows(panel, data ?? []);
+}
+
+async function updateVisibility(panel, button) {
+  const isPublic = button.dataset.isPublic !== "true";
+  button.disabled = true;
+  const { error } = await supabase
+    .from("site_section_visibility")
+    .update({ is_public: isPublic })
+    .eq("section_key", button.dataset.sectionKey);
+  button.disabled = false;
+  if (error) {
+    panel.querySelector(".section-visibility-message").textContent =
+      "Could not save that visibility change. Please try again.";
+    console.error("Section visibility could not be updated.", error);
+    return;
+  }
+  button.dataset.isPublic = String(isPublic);
+  button.textContent = isPublic ? "Public" : "Hidden";
+  button.setAttribute("aria-pressed", String(isPublic));
+  panel.querySelector(".section-visibility-message").textContent =
+    `${button.closest(".section-visibility-row").querySelector("strong").textContent} is now ${
+      isPublic ? "public" : "hidden"
+    }.`;
+}
+
+function bindVisibilityPanel(panel) {
+  panel.addEventListener("click", (event) => {
+    const button = event.target.closest(".visibility-toggle");
+    if (button) updateVisibility(panel, button);
+  });
+}
+
 async function initialize() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return showLogin();
@@ -45,10 +126,19 @@ async function initialize() {
     return showLogin("This account is not an admin account.");
   }
   showAdmin();
+  const panel = createVisibilityPanel();
+  bindVisibilityPanel(panel);
   try {
     await loadAnalytics();
   } catch (error) {
     console.error("Admin data could not be loaded.", error);
+  }
+  try {
+    await loadVisibility(panel);
+  } catch (error) {
+    panel.querySelector(".section-visibility-message").textContent =
+      "Visibility settings could not be loaded.";
+    console.error("Section visibility could not be loaded.", error);
   }
 }
 
@@ -69,4 +159,5 @@ byId("adminSignOut").addEventListener("click", async () => {
   await supabase.auth.signOut();
   showLogin();
 });
+
 initialize();
