@@ -41,7 +41,13 @@ adminStyle.textContent = `
   .admin-request-actions button { padding: 8px 9px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 700 10px Manrope; cursor: pointer; }
   .admin-request-actions button[data-request-action="reject"] { background: var(--red); }
   .admin-request-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
+  .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
+  .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
+  .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .admin-section-select { display: none; width: 100%; }
+  [data-admin-section].is-admin-section-hidden { display: none; }
   @media (max-width: 700px) { .user-management-row { align-items: flex-start; flex-direction: column; } .user-management-actions { justify-content: flex-start; } }
+  @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
 `;
 document.head.append(adminStyle);
 
@@ -85,12 +91,74 @@ function initializeTheme() {
 function showLogin(message = "") {
   byId("adminLogin").classList.remove("hidden");
   byId("analyticsPanel").classList.add("hidden");
+  byId("adminSectionNav")?.classList.add("hidden");
   byId("adminMessage").textContent = message;
 }
 
 function showAdmin() {
   byId("adminLogin").classList.add("hidden");
   byId("analyticsPanel").classList.remove("hidden");
+  byId("adminSectionNav")?.classList.remove("hidden");
+}
+
+function createAdminSectionNav() {
+  const existing = byId("adminSectionNav");
+  if (existing) return existing;
+  const nav = document.createElement("nav");
+  nav.className = "admin-section-nav";
+  nav.id = "adminSectionNav";
+  nav.setAttribute("aria-label", "Admin sections");
+  nav.innerHTML = `
+    <button type="button" data-admin-section-target="traffic" class="is-active">Traffic</button>
+    <button type="button" data-admin-section-target="visibility">Hide tabs</button>
+    <button type="button" data-admin-section-target="users">Users</button>
+    <select class="admin-section-select" aria-label="Admin section">
+      <option value="traffic">Traffic</option>
+      <option value="visibility">Hide tabs</option>
+      <option value="users">Users</option>
+    </select>
+  `;
+  byId("analyticsPanel").before(nav);
+  nav.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-admin-section-target]");
+    if (button) setAdminSection(button.dataset.adminSectionTarget);
+  });
+  nav.querySelector("select").addEventListener("change", (event) => {
+    setAdminSection(event.target.value);
+  });
+  return nav;
+}
+
+function setAdminSection(section) {
+  const trafficElements = [
+    ".analytics-topline",
+    ".analytics-subtitle",
+    ".traffic-stats",
+    ".traffic-breakdown",
+  ];
+  trafficElements.forEach((selector) => {
+    document.querySelector(selector)?.classList.toggle(
+      "is-admin-section-hidden",
+      section !== "traffic",
+    );
+  });
+  document.querySelector("#sectionVisibilityPanel")?.classList.toggle(
+    "is-admin-section-hidden",
+    section !== "visibility",
+  );
+  document.querySelector("#userManagementPanel")?.classList.toggle(
+    "is-admin-section-hidden",
+    section !== "users",
+  );
+  document.querySelector("#adminRequestPanel")?.classList.toggle(
+    "is-admin-section-hidden",
+    section !== "users",
+  );
+  document.querySelectorAll("[data-admin-section-target]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.adminSectionTarget === section);
+  });
+  const select = document.querySelector(".admin-section-select");
+  if (select) select.value = section;
 }
 
 async function loadAnalytics() {
@@ -356,12 +424,14 @@ async function initializeAdmin() {
   }
 
   showAdmin();
+  createAdminSectionNav();
   const panel = createVisibilityPanel();
   bindVisibilityPanel(panel);
   const usersPanel = byId("userManagementPanel") || createUsersPanel();
   bindUsersPanel(usersPanel);
   const requestsPanel = byId("adminRequestPanel") || createRequestsPanel();
   bindRequestsPanel(requestsPanel);
+  setAdminSection("traffic");
   try {
     await loadAnalytics();
   } catch (error) {
