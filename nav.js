@@ -18,7 +18,7 @@ document.querySelectorAll(".campus-menu").forEach((menu) => {
 });
 
 document.querySelectorAll("[data-last-updated]").forEach((element) => {
-  element.textContent = "Last updated: October 14, 2026 at 8:20 AM IST";
+  element.textContent = "Last updated: October 15, 2026 at 12:07 AM IST";
 });
 
 (() => {
