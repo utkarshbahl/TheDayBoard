@@ -45,7 +45,7 @@ adminStyle.textContent = `
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
   .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
   .admin-section-select { display: none; width: 100%; }
-  [data-admin-section].is-admin-section-hidden { display: none; }
+  .is-admin-section-hidden { display: none; }
   @media (max-width: 700px) { .user-management-row { align-items: flex-start; flex-direction: column; } .user-management-actions { justify-content: flex-start; } }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
 `;
