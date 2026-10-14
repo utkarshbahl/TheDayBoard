@@ -55,10 +55,11 @@ async function initialize() {
   const { data, error } = await supabase
     .from("site_section_visibility")
     .select("section_key, is_public");
-  if (error) throw error;
+  if (error) {
+    console.error("Section visibility could not be loaded.", error);
+    return;
+  }
   applyVisibility(data ?? []);
 }
 
-initialize().catch((error) => {
-  console.error("Section visibility could not be loaded.", error);
-});
+initialize();

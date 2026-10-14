@@ -24,6 +24,9 @@
 
   alter table public.site_section_visibility enable row level security;
 
+  grant select on public.site_section_visibility to anon, authenticated;
+  grant update on public.site_section_visibility to authenticated;
+
   drop policy if exists "Anyone can view section visibility" on public.site_section_visibility;
   create policy "Anyone can view section visibility"
   on public.site_section_visibility for select

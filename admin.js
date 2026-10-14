@@ -151,23 +151,27 @@ async function loadVisibility(panel) {
 async function updateVisibility(panel, button) {
   const isPublic = button.dataset.isPublic !== "true";
   button.disabled = true;
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("site_section_visibility")
     .update({ is_public: isPublic })
-    .eq("section_key", button.dataset.sectionKey);
+    .eq("section_key", button.dataset.sectionKey)
+    .select("section_key, is_public")
+    .maybeSingle();
   button.disabled = false;
-  if (error) {
+  if (error || !data) {
     panel.querySelector(".section-visibility-message").textContent =
-      "Could not save that visibility change. Please try again.";
-    console.error("Section visibility could not be updated.", error);
+      error?.code === "42P01"
+        ? "Visibility settings are not set up yet. Run the section visibility migration in Supabase."
+        : "Could not save that visibility change. Check the Supabase migration and admin permissions.";
+    console.error("Section visibility could not be updated.", error ?? "No row was updated.");
     return;
   }
-  button.dataset.isPublic = String(isPublic);
-  button.textContent = isPublic ? "Public" : "Hidden";
-  button.setAttribute("aria-pressed", String(isPublic));
+  button.dataset.isPublic = String(data.is_public);
+  button.textContent = data.is_public ? "Public" : "Hidden";
+  button.setAttribute("aria-pressed", String(data.is_public));
   panel.querySelector(".section-visibility-message").textContent =
     `${button.closest(".section-visibility-row").querySelector("strong").textContent} is now ${
-      isPublic ? "public" : "hidden"
+      data.is_public ? "public" : "hidden"
     }.`;
 }
 
