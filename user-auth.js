@@ -13,6 +13,7 @@ style.textContent = `
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
   .user-auth-card { position: relative; width: min(420px, calc(100vw - 42px)); padding: 30px; border-radius: 12px; background: var(--paper); box-shadow: 8px 9px 0 var(--lime); }
   .user-auth-card h2 { margin: 0 0 24px; font-size: 28px; letter-spacing: -1.3px; }
+  .user-auth-greeting { margin: -10px 0 20px; color: var(--muted); font-size: 14px; }
   .user-auth-close { position: absolute; top: 14px; right: 16px; border: 0; background: none; color: var(--muted); font-size: 24px; cursor: pointer; }
   .user-auth-card label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; }
   .user-auth-card input { display: block; width: 100%; margin-top: 7px; padding: 12px; border: 1px solid var(--line); border-radius: 5px; font: 14px Manrope; }
@@ -50,6 +51,7 @@ dialog.innerHTML = `
     <button class="user-auth-close" value="cancel" aria-label="Close account dialog">×</button>
     <p class="section-kicker">CAMPUS ACCOUNT</p>
     <h2>Welcome to LNMIIT Campus</h2>
+    <p class="user-auth-greeting is-hidden"></p>
     <div class="user-auth-tabs">
       <button type="button" class="user-auth-tab is-active" data-auth-mode="login">Log in</button>
       <button type="button" class="user-auth-tab" data-auth-mode="signup">Create account</button>
@@ -88,9 +90,12 @@ function greeting(name) {
 
 function showLoggedIn(user) {
   const name = user.user_metadata?.full_name || "there";
-  authLink.textContent = greeting(name);
+  authLink.textContent = "Account";
   authLink.href = "#account";
   authLink.dataset.loggedIn = "true";
+  const greetingElement = dialog.querySelector(".user-auth-greeting");
+  greetingElement.textContent = greeting(name);
+  greetingElement.classList.remove("is-hidden");
 }
 
 async function loadSession() {
@@ -175,6 +180,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   } else if (event === "SIGNED_OUT") {
     authLink.textContent = "Log in";
     delete authLink.dataset.loggedIn;
+    dialog.querySelector(".user-auth-greeting").classList.add("is-hidden");
   }
 });
 
