@@ -2,9 +2,6 @@ import { supabase } from "./supabase.js";
 
 const style = document.createElement("style");
 style.textContent = `
-  .user-auth-link { margin-left: 24px; color: inherit; text-decoration: none; opacity: .62; }
-  .user-auth-link:hover, .user-auth-link:focus-visible { opacity: 1; color: var(--ink); }
-  .user-auth-link:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
   .user-auth-button { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-left: 10px; padding: 0; border: 2px solid var(--ink); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; transition: background-color .18s,color .18s,border-color .18s; }
   .user-auth-button:hover, .user-auth-button:focus-visible { border-color: var(--lime); background: var(--lime); }
   .user-auth-button:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
@@ -23,14 +20,10 @@ style.textContent = `
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
-  @media (max-width: 600px) { .user-auth-link { margin-left: 10px; } .user-auth-button { width: 32px; height: 32px; margin-left: 7px; } }
+  @media (max-width: 600px) { .user-auth-button { width: 32px; height: 32px; margin-left: 7px; } }
 `;
 document.head.append(style);
 
-const authLink = document.createElement("a");
-authLink.className = "user-auth-link";
-authLink.href = "#account";
-authLink.textContent = "Log in";
 const authButton = document.createElement("button");
 authButton.className = "user-auth-button";
 authButton.type = "button";
@@ -41,7 +34,7 @@ authButton.innerHTML = `
     <path d="M5 20c.8-3.7 3.1-5.7 7-5.7s6.2 2 7 5.7"></path>
   </svg>
 `;
-document.querySelector(".nav-actions")?.append(authLink, authButton);
+document.querySelector(".nav-actions")?.append(authButton);
 
 const dialog = document.createElement("dialog");
 dialog.className = "user-auth-dialog";
@@ -90,9 +83,7 @@ function greeting(name) {
 
 function showLoggedIn(user) {
   const name = user.user_metadata?.full_name || "there";
-  authLink.textContent = "Account";
-  authLink.href = "#account";
-  authLink.dataset.loggedIn = "true";
+  authButton.setAttribute("aria-label", `Open account for ${name}`);
   const greetingElement = dialog.querySelector(".user-auth-greeting");
   greetingElement.textContent = greeting(name);
   greetingElement.classList.remove("is-hidden");
@@ -117,11 +108,6 @@ async function loadSession() {
     showLoggedIn(data.session.user);
   }
 }
-
-authLink.addEventListener("click", (event) => {
-  event.preventDefault();
-  if (typeof dialog.showModal === "function") dialog.showModal();
-});
 
 authButton.addEventListener("click", () => {
   if (typeof dialog.showModal === "function") dialog.showModal();
@@ -178,8 +164,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   if (session) {
     showLoggedIn(session.user);
   } else if (event === "SIGNED_OUT") {
-    authLink.textContent = "Log in";
-    delete authLink.dataset.loggedIn;
+    authButton.setAttribute("aria-label", "Open account login");
     dialog.querySelector(".user-auth-greeting").classList.add("is-hidden");
   }
 });
