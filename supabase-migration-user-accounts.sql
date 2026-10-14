@@ -29,6 +29,21 @@
   end;
   $$;
 
+  create or replace function public.admin_list_admins()
+  returns table (id uuid, full_name text, email text, created_at timestamptz)
+  language sql security definer set search_path = public as $$
+    select
+      u.id,
+      coalesce(p.full_name, u.raw_user_meta_data ->> 'full_name', 'Campus user'),
+      coalesce(p.email, u.email),
+      u.created_at
+    from auth.users u
+    left join public.user_profiles p on p.id = u.id
+    where (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+      and u.raw_app_meta_data ->> 'role' = 'admin'
+    order by u.created_at asc;
+  $$;
+
   drop trigger if exists on_auth_user_created on auth.users;
   create trigger on_auth_user_created
   after insert on auth.users
@@ -91,6 +106,7 @@
   $$;
 
   grant execute on function public.admin_list_user_profiles() to authenticated;
+  grant execute on function public.admin_list_admins() to authenticated;
   grant execute on function public.admin_set_user_admin(uuid, boolean) to authenticated;
   grant execute on function public.admin_set_user_active(uuid, boolean) to authenticated;
   grant execute on function public.admin_delete_user(uuid) to authenticated;

@@ -54,7 +54,7 @@ dialog.className = "user-auth-dialog";
 dialog.id = "account";
 dialog.innerHTML = `
   <form method="dialog" class="user-auth-card">
-    <button class="user-auth-close" value="cancel" aria-label="Close account dialog">×</button>
+    <button type="button" class="user-auth-close" aria-label="Close account dialog">×</button>
     <p class="section-kicker">CAMPUS ACCOUNT</p>
     <h2>Welcome to LNMIIT Campus</h2>
     <p class="user-auth-greeting is-hidden"></p>
@@ -75,6 +75,10 @@ const form = dialog.querySelector(".user-auth-card");
 const nameField = dialog.querySelector(".user-auth-name");
 const message = dialog.querySelector(".user-auth-message");
 let mode = "login";
+
+dialog.querySelector(".user-auth-close").addEventListener("click", () => {
+  dialog.close();
+});
 
 function setMode(nextMode) {
   mode = nextMode;
