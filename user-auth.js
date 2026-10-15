@@ -10,7 +10,6 @@ style.textContent = `
   .user-auth-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 40; min-width: 190px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 5px 6px 0 var(--lime); }
   .user-auth-dropdown p { margin: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
   .user-auth-signout { margin-top: 12px; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
-  .user-auth-request { display: block; margin-top: 10px; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
   .user-auth-dialog { border: 0; border-radius: 12px; padding: 0; color: var(--ink); background: transparent; }
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
   .user-auth-card { position: relative; width: min(420px, calc(100vw - 42px)); padding: 30px; border-radius: 12px; background: var(--paper); box-shadow: 8px 9px 0 var(--lime); }
@@ -45,7 +44,6 @@ authMenu.className = "user-auth-menu";
 authMenu.innerHTML = `
   <div class="user-auth-dropdown" hidden>
     <p class="user-auth-dropdown-greeting"></p>
-    <button type="button" class="user-auth-request">Request admin access</button>
     <button type="button" class="user-auth-signout">Sign out</button>
   </div>
 `;
@@ -160,15 +158,6 @@ document.addEventListener("click", (event) => {
 authMenu.querySelector(".user-auth-signout").addEventListener("click", async () => {
   await supabase.auth.signOut();
   authMenu.querySelector(".user-auth-dropdown").hidden = true;
-});
-
-authMenu.querySelector(".user-auth-request").addEventListener("click", async () => {
-  const button = authMenu.querySelector(".user-auth-request");
-  button.disabled = true;
-  const { error } = await supabase.rpc("request_admin_access");
-  button.disabled = false;
-  button.textContent = error ? "Request could not be sent" : "Admin request submitted";
-  if (error) console.error("Admin access request failed.", error);
 });
 
 dialog.querySelectorAll("[data-auth-mode]").forEach((tab) => {
