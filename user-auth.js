@@ -171,11 +171,6 @@ form.addEventListener("submit", async (event) => {
   message.textContent = "";
   const email = form.elements.email.value.trim().toLowerCase();
   const password = form.elements.password.value;
-  if (mode === "signup" && !email.endsWith("@lnmiit.ac.in")) {
-    submit.disabled = false;
-    message.textContent = "Use your campus email address.";
-    return;
-  }
   const result =
     mode === "reset"
       ? await supabase.auth.resetPasswordForEmail(email, {
@@ -218,7 +213,7 @@ form.addEventListener("submit", async (event) => {
   }
   if (mode === "signup" && result.data.user && !result.data.user.email_confirmed_at) {
     await supabase.auth.signOut();
-    message.textContent = "Check your campus email to confirm your account before signing in.";
+    message.textContent = "Check your email to confirm your account before signing in.";
     return;
   }
   if (result.data.user) showLoggedIn(result.data.user);

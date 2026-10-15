@@ -76,20 +76,8 @@
   after update of email on auth.users
   for each row execute function public.sync_user_profile_email();
 
-  create or replace function public.require_campus_email()
-  returns trigger language plpgsql security definer set search_path = public as $$
-  begin
-    if new.email is null or lower(new.email) not like '%@lnmiit.ac.in' then
-      raise exception 'Use a verified LNMIIT campus email address';
-    end if;
-    return new;
-  end;
-  $$;
-
   drop trigger if exists on_auth_user_campus_email on auth.users;
-  create trigger on_auth_user_campus_email
-  before insert on auth.users
-  for each row execute function public.require_campus_email();
+  drop function if exists public.require_campus_email();
 
   create or replace function public.create_user_profile()
   returns trigger language plpgsql security definer set search_path = public as $$
