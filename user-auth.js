@@ -42,6 +42,7 @@ authButton.innerHTML = `
 `;
 const authMenu = document.createElement("div");
 authMenu.className = "user-auth-menu";
+let loginVisible = true;
 authMenu.innerHTML = `
   <div class="user-auth-dropdown" hidden>
     <p class="user-auth-dropdown-greeting"></p>
@@ -50,6 +51,22 @@ authMenu.innerHTML = `
 `;
 authMenu.prepend(authButton);
 document.querySelector(".nav-actions")?.append(authMenu);
+
+async function applyLoginVisibility() {
+  const { data, error } = await supabase
+    .from("site_section_visibility")
+    .select("is_public")
+    .eq("section_key", "auth")
+    .maybeSingle();
+  if (error) {
+    console.error("Login visibility could not be loaded.", error);
+    return;
+  }
+  if (data?.is_public === false) {
+    loginVisible = false;
+    authMenu.hidden = true;
+  }
+}
 
 const dialog = document.createElement("dialog");
 dialog.className = "user-auth-dialog";
@@ -74,6 +91,9 @@ dialog.innerHTML = `
   </form>
 `;
 document.body.append(dialog);
+applyLoginVisibility().catch((error) => {
+  console.error("Login visibility could not be applied.", error);
+});
 
 const form = dialog.querySelector(".user-auth-card");
 const nameField = dialog.querySelector(".user-auth-name");
@@ -141,7 +161,9 @@ const loginEmail = new URLSearchParams(window.location.search).get("email");
 if (loginEmail) {
   form.elements.email.value = loginEmail;
   setTimeout(() => {
-    if (!authMenu.dataset.loggedIn && typeof dialog.showModal === "function") dialog.showModal();
+    if (loginVisible && !authMenu.dataset.loggedIn && typeof dialog.showModal === "function") {
+      dialog.showModal();
+    }
   }, 0);
 }
 

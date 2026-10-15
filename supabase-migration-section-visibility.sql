@@ -7,11 +7,18 @@
       'mess',
       'bus',
       'curriculum',
-      'campus-map'
+      'campus-map',
+      'auth'
     )),
     is_public boolean not null default true,
     updated_at timestamptz not null default now()
   );
+
+  alter table public.site_section_visibility
+    drop constraint if exists site_section_visibility_section_key_check;
+  alter table public.site_section_visibility
+    add constraint site_section_visibility_section_key_check
+    check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'campus-map', 'auth'));
 
   insert into public.site_section_visibility (section_key, is_public)
   values
@@ -19,7 +26,8 @@
     ('mess', true),
     ('bus', true),
     ('curriculum', true),
-    ('campus-map', true)
+    ('campus-map', true),
+    ('auth', true)
   on conflict (section_key) do nothing;
 
   alter table public.site_section_visibility enable row level security;

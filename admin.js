@@ -14,6 +14,7 @@ const sections = [
   ["bus", "Bus timings"],
   ["curriculum", "B.Tech curriculum"],
   ["campus-map", "Campus map"],
+  ["auth", "User login"],
 ];
 
 const themeToggle = byId("adminThemeToggle");
