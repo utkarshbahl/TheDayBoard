@@ -34,6 +34,19 @@
   revoke all on function public.is_active_user() from public;
   grant execute on function public.is_active_user() to authenticated;
 
+  create or replace function public.is_email_login_allowed(target_email text)
+  returns boolean language sql security definer set search_path = public as $$
+    select exists (
+      select 1
+      from public.user_profiles
+      where lower(email) = lower(trim(target_email))
+        and is_active
+    );
+  $$;
+
+  revoke all on function public.is_email_login_allowed(text) from public;
+  grant execute on function public.is_email_login_allowed(text) to anon, authenticated;
+
   drop policy if exists "Admins can view account audit log" on public.account_audit_log;
   create policy "Admins can view account audit log"
   on public.account_audit_log for select to authenticated

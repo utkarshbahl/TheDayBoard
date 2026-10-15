@@ -1,1 +1,1 @@
-import{createClient as s}from"https://esm.sh/@supabase/supabase-js@2";export const supabase=s("https://xlepegdbvdrtyvjzhgxm.supabase.co","sb_publishable_7ZGpCpVSNZsy0Y5D6pz7Ew_nPV-AJP2");
+import{createClient as s}from"https://esm.sh/@supabase/supabase-js@2";export const supabase=s("https://xlepegdbvdrtyvjzhgxm.supabase.co","sb_publishable_7ZGpCpVSNZsy0Y5D6pz7Ew_nPV-AJP2",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});

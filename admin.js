@@ -494,7 +494,7 @@ async function initializeAdmin() {
     console.error("Admin profile could not be checked.", profileError);
     return showLogin("Your account could not be verified.");
   }
-  if (profile?.is_active === false) {
+  if (profile?.is_active !== true) {
     await supabase.auth.signOut();
     return showLogin("This account has been disabled.");
   }
@@ -551,6 +551,24 @@ function initialize() {
   return initializeAdmin();
 }
 
+let adminInitialization;
+function initializePersistedAdminSession() {
+  if (!adminInitialization) {
+    adminInitialization = initializeAdmin().finally(() => {
+      adminInitialization = null;
+    });
+  }
+  return adminInitialization;
+}
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session && (event === "INITIAL_SESSION" || event === "SIGNED_IN")) {
+    initializePersistedAdminSession();
+  } else if (!session && event === "SIGNED_OUT") {
+    showLogin();
+  }
+});
+
 byId("adminLoginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = event.submitter;
@@ -562,7 +580,7 @@ byId("adminLoginForm").addEventListener("submit", async (event) => {
   button.disabled = false;
   if (error) return showLogin("Check the email and password, then try again.");
   initializeTheme();
-  initialize();
+  initializePersistedAdminSession();
 });
 
 byId("adminGoogleLogin").addEventListener("click", async (event) => {
@@ -583,4 +601,4 @@ byId("adminSignOut").addEventListener("click", async () => {
   showLogin();
 });
 
-initialize();
+initializePersistedAdminSession();

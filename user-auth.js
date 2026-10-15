@@ -124,16 +124,12 @@ async function loadSession() {
   const { data, error } = await supabase.auth.getSession();
   if (error) throw error;
   if (data.session) {
-    const { data: profile, error: profileError } = await supabase
-      .from("user_profiles")
-      .select("is_active")
-      .eq("id", data.session.user.id)
-      .maybeSingle();
+    const { data: isActive, error: profileError } = await supabase.rpc("is_active_user");
     if (profileError) {
       console.error("User profile could not be loaded.", profileError);
     }
 
-    if (profile?.is_active === false) {
+    if (isActive !== true) {
       await supabase.auth.signOut();
       return;
     }
@@ -200,6 +196,18 @@ form.addEventListener("submit", async (event) => {
   message.textContent = "";
   const email = form.elements.email.value.trim().toLowerCase();
   const password = form.elements.password.value;
+  if (mode === "reset") {
+    const { data: isAllowed, error: eligibilityError } = await supabase.rpc(
+      "is_email_login_allowed",
+      { target_email: email },
+    );
+    if (eligibilityError || isAllowed !== true) {
+      submit.disabled = false;
+      message.textContent = "Password reset could not be requested right now. Please try again later.";
+      if (eligibilityError) console.error("Password reset eligibility could not be checked.", eligibilityError);
+      return;
+    }
+  }
   const result =
     mode === "reset"
       ? await supabase.auth.resetPasswordForEmail(email, {
@@ -223,15 +231,11 @@ form.addEventListener("submit", async (event) => {
     return;
   }
   if (mode === "login" && result.data.user) {
-    const { data: profile, error: profileError } = await supabase
-      .from("user_profiles")
-      .select("is_active")
-      .eq("id", result.data.user.id)
-      .maybeSingle();
+    const { data: isActive, error: profileError } = await supabase.rpc("is_active_user");
     if (profileError) {
       console.error("User profile could not be loaded.", profileError);
     }
-    if (profile?.is_active === false) {
+    if (isActive !== true) {
       await supabase.auth.signOut();
       message.textContent = "This account has been disabled.";
       return;
@@ -251,16 +255,18 @@ form.addEventListener("submit", async (event) => {
 
 supabase.auth.onAuthStateChange((event, session) => {
   if (session) {
-    showLoggedIn(session.user);
     if (event === "TOKEN_REFRESHED" || event === "SIGNED_IN") {
-      supabase.from("user_profiles").select("is_active").eq("id", session.user.id).maybeSingle()
-        .then(({ data: profile, error }) => {
+      supabase.rpc("is_active_user").then(({ data: isActive, error }) => {
           if (error) {
             console.error("User profile could not be checked.", error);
-          } else if (profile?.is_active === false) {
+          } else if (isActive !== true) {
             supabase.auth.signOut();
+          } else {
+            showLoggedIn(session.user);
           }
         });
+    } else {
+      showLoggedIn(session.user);
     }
   } else if (event === "SIGNED_OUT") {
     authButton.setAttribute("aria-label", "Open account login");
