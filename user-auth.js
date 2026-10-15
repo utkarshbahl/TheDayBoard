@@ -57,7 +57,7 @@ dialog.innerHTML = `
   <form method="dialog" class="user-auth-card">
     <button type="button" class="user-auth-close" aria-label="Close account dialog">×</button>
     <p class="section-kicker">CAMPUS ACCOUNT</p>
-    <h2>Welcome to LNMIIT Campus</h2>
+    <h2>Welcome to DayBoard</h2>
     <p class="user-auth-greeting is-hidden"></p>
     <div class="user-auth-tabs">
       <button type="button" class="user-auth-tab is-active" data-auth-mode="login">Log in</button>
@@ -173,7 +173,7 @@ form.addEventListener("submit", async (event) => {
   const password = form.elements.password.value;
   if (mode === "signup" && !email.endsWith("@lnmiit.ac.in")) {
     submit.disabled = false;
-    message.textContent = "Use your LNMIIT campus email address.";
+    message.textContent = "Use your campus email address.";
     return;
   }
   const result =
@@ -218,7 +218,7 @@ form.addEventListener("submit", async (event) => {
   }
   if (mode === "signup" && result.data.user && !result.data.user.email_confirmed_at) {
     await supabase.auth.signOut();
-    message.textContent = "Check your LNMIIT email to confirm your account before signing in.";
+    message.textContent = "Check your campus email to confirm your account before signing in.";
     return;
   }
   if (result.data.user) showLoggedIn(result.data.user);
