@@ -259,6 +259,8 @@ async function updateVisibility(panel, button) {
     panel.querySelector(".section-visibility-message").textContent =
       error?.code === "42P01"
         ? "Visibility settings are not set up yet. Run the section visibility migration in Supabase."
+        : !error && !data
+        ? "User login is missing from Supabase. Run the updated section visibility migration."
         : "Could not save that visibility change. Check the Supabase migration and admin permissions.";
     console.error("Section visibility could not be updated.", error ?? "No row was updated.");
     return;

@@ -20,6 +20,7 @@
     add constraint site_section_visibility_section_key_check
     check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'campus-map', 'auth'));
 
+  -- Upgrade an existing installation with the login visibility row.
   insert into public.site_section_visibility (section_key, is_public)
   values
     ('laundry', true),
