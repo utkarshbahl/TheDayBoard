@@ -18,9 +18,19 @@ document.querySelectorAll(".campus-menu").forEach((menu) => {
   links.forEach((link) => link.addEventListener("click", close));
 });
 
-document.querySelectorAll("[data-last-updated]").forEach((element) => {
-  element.textContent = "Last updated: October 15, 2026 at 12:07 AM IST";
-});
+const updateLiveTime = () => {
+  const time = new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(new Date());
+  document.querySelectorAll("[data-last-updated]").forEach((element) => {
+    element.textContent = `Current time: ${time} IST`;
+  });
+};
+
+updateLiveTime();
+window.setInterval(updateLiveTime, 60_000);
 
 (() => {
   const themeKey = "lnmiit-theme";
