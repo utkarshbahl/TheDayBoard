@@ -49,7 +49,6 @@ function applyVisibility(rows) {
     });
     addUnavailableMessage(sections[currentSection].label);
   }
-  document.documentElement.classList.add("visibility-ready");
 }
 
 async function initialize() {
@@ -58,7 +57,6 @@ async function initialize() {
     .select("section_key, is_public");
   if (error) {
     console.error("Section visibility could not be loaded.", error);
-    document.documentElement.classList.add("visibility-ready");
     return;
   }
   applyVisibility(data ?? []);
