@@ -36,7 +36,6 @@ adminStyle.textContent = `
   .user-management-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
   .user-management-actions button { padding: 8px 9px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 700 10px Manrope; cursor: pointer; }
   .user-management-actions button[data-user-action="delete"] { background: var(--red); }
-  .user-management-actions button[data-user-action="admin"] { background: var(--lime); color: var(--ink); }
   .user-management-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
   .admin-list { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
   .admin-list h2 { margin: 0 0 8px; font-size: 18px; }
@@ -50,9 +49,6 @@ adminStyle.textContent = `
   .audit-log-row { padding: 11px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
   .audit-log-row strong { color: var(--ink); }
   .audit-log-message { min-height: 18px; color: var(--muted); }
-  .access-requests { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
-  .access-request-row { display: flex; justify-content: space-between; gap: 15px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); font-size: 12px; }
-  .access-request-actions { display: flex; gap: 6px; }
   .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
   .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -338,7 +334,7 @@ function renderUsers(panel) {
         <div class="user-management-actions">
           <button type="button" data-user-action="active"></button>
           <button type="button" data-user-action="reset">Reset password</button>
-          <button type="button" data-user-action="admin"></button>
+          <button type="button" data-user-action="signin">Open sign-in</button>
           <button type="button" data-user-action="delete">Delete</button>
         </div>
       `;
@@ -353,14 +349,11 @@ function renderUsers(panel) {
         `${user.email} · Created ${new Date(user.created_at).toLocaleDateString()} · ` +
         `Last sign-in ${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : "never"}`;
       const activeButton = row.querySelector('[data-user-action="active"]');
-      activeButton.textContent = user.is_active ? "Disable" : "Enable";
+      activeButton.textContent = user.is_active ? "Hide login" : "Show login";
       activeButton.dataset.userId = user.id;
       activeButton.dataset.active = String(user.is_active);
       row.querySelector('[data-user-action="reset"]').dataset.email = user.email;
-      const adminButton = row.querySelector('[data-user-action="admin"]');
-      adminButton.textContent = user.is_admin ? "Remove admin" : "Make admin";
-      adminButton.dataset.userId = user.id;
-      adminButton.dataset.admin = String(user.is_admin);
+      row.querySelector('[data-user-action="signin"]').dataset.email = user.email;
       row.querySelector('[data-user-action="delete"]').dataset.userId = user.id;
       return row;
     }),
@@ -372,7 +365,7 @@ async function manageUser(panel, button) {
   button.disabled = true;
   let error;
   if (action === "active") {
-    if (!window.confirm(`${button.dataset.active === "true" ? "Disable" : "Enable"} this account?`)) {
+    if (!window.confirm(`${button.dataset.active === "true" ? "Hide" : "Show"} this login?`)) {
       button.disabled = false;
       return;
     }
@@ -380,15 +373,22 @@ async function manageUser(panel, button) {
       target_user_id: button.dataset.userId,
       active: button.dataset.active !== "true",
     }));
-  } else if (action === "admin") {
-    if (!window.confirm(`${button.dataset.admin === "true" ? "Remove admin access from" : "Make"} this account ${button.dataset.admin === "true" ? "" : "an admin"}?`)) {
+  } else if (action === "reset") {
+    if (!window.confirm(`Send a password reset email to ${button.dataset.email}?`)) {
       button.disabled = false;
       return;
     }
-    ({ error } = await supabase.rpc("admin_set_user_admin", {
-      target_user_id: button.dataset.userId,
-      make_admin: button.dataset.admin !== "true",
+    ({ error } = await supabase.auth.resetPasswordForEmail(button.dataset.email, {
+      redirectTo: `${location.origin}/admin.html`,
     }));
+  } else if (action === "signin") {
+    window.open(
+      `${location.origin}/index.html?email=${encodeURIComponent(button.dataset.email)}#account`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+    button.disabled = false;
+    return;
   } else if (action === "delete") {
     if (!window.confirm(`Delete ${button.closest(".user-management-row").querySelector("strong").firstChild.textContent} permanently?`)) {
       button.disabled = false;
@@ -396,10 +396,6 @@ async function manageUser(panel, button) {
     }
     ({ error } = await supabase.rpc("admin_delete_user", {
       target_user_id: button.dataset.userId,
-    }));
-  } else {
-    ({ error } = await supabase.auth.resetPasswordForEmail(button.dataset.email, {
-      redirectTo: `${location.origin}/admin.html`,
     }));
   }
   button.disabled = false;
@@ -469,67 +465,6 @@ function createAuditPanel() {
   return panel;
 }
 
-function createRequestsPanel() {
-  const panel = document.createElement("section");
-  panel.className = "access-requests";
-  panel.id = "accessRequestsPanel";
-  panel.innerHTML = `
-    <h2>Pending admin requests</h2>
-    <p>Review requests from signed-in campus users.</p>
-    <div class="access-request-items"></div>
-    <p class="access-request-message" role="status"></p>
-  `;
-  byId("analyticsPanel").append(panel);
-  return panel;
-}
-
-async function loadRequests(panel) {
-  const { data, error } = await supabase.rpc("admin_list_access_requests");
-  if (error) throw error;
-  panel.querySelector(".access-request-items").replaceChildren(
-    ...(data ?? []).map((request) => {
-      const row = document.createElement("div");
-      row.className = "access-request-row";
-      row.innerHTML = `<span></span><div class="access-request-actions">
-        <button type="button" data-request-action="approve">Approve</button>
-        <button type="button" data-request-action="reject">Reject</button>
-      </div>`;
-      row.querySelector("span").textContent =
-        `${request.full_name} · ${request.email} · ${new Date(request.requested_at).toLocaleDateString()}`;
-      row.querySelectorAll("[data-request-action]").forEach((button) => {
-        button.dataset.requestId = request.id;
-      });
-      return row;
-    }),
-  );
-}
-
-async function reviewRequest(panel, button) {
-  const approve = button.dataset.requestAction === "approve";
-  if (!window.confirm(`${approve ? "Approve" : "Reject"} this admin access request?`)) return;
-  button.disabled = true;
-  const { error } = await supabase.rpc("admin_review_access_request", {
-    request_id: button.dataset.requestId,
-    approve,
-  });
-  if (error) {
-    panel.querySelector(".access-request-message").textContent = "Request could not be reviewed.";
-    console.error("Admin access request review failed.", error);
-  } else {
-    panel.querySelector(".access-request-message").textContent = "Request reviewed.";
-    await loadRequests(panel);
-  }
-}
-
-function bindRequestsPanel(panel) {
-  if (panel.dataset.bound === "true") return;
-  panel.dataset.bound = "true";
-  panel.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-request-action]");
-    if (button) reviewRequest(panel, button);
-  });
-}
-
 async function loadAudit(panel) {
   const { data, error } = await supabase.rpc("admin_list_account_audit");
   if (error) throw error;
@@ -576,8 +511,6 @@ async function initializeAdmin() {
   bindUsersPanel(usersPanel);
   const adminsPanel = byId("adminListPanel") || createAdminsPanel();
   const auditPanel = byId("auditLogPanel") || createAuditPanel();
-  const requestsPanel = byId("accessRequestsPanel") || createRequestsPanel();
-  bindRequestsPanel(requestsPanel);
   setAdminSection("traffic");
   try {
     await loadAnalytics();
@@ -612,13 +545,6 @@ async function initializeAdmin() {
       "Account activity could not be loaded. Run the updated user accounts migration.";
     console.error("Account activity could not be loaded.", error);
   }
-  try {
-    await loadRequests(requestsPanel);
-  } catch (error) {
-    requestsPanel.querySelector(".access-request-message").textContent =
-      "Admin access requests could not be loaded. Run the access requests migration.";
-    console.error("Admin access requests could not be loaded.", error);
-  }
 }
 
 function initialize() {
@@ -637,6 +563,19 @@ byId("adminLoginForm").addEventListener("submit", async (event) => {
   if (error) return showLogin("Check the email and password, then try again.");
   initializeTheme();
   initialize();
+});
+
+byId("adminGoogleLogin").addEventListener("click", async (event) => {
+  event.currentTarget.disabled = true;
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${location.origin}/admin.html` },
+  });
+  if (error) {
+    event.currentTarget.disabled = false;
+    byId("adminMessage").textContent = "Google sign-in could not be started.";
+    console.error("Admin Google sign-in failed.", error);
+  }
 });
 
 byId("adminSignOut").addEventListener("click", async () => {

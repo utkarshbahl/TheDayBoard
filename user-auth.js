@@ -22,6 +22,7 @@ style.textContent = `
   .user-auth-tab { padding: 0 0 9px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: 700 12px Manrope; cursor: pointer; }
   .user-auth-tab.is-active { border-color: var(--ink); color: var(--ink); }
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
+  .user-auth-google { width: 100%; margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 13px Manrope; cursor: pointer; }
   .user-auth-reset { display: block; margin: 12px auto 0; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
@@ -68,6 +69,7 @@ dialog.innerHTML = `
     <label>Password<input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
     <p class="user-auth-message" role="status"></p>
     <button type="submit" class="user-auth-submit">Log in</button>
+    <button type="button" class="user-auth-google">Continue with Google</button>
     <button type="button" class="user-auth-reset">Forgot password?</button>
   </form>
 `;
@@ -90,6 +92,7 @@ function setMode(nextMode) {
   const passwordLabel = dialog.querySelector('input[name="password"]').closest("label");
   passwordLabel.classList.toggle("is-hidden", mode === "reset");
   dialog.querySelector('input[name="password"]').required = mode !== "reset";
+  dialog.querySelector(".user-auth-google").classList.toggle("is-hidden", mode === "reset");
   dialog.querySelector(".user-auth-submit").textContent =
     mode === "signup" ? "Create account" : mode === "reset" ? "Send reset email" : "Log in";
   dialog.querySelector(".user-auth-reset").textContent =
@@ -98,9 +101,6 @@ function setMode(nextMode) {
     tab.classList.toggle("is-active", tab.dataset.authMode === mode);
   });
 
-  dialog.querySelector(".user-auth-reset").addEventListener("click", () => {
-    setMode(mode === "reset" ? "login" : "reset");
-  });
   message.textContent = "";
 }
 
@@ -132,12 +132,21 @@ async function loadSession() {
     if (profileError) {
       console.error("User profile could not be loaded.", profileError);
     }
+
     if (profile?.is_active === false) {
       await supabase.auth.signOut();
       return;
     }
     showLoggedIn(data.session.user);
   }
+}
+
+const loginEmail = new URLSearchParams(window.location.search).get("email");
+if (loginEmail) {
+  form.elements.email.value = loginEmail;
+  setTimeout(() => {
+    if (!authMenu.dataset.loggedIn && typeof dialog.showModal === "function") dialog.showModal();
+  }, 0);
 }
 
 authButton.addEventListener("click", () => {
@@ -164,6 +173,26 @@ dialog.querySelectorAll("[data-auth-mode]").forEach((tab) => {
   tab.addEventListener("click", () => setMode(tab.dataset.authMode));
 });
 
+dialog.querySelector(".user-auth-google").addEventListener("click", async () => {
+  const button = dialog.querySelector(".user-auth-google");
+  button.disabled = true;
+  message.textContent = "";
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.href },
+  });
+  if (error) {
+    button.disabled = false;
+    message.textContent = "Google sign-in could not be started.";
+    console.error("Google sign-in failed.", error);
+  }
+});
+
+dialog.querySelector(".user-auth-reset").addEventListener("click", (event) => {
+  event.preventDefault();
+  setMode(mode === "reset" ? "login" : "reset");
+});
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submit = dialog.querySelector(".user-auth-submit");
@@ -185,7 +214,12 @@ form.addEventListener("submit", async (event) => {
       : await supabase.auth.signInWithPassword({ email, password });
   submit.disabled = false;
   if (result.error) {
-    message.textContent = result.error.message;
+    message.textContent =
+      mode === "reset"
+        ? "Password reset could not be requested right now. Please try again later."
+        : mode === "signup"
+        ? "Account could not be created right now. Please try again later."
+        : "Unable to complete sign in. Please check your details and try again later.";
     return;
   }
   if (mode === "login" && result.data.user) {
@@ -204,7 +238,7 @@ form.addEventListener("submit", async (event) => {
     }
   }
   if (mode === "reset") {
-    message.textContent = result.error ? result.error.message : "If that account exists, a reset email has been sent.";
+    message.textContent = "If that account exists, a reset email has been sent.";
     return;
   }
   if (mode === "signup" && !result.data.session) {

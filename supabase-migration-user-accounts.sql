@@ -105,6 +105,7 @@
     where (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
       and u.raw_app_meta_data ->> 'role' = 'admin'
       and public.is_active_user()
+      and p.is_active
     order by u.created_at asc;
   $$;
 
@@ -155,34 +156,6 @@
     order by p.created_at desc;
   $$;
 
-  create or replace function public.admin_set_user_admin(target_user_id uuid, make_admin boolean)
-  returns void language plpgsql security definer set search_path = public as $$
-  begin
-    if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' or not public.is_active_user() then
-      raise exception 'Only admins can manage user accounts';
-    end if;
-    if target_user_id = auth.uid() and not make_admin then
-      raise exception 'Admins cannot remove their own admin access';
-    end if;
-    if not make_admin and (
-      select count(*) from auth.users
-      where raw_app_meta_data ->> 'role' = 'admin'
-    ) <= 1 then
-      raise exception 'The last administrator cannot be removed';
-    end if;
-    update auth.users
-    set raw_app_meta_data = case
-      when make_admin then coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"admin"}'::jsonb
-      else coalesce(raw_app_meta_data, '{}'::jsonb) - 'role'
-    end
-    where id = target_user_id;
-    perform public.audit_account_action(
-      case when make_admin then 'admin_granted' else 'admin_revoked' end,
-      target_user_id
-    );
-  end;
-  $$;
-
   create or replace function public.admin_set_user_active(target_user_id uuid, active boolean)
   returns void language plpgsql security definer set search_path = public as $$
   begin
@@ -219,7 +192,6 @@
   grant execute on function public.admin_list_user_profiles() to authenticated;
   grant execute on function public.admin_list_admins() to authenticated;
   grant execute on function public.admin_list_account_audit() to authenticated;
-  grant execute on function public.admin_set_user_admin(uuid, boolean) to authenticated;
   grant execute on function public.admin_set_user_active(uuid, boolean) to authenticated;
   grant execute on function public.admin_delete_user(uuid) to authenticated;
   grant select on public.account_audit_log to authenticated;
