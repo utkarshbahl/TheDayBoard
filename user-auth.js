@@ -42,6 +42,7 @@ authButton.innerHTML = `
 `;
 const authMenu = document.createElement("div");
 authMenu.className = "user-auth-menu";
+authMenu.hidden = true;
 let loginVisible = true;
 authMenu.innerHTML = `
   <div class="user-auth-dropdown" hidden>
@@ -60,12 +61,13 @@ async function applyLoginVisibility() {
     .maybeSingle();
   if (error) {
     console.error("Login visibility could not be loaded.", error);
+    authMenu.hidden = false;
     return;
   }
   if (data?.is_public === false) {
     loginVisible = false;
-    authMenu.hidden = true;
   }
+  authMenu.hidden = !loginVisible;
 }
 
 const dialog = document.createElement("dialog");
