@@ -10,6 +10,7 @@ style.textContent = `
   .user-auth-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 40; min-width: 190px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 5px 6px 0 var(--lime); }
   .user-auth-dropdown p { margin: 0; color: var(--ink); font-size: 13px; white-space: nowrap; }
   .user-auth-signout { margin-top: 12px; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
+  .user-auth-request { display: block; margin-top: 10px; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
   .user-auth-dialog { border: 0; border-radius: 12px; padding: 0; color: var(--ink); background: transparent; }
   .user-auth-dialog::backdrop { background: rgba(20, 40, 31, .58); }
   .user-auth-card { position: relative; width: min(420px, calc(100vw - 42px)); padding: 30px; border-radius: 12px; background: var(--paper); box-shadow: 8px 9px 0 var(--lime); }
@@ -22,6 +23,7 @@ style.textContent = `
   .user-auth-tab { padding: 0 0 9px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font: 700 12px Manrope; cursor: pointer; }
   .user-auth-tab.is-active { border-color: var(--ink); color: var(--ink); }
   .user-auth-submit { width: 100%; margin-top: 18px; padding: 13px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font: 800 14px Manrope; cursor: pointer; }
+  .user-auth-reset { display: block; margin: 12px auto 0; padding: 0; border: 0; background: none; color: var(--muted); font: 600 11px Manrope; text-decoration: underline; cursor: pointer; }
   .user-auth-message { min-height: 18px; margin: 10px 0 0; color: var(--red); font-size: 12px; line-height: 1.4; }
   .is-hidden { display: none !important; }
   @media (max-width: 600px) { .user-auth-menu { margin-left: 7px; } .user-auth-button { width: 32px; height: 32px; margin-left: 0; } }
@@ -43,6 +45,7 @@ authMenu.className = "user-auth-menu";
 authMenu.innerHTML = `
   <div class="user-auth-dropdown" hidden>
     <p class="user-auth-dropdown-greeting"></p>
+    <button type="button" class="user-auth-request">Request admin access</button>
     <button type="button" class="user-auth-signout">Sign out</button>
   </div>
 `;
@@ -67,6 +70,7 @@ dialog.innerHTML = `
     <label>Password<input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
     <p class="user-auth-message" role="status"></p>
     <button type="submit" class="user-auth-submit">Log in</button>
+    <button type="button" class="user-auth-reset">Forgot password?</button>
   </form>
 `;
 document.body.append(dialog);
@@ -84,10 +88,20 @@ function setMode(nextMode) {
   mode = nextMode;
   nameField.classList.toggle("is-hidden", mode !== "signup");
   nameField.querySelector("input").required = mode === "signup";
+  dialog.querySelector(".user-auth-tabs").classList.toggle("is-hidden", mode === "reset");
+  const passwordLabel = dialog.querySelector('input[name="password"]').closest("label");
+  passwordLabel.classList.toggle("is-hidden", mode === "reset");
+  dialog.querySelector('input[name="password"]').required = mode !== "reset";
   dialog.querySelector(".user-auth-submit").textContent =
-    mode === "signup" ? "Create account" : "Log in";
+    mode === "signup" ? "Create account" : mode === "reset" ? "Send reset email" : "Log in";
+  dialog.querySelector(".user-auth-reset").textContent =
+    mode === "reset" ? "Back to log in" : "Forgot password?";
   dialog.querySelectorAll("[data-auth-mode]").forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.authMode === mode);
+  });
+
+  dialog.querySelector(".user-auth-reset").addEventListener("click", () => {
+    setMode(mode === "reset" ? "login" : "reset");
   });
   message.textContent = "";
 }
@@ -148,6 +162,15 @@ authMenu.querySelector(".user-auth-signout").addEventListener("click", async () 
   authMenu.querySelector(".user-auth-dropdown").hidden = true;
 });
 
+authMenu.querySelector(".user-auth-request").addEventListener("click", async () => {
+  const button = authMenu.querySelector(".user-auth-request");
+  button.disabled = true;
+  const { error } = await supabase.rpc("request_admin_access");
+  button.disabled = false;
+  button.textContent = error ? "Request could not be sent" : "Admin request submitted";
+  if (error) console.error("Admin access request failed.", error);
+});
+
 dialog.querySelectorAll("[data-auth-mode]").forEach((tab) => {
   tab.addEventListener("click", () => setMode(tab.dataset.authMode));
 });
@@ -159,8 +182,17 @@ form.addEventListener("submit", async (event) => {
   message.textContent = "";
   const email = form.elements.email.value.trim().toLowerCase();
   const password = form.elements.password.value;
+  if (mode === "signup" && !email.endsWith("@lnmiit.ac.in")) {
+    submit.disabled = false;
+    message.textContent = "Use your LNMIIT campus email address.";
+    return;
+  }
   const result =
-    mode === "signup"
+    mode === "reset"
+      ? await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${location.origin}/index.html`,
+        })
+      : mode === "signup"
       ? await supabase.auth.signUp({
           email,
           password,
@@ -187,8 +219,17 @@ form.addEventListener("submit", async (event) => {
       return;
     }
   }
+  if (mode === "reset") {
+    message.textContent = result.error ? result.error.message : "If that account exists, a reset email has been sent.";
+    return;
+  }
   if (mode === "signup" && !result.data.session) {
     message.textContent = "Check your email to confirm your account.";
+    return;
+  }
+  if (mode === "signup" && result.data.user && !result.data.user.email_confirmed_at) {
+    await supabase.auth.signOut();
+    message.textContent = "Check your LNMIIT email to confirm your account before signing in.";
     return;
   }
   if (result.data.user) showLoggedIn(result.data.user);
@@ -198,6 +239,16 @@ form.addEventListener("submit", async (event) => {
 supabase.auth.onAuthStateChange((event, session) => {
   if (session) {
     showLoggedIn(session.user);
+    if (event === "TOKEN_REFRESHED" || event === "SIGNED_IN") {
+      supabase.from("user_profiles").select("is_active").eq("id", session.user.id).maybeSingle()
+        .then(({ data: profile, error }) => {
+          if (error) {
+            console.error("User profile could not be checked.", error);
+          } else if (profile?.is_active === false) {
+            supabase.auth.signOut();
+          }
+        });
+    }
   } else if (event === "SIGNED_OUT") {
     authButton.setAttribute("aria-label", "Open account login");
     delete authMenu.dataset.loggedIn;

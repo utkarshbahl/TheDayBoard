@@ -30,6 +30,9 @@
   declare
     request public.admin_access_requests;
   begin
+    if not public.is_active_user() then
+      raise exception 'Only active accounts can request admin access';
+    end if;
     insert into public.admin_access_requests (user_id)
     values (auth.uid())
     on conflict (user_id) do update
@@ -64,6 +67,7 @@
     left join public.user_profiles p on p.id = r.user_id
     where (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
       and r.status = 'pending'
+      and public.is_active_user()
     order by r.requested_at desc;
   $$;
 
@@ -96,7 +100,7 @@
   declare
     requested_user_id uuid;
   begin
-    if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' then
+    if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' or not public.is_active_user() then
       raise exception 'Only admins can review access requests';
     end if;
 
@@ -118,6 +122,10 @@
         reviewed_at = now(),
         reviewed_by = auth.uid()
     where id = request_id;
+    perform public.audit_account_action(
+      case when approve then 'admin_access_approved' else 'admin_access_rejected' end,
+      requested_user_id
+    );
   end;
   $$;
 

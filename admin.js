@@ -24,6 +24,12 @@ adminStyle.textContent = `
   .user-management { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
   .user-management h2 { margin: 0 0 8px; font-size: 18px; }
   .user-management > p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .user-management-toolbar { display: flex; gap: 8px; margin: 16px 0; }
+  .user-management-toolbar input, .user-management-toolbar select { min-width: 0; flex: 1; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 12px Manrope; }
+  .user-management-toolbar select { flex: 0 1 150px; }
+  .user-management-summary { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; color: var(--muted); font: 11px "DM Mono", monospace; }
+  .account-badge { display: inline-block; margin-left: 6px; padding: 3px 6px; border-radius: 999px; background: var(--lime); color: var(--ink); font: 700 9px Manrope; }
+  .account-badge.is-disabled { background: var(--red); color: #fff; }
   .user-management-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 13px; }
   .user-management-row strong, .user-management-row span { display: block; }
   .user-management-row span { margin-top: 4px; color: var(--muted); font-size: 11px; }
@@ -38,6 +44,15 @@ adminStyle.textContent = `
   .admin-list-row { display: flex; justify-content: space-between; gap: 15px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 13px; }
   .admin-list-row span { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
   .admin-list-message { min-height: 18px; margin-bottom: 0; color: var(--muted); }
+  .audit-log { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .audit-log h2 { margin: 0 0 8px; font-size: 18px; }
+  .audit-log-items { max-height: 300px; overflow: auto; }
+  .audit-log-row { padding: 11px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+  .audit-log-row strong { color: var(--ink); }
+  .audit-log-message { min-height: 18px; color: var(--muted); }
+  .access-requests { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .access-request-row { display: flex; justify-content: space-between; gap: 15px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); font-size: 12px; }
+  .access-request-actions { display: flex; gap: 6px; }
   .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
   .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -276,6 +291,14 @@ function createUsersPanel() {
   panel.innerHTML = `
     <h2>User accounts</h2>
     <p>View and manage registered campus accounts.</p>
+    <div class="user-management-toolbar">
+      <input type="search" class="user-search" placeholder="Search name or email" aria-label="Search user accounts">
+      <select class="user-filter" aria-label="Filter user accounts">
+        <option value="all">All accounts</option><option value="active">Active</option>
+        <option value="disabled">Disabled</option><option value="admins">Admins</option>
+      </select>
+    </div>
+    <div class="user-management-summary" aria-live="polite"></div>
     <div class="user-management-list"></div>
     <p class="user-management-message" role="status"></p>
   `;
@@ -286,9 +309,28 @@ function createUsersPanel() {
 async function loadUsers(panel) {
   const { data, error } = await supabase.rpc("admin_list_user_profiles");
   if (error) throw error;
+  panel.userData = data ?? [];
+  renderUsers(panel);
+}
+
+function renderUsers(panel) {
+  const search = panel.querySelector(".user-search").value.trim().toLowerCase();
+  const filter = panel.querySelector(".user-filter").value;
+  const users = panel.userData.filter((user) => {
+    const matchesSearch = !search || `${user.full_name} ${user.email}`.toLowerCase().includes(search);
+    const matchesFilter =
+      filter === "all" || (filter === "active" && user.is_active) ||
+      (filter === "disabled" && !user.is_active) || (filter === "admins" && user.is_admin);
+    return matchesSearch && matchesFilter;
+  });
+  const total = panel.userData.length;
+  panel.querySelector(".user-management-summary").textContent =
+    `${total} total · ${panel.userData.filter((user) => user.is_active).length} active · ` +
+    `${panel.userData.filter((user) => !user.is_active).length} disabled · ` +
+    `${panel.userData.filter((user) => user.is_admin).length} admins`;
   const list = panel.querySelector(".user-management-list");
   list.replaceChildren(
-    ...(data ?? []).map((user) => {
+    ...users.map((user) => {
       const row = document.createElement("div");
       row.className = "user-management-row";
       row.innerHTML = `
@@ -301,17 +343,24 @@ async function loadUsers(panel) {
         </div>
       `;
       row.querySelector("strong").textContent = user.full_name;
-      row.querySelector("span").textContent = `${user.email} · ${new Date(user.created_at).toLocaleDateString()}`;
+      if (user.is_admin || !user.is_active) {
+        const badge = document.createElement("span");
+        badge.className = `account-badge${user.is_active ? "" : " is-disabled"}`;
+        badge.textContent = user.is_active ? "Admin" : "Disabled";
+        row.querySelector("strong").append(badge);
+      }
+      row.querySelector("span").textContent =
+        `${user.email} · Created ${new Date(user.created_at).toLocaleDateString()} · ` +
+        `Last sign-in ${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : "never"}`;
       const activeButton = row.querySelector('[data-user-action="active"]');
       activeButton.textContent = user.is_active ? "Disable" : "Enable";
       activeButton.dataset.userId = user.id;
       activeButton.dataset.active = String(user.is_active);
       row.querySelector('[data-user-action="reset"]').dataset.email = user.email;
       const adminButton = row.querySelector('[data-user-action="admin"]');
-      adminButton.textContent = user.is_admin ? "Admin" : "Make admin";
+      adminButton.textContent = user.is_admin ? "Remove admin" : "Make admin";
       adminButton.dataset.userId = user.id;
       adminButton.dataset.admin = String(user.is_admin);
-      adminButton.disabled = user.is_admin;
       row.querySelector('[data-user-action="delete"]').dataset.userId = user.id;
       return row;
     }),
@@ -323,17 +372,25 @@ async function manageUser(panel, button) {
   button.disabled = true;
   let error;
   if (action === "active") {
+    if (!window.confirm(`${button.dataset.active === "true" ? "Disable" : "Enable"} this account?`)) {
+      button.disabled = false;
+      return;
+    }
     ({ error } = await supabase.rpc("admin_set_user_active", {
       target_user_id: button.dataset.userId,
       active: button.dataset.active !== "true",
     }));
   } else if (action === "admin") {
+    if (!window.confirm(`${button.dataset.admin === "true" ? "Remove admin access from" : "Make"} this account ${button.dataset.admin === "true" ? "" : "an admin"}?`)) {
+      button.disabled = false;
+      return;
+    }
     ({ error } = await supabase.rpc("admin_set_user_admin", {
       target_user_id: button.dataset.userId,
       make_admin: button.dataset.admin !== "true",
     }));
   } else if (action === "delete") {
-    if (!window.confirm("Delete this account permanently?")) {
+    if (!window.confirm(`Delete ${button.closest(".user-management-row").querySelector("strong").firstChild.textContent} permanently?`)) {
       button.disabled = false;
       return;
     }
@@ -364,6 +421,8 @@ function bindUsersPanel(panel) {
     const button = event.target.closest("[data-user-action]");
     if (button) manageUser(panel, button);
   });
+  panel.querySelector(".user-search").addEventListener("input", () => renderUsers(panel));
+  panel.querySelector(".user-filter").addEventListener("change", () => renderUsers(panel));
 }
 
 function createAdminsPanel() {
@@ -396,9 +455,114 @@ async function loadAdmins(panel) {
   );
 }
 
+function createAuditPanel() {
+  const panel = document.createElement("section");
+  panel.className = "audit-log";
+  panel.id = "auditLogPanel";
+  panel.innerHTML = `
+    <h2>Account activity</h2>
+    <p>Recent administrative account actions.</p>
+    <div class="audit-log-items"></div>
+    <p class="audit-log-message" role="status"></p>
+  `;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+function createRequestsPanel() {
+  const panel = document.createElement("section");
+  panel.className = "access-requests";
+  panel.id = "accessRequestsPanel";
+  panel.innerHTML = `
+    <h2>Pending admin requests</h2>
+    <p>Review requests from signed-in campus users.</p>
+    <div class="access-request-items"></div>
+    <p class="access-request-message" role="status"></p>
+  `;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+async function loadRequests(panel) {
+  const { data, error } = await supabase.rpc("admin_list_access_requests");
+  if (error) throw error;
+  panel.querySelector(".access-request-items").replaceChildren(
+    ...(data ?? []).map((request) => {
+      const row = document.createElement("div");
+      row.className = "access-request-row";
+      row.innerHTML = `<span></span><div class="access-request-actions">
+        <button type="button" data-request-action="approve">Approve</button>
+        <button type="button" data-request-action="reject">Reject</button>
+      </div>`;
+      row.querySelector("span").textContent =
+        `${request.full_name} · ${request.email} · ${new Date(request.requested_at).toLocaleDateString()}`;
+      row.querySelectorAll("[data-request-action]").forEach((button) => {
+        button.dataset.requestId = request.id;
+      });
+      return row;
+    }),
+  );
+}
+
+async function reviewRequest(panel, button) {
+  const approve = button.dataset.requestAction === "approve";
+  if (!window.confirm(`${approve ? "Approve" : "Reject"} this admin access request?`)) return;
+  button.disabled = true;
+  const { error } = await supabase.rpc("admin_review_access_request", {
+    request_id: button.dataset.requestId,
+    approve,
+  });
+  if (error) {
+    panel.querySelector(".access-request-message").textContent = "Request could not be reviewed.";
+    console.error("Admin access request review failed.", error);
+  } else {
+    panel.querySelector(".access-request-message").textContent = "Request reviewed.";
+    await loadRequests(panel);
+  }
+}
+
+function bindRequestsPanel(panel) {
+  if (panel.dataset.bound === "true") return;
+  panel.dataset.bound = "true";
+  panel.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-request-action]");
+    if (button) reviewRequest(panel, button);
+  });
+}
+
+async function loadAudit(panel) {
+  const { data, error } = await supabase.rpc("admin_list_account_audit");
+  if (error) throw error;
+  panel.querySelector(".audit-log-items").replaceChildren(
+    ...(data ?? []).map((entry) => {
+      const row = document.createElement("div");
+      row.className = "audit-log-row";
+      const target = entry.target_email || "deleted account";
+      row.innerHTML = "<strong></strong><span></span>";
+      row.querySelector("strong").textContent = entry.action.replaceAll("_", " ");
+      row.querySelector("span").textContent =
+        ` · ${target} · ${new Date(entry.created_at).toLocaleString()}`;
+      return row;
+    }),
+  );
+}
+
 async function initializeAdmin() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return showLogin();
+  const { data: profile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("is_active")
+    .eq("id", session.user.id)
+    .maybeSingle();
+  if (profileError) {
+    console.error("Admin profile could not be checked.", profileError);
+    return showLogin("Your account could not be verified.");
+  }
+  if (profile?.is_active === false) {
+    await supabase.auth.signOut();
+    return showLogin("This account has been disabled.");
+  }
   if (session.user.app_metadata?.role !== "admin") {
     await supabase.auth.signOut();
     return showLogin("This account is not an admin account.");
@@ -411,6 +575,9 @@ async function initializeAdmin() {
   const usersPanel = byId("userManagementPanel") || createUsersPanel();
   bindUsersPanel(usersPanel);
   const adminsPanel = byId("adminListPanel") || createAdminsPanel();
+  const auditPanel = byId("auditLogPanel") || createAuditPanel();
+  const requestsPanel = byId("accessRequestsPanel") || createRequestsPanel();
+  bindRequestsPanel(requestsPanel);
   setAdminSection("traffic");
   try {
     await loadAnalytics();
@@ -437,6 +604,20 @@ async function initializeAdmin() {
     adminsPanel.querySelector(".admin-list-message").textContent =
       "Current admins could not be loaded. Run the updated admin access migration.";
     console.error("Current admins could not be loaded.", error);
+  }
+  try {
+    await loadAudit(auditPanel);
+  } catch (error) {
+    auditPanel.querySelector(".audit-log-message").textContent =
+      "Account activity could not be loaded. Run the updated user accounts migration.";
+    console.error("Account activity could not be loaded.", error);
+  }
+  try {
+    await loadRequests(requestsPanel);
+  } catch (error) {
+    requestsPanel.querySelector(".access-request-message").textContent =
+      "Admin access requests could not be loaded. Run the access requests migration.";
+    console.error("Admin access requests could not be loaded.", error);
   }
 }
 
