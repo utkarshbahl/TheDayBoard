@@ -208,12 +208,7 @@ form.addEventListener("submit", async (event) => {
     return;
   }
   if (mode === "signup" && !result.data.session) {
-    message.textContent = "Check your email to confirm your account.";
-    return;
-  }
-  if (mode === "signup" && result.data.user && !result.data.user.email_confirmed_at) {
-    await supabase.auth.signOut();
-    message.textContent = "Check your email to confirm your account before signing in.";
+    message.textContent = "Account created. Sign in to continue.";
     return;
   }
   if (result.data.user) showLoggedIn(result.data.user);
