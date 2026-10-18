@@ -1,5 +1,11 @@
 import "./section-visibility.js?v=20261016";
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch((error) => {
+    console.error("Offline support could not be enabled.", error);
+  });
+}
+
 document.querySelectorAll(".campus-menu").forEach((menu) => {
   const trigger = menu.querySelector("summary");
   const links = menu.querySelectorAll(".campus-nav-link");
