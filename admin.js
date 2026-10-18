@@ -143,11 +143,14 @@ async function publishSurvey(event) {
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
   button.disabled = true; message.textContent = "Publishing…";
-  const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: true, published_at: new Date().toISOString() }).select("id").single();
+  const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: false }).select("id").single();
   const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
-  const { error: passwordError } = questionsError ? { error: questionsError } : await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: byId("surveyPassword").value });
+  const enteredPassword = byId("surveyPassword").value;
+  const { error: passwordError } = questionsError || !enteredPassword ? { error: questionsError } : await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: enteredPassword });
   button.disabled = false;
-  if (passwordError) { message.textContent = "The opinion could not be published."; return; }
+  if (passwordError) { if (survey?.id) await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
+  const { error: publishError } = await supabase.from("surveys").update({ is_published: true, published_at: new Date().toISOString() }).eq("id", survey.id);
+  if (publishError) { await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
   form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; loadSurveyResults();
 }
 

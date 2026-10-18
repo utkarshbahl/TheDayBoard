@@ -18,7 +18,7 @@ returns void language plpgsql security definer set search_path = public as $$
 begin
   if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' then raise exception 'Not authorized'; end if;
   update surveys set password_protected = coalesce(length(trim(p_password)), 0) > 0,
-    password_hash = case when coalesce(length(trim(p_password)), 0) > 0 then crypt(p_password, gen_salt('bf')) else null end
+    password_hash = case when coalesce(length(trim(p_password)), 0) > 0 then extensions.crypt(p_password, extensions.gen_salt('bf')) else null end
   where id = p_survey_id;
 end;
 $$;
@@ -27,7 +27,7 @@ create or replace function public.get_survey_questions(p_survey_id uuid, p_passw
 returns table(id uuid, prompt text, question_type text, options jsonb, question_position integer)
 language plpgsql security definer set search_path = public as $$
 begin
-  if not exists (select 1 from surveys where surveys.id = p_survey_id and is_published and (not password_protected or crypt(coalesce(p_password, ''), password_hash) = password_hash)) then
+  if not exists (select 1 from surveys where surveys.id = p_survey_id and is_published and (not password_protected or extensions.crypt(coalesce(p_password, ''), password_hash) = password_hash)) then
     raise exception 'This opinion is unavailable or the password is incorrect.';
   end if;
   return query select q.id, q.prompt, q.question_type, q.options, q.position from survey_questions q where q.survey_id = p_survey_id order by q.position;
@@ -38,7 +38,7 @@ create or replace function public.submit_survey_response(p_survey_id uuid, p_nam
 returns uuid language plpgsql security definer set search_path = public as $$
 declare response_id uuid; question record; submitted_answer text; survey_requires_name boolean;
 begin
-  select collect_name into survey_requires_name from surveys where id = p_survey_id and is_published and (not password_protected or crypt(coalesce(p_password, ''), password_hash) = password_hash);
+  select collect_name into survey_requires_name from surveys where id = p_survey_id and is_published and (not password_protected or extensions.crypt(coalesce(p_password, ''), password_hash) = password_hash);
   if not found then raise exception 'This opinion is unavailable or the password is incorrect.'; end if;
   if survey_requires_name and coalesce(length(trim(p_name)), 0) = 0 then raise exception 'Please enter your name.'; end if;
   if not survey_requires_name then p_name := null; end if;
