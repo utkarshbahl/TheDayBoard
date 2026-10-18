@@ -1,6 +1,8 @@
 import { supabase } from "./supabase.js";
 
 const byId = (id) => document.getElementById(id);
+let adminSurveys = [];
+let selectedAdminSurveyId = null;
 const pageNames = {
   "/": "Laundry status",
   "/mess-menu": "Mess menu",
@@ -118,6 +120,7 @@ function createSurveyPanel() {
   panel.id = "surveyAdminPanel";
   panel.className = "survey-admin is-admin-section-hidden";
   panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results…</p></div></div>`;
+  panel.querySelector("p").textContent = "Publish as many open opinions as needed. Each can contain multiple-choice and written questions.";
   byId("analyticsPanel").append(panel);
   const editors = panel.querySelector("#surveyQuestionEditors");
   editors.append(questionEditor(1));
@@ -137,20 +140,20 @@ async function publishSurvey(event) {
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
   button.disabled = true; message.textContent = "Publishing…";
-  const { error: closeError } = await supabase.from("surveys").update({ is_published: false }).eq("is_published", true);
-  if (closeError) { button.disabled = false; message.textContent = "Could not close the current opinion."; return; }
   const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: true, published_at: new Date().toISOString() }).select("id").single();
   const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
   button.disabled = false;
   if (questionsError) { message.textContent = "The opinion could not be published."; return; }
-  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; loadSurveyResults();
+  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; loadSurveyResults();
 }
 
 async function loadSurveyResults() {
   const target = byId("surveyResults"); if (!target) return;
-  const { data: surveys, error } = await supabase.from("surveys").select("id,title,collect_name,is_published,created_at").order("created_at", { ascending: false }).limit(10);
+  const { data: surveys, error } = await supabase.from("surveys").select("id,title,description,collect_name,is_published,created_at").order("created_at", { ascending: false });
   if (error || !surveys?.length) { target.innerHTML = "<p>No opinions have been published yet.</p>"; return; }
-  const survey = surveys[0];
+  adminSurveys = surveys;
+  if (!selectedAdminSurveyId || !surveys.some((item) => item.id === selectedAdminSurveyId)) selectedAdminSurveyId = surveys[0].id;
+  const survey = surveys.find((item) => item.id === selectedAdminSurveyId);
   const [{ data: questions }, { data: responses }] = await Promise.all([supabase.from("survey_questions").select("id,prompt,question_type,options,position").eq("survey_id", survey.id).order("position"), supabase.from("survey_responses").select("id,respondent_name,submitted_at").eq("survey_id", survey.id)]);
   const responseIds = (responses ?? []).map((response) => response.id);
   const { data: answers } = responseIds.length ? await supabase.from("survey_answers").select("response_id,question_id,answer_text").in("response_id", responseIds) : { data: [] };
@@ -160,6 +163,28 @@ async function loadSurveyResults() {
     if (question.question_type === "mcq") { const counts = new Map(question.options.map((option) => [option, 0])); questionAnswers.forEach((answer) => counts.set(answer.answer_text, (counts.get(answer.answer_text) ?? 0) + 1)); const max = Math.max(1, ...counts.values()); return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${[...counts].map(([option, count]) => `<div class="survey-bar-row"><span>${escapeHtml(option)}</span><div class="survey-bar"><i style="width:${Math.round(count / max * 100)}%"></i></div><strong>${count}</strong></div>`).join("")}</article>`; }
     return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${questionAnswers.length ? questionAnswers.map((answer) => `<p class="survey-written-answer">${survey.collect_name ? `<small>${escapeHtml(responseById.get(answer.response_id)?.respondent_name || "Unnamed")}</small>` : ""}${escapeHtml(answer.answer_text)}</p>`).join("") : "<p>No written responses yet.</p>"}</article>`;
   }).join("")}`;
+  target.insertAdjacentHTML("afterbegin", `<label class="survey-result-picker">View or manage opinion<select id="surveyResultPicker">${surveys.map((item) => `<option value="${item.id}"${item.id === survey.id ? " selected" : ""}>${escapeHtml(item.title)}${item.is_published ? " (open)" : ""}</option>`).join("")}</select></label><div class="survey-result-actions"><button type="button" id="editSurvey">Edit details</button><button type="button" id="deleteSurvey">Delete survey</button></div>`);
+  byId("surveyResultPicker").addEventListener("change", (event) => { selectedAdminSurveyId = event.target.value; loadSurveyResults(); });
+  byId("editSurvey").addEventListener("click", editSelectedSurvey);
+  byId("deleteSurvey").addEventListener("click", deleteSelectedSurvey);
+}
+
+async function editSelectedSurvey() {
+  const survey = adminSurveys.find((item) => item.id === selectedAdminSurveyId); if (!survey) return;
+  const title = prompt("Opinion title", survey.title); if (title === null || !title.trim()) return;
+  const description = prompt("Opinion description", survey.description || ""); if (description === null) return;
+  const collectName = confirm("Select OK to collect respondent names. Select Cancel to keep responses anonymous.");
+  const { error } = await supabase.from("surveys").update({ title: title.trim(), description: description.trim(), collect_name: collectName }).eq("id", survey.id);
+  if (error) { alert("The opinion could not be updated."); return; }
+  loadSurveyResults();
+}
+
+async function deleteSelectedSurvey() {
+  const survey = adminSurveys.find((item) => item.id === selectedAdminSurveyId);
+  if (!survey || !confirm(`Delete “${survey.title}” and all of its responses? This cannot be undone.`)) return;
+  const { error } = await supabase.from("surveys").delete().eq("id", survey.id);
+  if (error) { alert("The opinion could not be deleted."); return; }
+  selectedAdminSurveyId = null; loadSurveyResults();
 }
 
 async function loadAnalytics() {
