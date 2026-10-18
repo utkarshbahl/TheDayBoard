@@ -24,7 +24,7 @@ end;
 $$;
 
 create or replace function public.get_survey_questions(p_survey_id uuid, p_password text default '')
-returns table(id uuid, prompt text, question_type text, options jsonb, position integer)
+returns table(id uuid, prompt text, question_type text, options jsonb, question_position integer)
 language plpgsql security definer set search_path = public as $$
 begin
   if not exists (select 1 from surveys where surveys.id = p_survey_id and is_published and (not password_protected or crypt(coalesce(p_password, ''), password_hash) = password_hash)) then

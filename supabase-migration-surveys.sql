@@ -42,11 +42,17 @@ alter table public.survey_questions enable row level security;
 alter table public.survey_responses enable row level security;
 alter table public.survey_answers enable row level security;
 
+drop policy if exists "Anyone can read published surveys" on public.surveys;
 create policy "Anyone can read published surveys" on public.surveys for select using (is_published = true);
+drop policy if exists "Admins manage surveys" on public.surveys;
 create policy "Admins manage surveys" on public.surveys for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists "Anyone can read questions for published surveys" on public.survey_questions;
 create policy "Anyone can read questions for published surveys" on public.survey_questions for select using (exists (select 1 from public.surveys s where s.id = survey_id and s.is_published));
+drop policy if exists "Admins manage survey questions" on public.survey_questions;
 create policy "Admins manage survey questions" on public.survey_questions for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists "Admins can read survey responses" on public.survey_responses;
 create policy "Admins can read survey responses" on public.survey_responses for select to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+drop policy if exists "Admins can read survey answers" on public.survey_answers;
 create policy "Admins can read survey answers" on public.survey_answers for select to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 create or replace function public.submit_survey_response(p_survey_id uuid, p_name text, p_answers jsonb)

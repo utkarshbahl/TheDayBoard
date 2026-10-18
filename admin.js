@@ -123,6 +123,9 @@ function createSurveyPanel() {
   panel.querySelector("p").textContent = "Publish as many open opinions as needed. Each can contain multiple-choice and written questions.";
   byId("analyticsPanel").append(panel);
   const editors = panel.querySelector("#surveyQuestionEditors");
+  const password = document.createElement("label");
+  password.innerHTML = `Survey password (optional)<input id="surveyPassword" type="password" maxlength="200" autocomplete="new-password" placeholder="Leave blank for public access">`;
+  editors.before(password);
   editors.append(questionEditor(1));
   panel.querySelector("#addSurveyQuestion").addEventListener("click", () => editors.append(questionEditor(editors.children.length + 1)));
   panel.querySelector("#surveyEditor").addEventListener("submit", publishSurvey);
@@ -142,8 +145,9 @@ async function publishSurvey(event) {
   button.disabled = true; message.textContent = "Publishing…";
   const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: true, published_at: new Date().toISOString() }).select("id").single();
   const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
+  const { error: passwordError } = questionsError ? { error: questionsError } : await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: byId("surveyPassword").value });
   button.disabled = false;
-  if (questionsError) { message.textContent = "The opinion could not be published."; return; }
+  if (passwordError) { message.textContent = "The opinion could not be published."; return; }
   form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; loadSurveyResults();
 }
 
@@ -174,8 +178,11 @@ async function editSelectedSurvey() {
   const title = prompt("Opinion title", survey.title); if (title === null || !title.trim()) return;
   const description = prompt("Opinion description", survey.description || ""); if (description === null) return;
   const collectName = confirm("Select OK to collect respondent names. Select Cancel to keep responses anonymous.");
+  const password = prompt("Enter a new password. Leave it blank to remove password protection."); if (password === null) return;
   const { error } = await supabase.from("surveys").update({ title: title.trim(), description: description.trim(), collect_name: collectName }).eq("id", survey.id);
   if (error) { alert("The opinion could not be updated."); return; }
+  const { error: passwordError } = await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: password });
+  if (passwordError) { alert("The survey details changed, but its password could not be saved."); }
   loadSurveyResults();
 }
 
