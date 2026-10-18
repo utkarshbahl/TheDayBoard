@@ -15,7 +15,7 @@ const APP_SHELL = [
   "/service-tables.js",
   "/section-visibility.js?v=20261016",
   "/traffic.js",
-  "/surveys.js?v=2",
+  "/surveys.js?v=3",
   "/surveys.css?v=1",
   "/surveys-extra.css?v=2",
   "/manifest.webmanifest",

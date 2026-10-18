@@ -23,6 +23,18 @@ begin
 end;
 $$;
 
+-- Removes only incomplete drafts left behind by interrupted publishing; published data is never auto-deleted.
+create or replace function public.clean_abandoned_survey_drafts()
+returns integer language plpgsql security definer set search_path = public as $$
+declare removed_count integer;
+begin
+  if (auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' then raise exception 'Not authorized'; end if;
+  delete from surveys where is_published = false and created_at < now() - interval '24 hours';
+  get diagnostics removed_count = row_count;
+  return removed_count;
+end;
+$$;
+
 create or replace function public.get_survey_questions(p_survey_id uuid, p_password text default '')
 returns table(id uuid, prompt text, question_type text, options jsonb, question_position integer)
 language plpgsql security definer set search_path = public as $$
@@ -55,6 +67,8 @@ $$;
 
 revoke all on function public.set_survey_password(uuid, text) from public;
 grant execute on function public.set_survey_password(uuid, text) to authenticated;
+revoke all on function public.clean_abandoned_survey_drafts() from public;
+grant execute on function public.clean_abandoned_survey_drafts() to authenticated;
 revoke all on function public.get_survey_questions(uuid, text) from public;
 grant execute on function public.get_survey_questions(uuid, text) to anon, authenticated;
 revoke all on function public.submit_survey_response(uuid, text, jsonb, text) from public;

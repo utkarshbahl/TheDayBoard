@@ -3,6 +3,7 @@ import { supabase } from "./supabase.js";
 const byId = (id) => document.getElementById(id);
 let adminSurveys = [];
 let selectedAdminSurveyId = null;
+let surveyResultsLoaded = false;
 const pageNames = {
   "/": "Laundry status",
   "/mess-menu": "Mess menu",
@@ -91,6 +92,7 @@ function setSection(section) {
   });
   byId("sectionVisibilityPanel")?.classList.toggle("is-admin-section-hidden", section !== "visibility");
   byId("surveyAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "surveys");
+  if (section === "surveys" && !surveyResultsLoaded) { surveyResultsLoaded = true; loadSurveyResults(); }
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
@@ -143,6 +145,7 @@ async function publishSurvey(event) {
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
   button.disabled = true; message.textContent = "Publishing…";
+  supabase.rpc("clean_abandoned_survey_drafts").catch((error) => console.warn("Abandoned survey drafts could not be cleaned.", error));
   const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: false }).select("id").single();
   const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
   const enteredPassword = byId("surveyPassword").value;
@@ -151,12 +154,13 @@ async function publishSurvey(event) {
   if (passwordError) { if (survey?.id) await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
   const { error: publishError } = await supabase.from("surveys").update({ is_published: true, published_at: new Date().toISOString() }).eq("id", survey.id);
   if (publishError) { await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
-  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; loadSurveyResults();
+  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; surveyResultsLoaded = true; loadSurveyResults(true);
 }
 
-async function loadSurveyResults() {
+async function loadSurveyResults(refresh = false) {
   const target = byId("surveyResults"); if (!target) return;
-  const { data: surveys, error } = await supabase.from("surveys").select("id,title,description,collect_name,is_published,created_at").order("created_at", { ascending: false });
+  let surveys = adminSurveys, error = null;
+  if (refresh || !surveys.length) ({ data: surveys, error } = await supabase.from("surveys").select("id,title,description,collect_name,is_published,created_at").order("created_at", { ascending: false }));
   if (error || !surveys?.length) { target.innerHTML = "<p>No opinions have been published yet.</p>"; return; }
   adminSurveys = surveys;
   if (!selectedAdminSurveyId || !surveys.some((item) => item.id === selectedAdminSurveyId)) selectedAdminSurveyId = surveys[0].id;
@@ -186,7 +190,7 @@ async function editSelectedSurvey() {
   if (error) { alert("The opinion could not be updated."); return; }
   const { error: passwordError } = await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: password });
   if (passwordError) { alert("The survey details changed, but its password could not be saved."); }
-  loadSurveyResults();
+  loadSurveyResults(true);
 }
 
 async function deleteSelectedSurvey() {
@@ -194,7 +198,7 @@ async function deleteSelectedSurvey() {
   if (!survey || !confirm(`Delete “${survey.title}” and all of its responses? This cannot be undone.`)) return;
   const { error } = await supabase.from("surveys").delete().eq("id", survey.id);
   if (error) { alert("The opinion could not be deleted."); return; }
-  selectedAdminSurveyId = null; loadSurveyResults();
+  selectedAdminSurveyId = null; loadSurveyResults(true);
 }
 
 async function loadAnalytics() {
@@ -279,7 +283,7 @@ async function initializeAdmin() {
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
   createSurveyPanel();
   setSection("traffic");
-  try { await Promise.all([loadAnalytics(), loadVisibility(visibilityPanel), loadSurveyResults()]); } catch (loadError) { console.error("Admin data could not be loaded.", loadError); }
+  try { await Promise.all([loadAnalytics(), loadVisibility(visibilityPanel)]); } catch (loadError) { console.error("Admin data could not be loaded.", loadError); }
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
