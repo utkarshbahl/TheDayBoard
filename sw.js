@@ -1,4 +1,4 @@
-const CACHE_NAME = "dayboard-shell-v1";
+const CACHE_NAME = "dayboard-shell-v2";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -6,6 +6,7 @@ const APP_SHELL = [
   "/mess-menu.html",
   "/bus-timings.html",
   "/campus-map.html",
+  "/surveys.html",
   "/about.html",
   "/styles.css?v=20261014",
   "/nav.js?v=20261022",
@@ -14,6 +15,8 @@ const APP_SHELL = [
   "/service-tables.js",
   "/section-visibility.js?v=20261016",
   "/traffic.js",
+  "/surveys.js?v=1",
+  "/surveys.css?v=1",
   "/manifest.webmanifest",
   "/assets/ethers-club-icon.png",
   "/assets/ethers-club-logo.png",

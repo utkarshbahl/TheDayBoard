@@ -1,5 +1,25 @@
 import "./section-visibility.js?v=20261016";
 
+const isOpinionsPage = /\/surveys(?:\.html)?\/?$/.test(location.pathname);
+document.querySelectorAll(".nav-links").forEach((nav) => {
+  if (nav.querySelector('a[href="surveys.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "nav-link";
+  link.href = "surveys.html";
+  link.innerHTML = "Campus <b>Opinions</b>";
+  if (isOpinionsPage) link.setAttribute("aria-current", "page");
+  nav.append(link);
+});
+document.querySelectorAll(".campus-dropdown").forEach((nav) => {
+  if (nav.querySelector('a[href="surveys.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "campus-nav-link";
+  link.href = "surveys.html";
+  link.innerHTML = '<span>Campus <b>Opinions</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  if (isOpinionsPage) link.setAttribute("aria-current", "page");
+  nav.append(link);
+});
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch((error) => {
     console.error("Offline support could not be enabled.", error);

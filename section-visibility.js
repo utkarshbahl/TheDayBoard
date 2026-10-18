@@ -6,6 +6,7 @@ const sections = {
   bus: { path: "/bus-timings", label: "Bus timings" },
   curriculum: { path: "/curriculum", label: "B.Tech curriculum" },
   "campus-map": { path: "/campus-map", label: "Campus map" },
+  surveys: { path: "/surveys", label: "Campus opinions" },
 };
 
 const normalizePath = (path) => {

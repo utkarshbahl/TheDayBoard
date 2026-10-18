@@ -6,14 +6,16 @@ const pageNames = {
   "/mess-menu": "Mess menu",
   "/bus-timings": "Bus timings",
   "/campus-map": "Campus map",
-  "/curriculum": "B.Tech curriculum",
+  "/curriculum": "Academic Help",
+  "/surveys": "Campus opinions",
 };
 const sections = [
   ["laundry", "Laundry status"],
   ["mess", "Mess menu"],
   ["bus", "Bus timings"],
-  ["curriculum", "B.Tech curriculum"],
+  ["curriculum", "Academic Help"],
   ["campus-map", "Campus map"],
+  ["surveys", "Campus opinions"],
 ];
 
 const themeToggle = byId("adminThemeToggle");
@@ -25,6 +27,12 @@ adminStyle.textContent = `
   .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
   .admin-section-select { display: none; width: 100%; }
   .is-admin-section-hidden { display: none; }
+  .survey-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .survey-admin h2 { margin: 0 0 8px; font-size: 18px; } .survey-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font: 13px Manrope; }
+  .survey-admin textarea { min-height: 80px; resize: vertical; } .survey-admin input[type=checkbox] { margin-right: 8px; accent-color: var(--ink); }
+  .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: #fff; }
+  .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
 `;
 document.head.append(adminStyle);
@@ -66,7 +74,7 @@ function createSectionNav() {
   nav.id = "adminSectionNav";
   nav.className = "admin-section-nav";
   nav.setAttribute("aria-label", "Admin sections");
-  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="visibility">Hide tabs</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="visibility">Hide tabs</option></select>`;
+  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option></select>`;
   byId("analyticsPanel").before(nav);
   nav.addEventListener("click", (event) => {
     const button = event.target.closest("[data-section]");
@@ -80,9 +88,78 @@ function setSection(section) {
     document.querySelector(selector)?.classList.toggle("is-admin-section-hidden", section !== "traffic");
   });
   byId("sectionVisibilityPanel")?.classList.toggle("is-admin-section-hidden", section !== "visibility");
+  byId("surveyAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "surveys");
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
+}
+
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
+
+function questionEditor(number) {
+  const question = document.createElement("fieldset");
+  question.className = "survey-question-editor";
+  question.innerHTML = `<div class="survey-question-editor-header"><strong>Question ${number}</strong><button type="button" class="remove-survey-question">Remove</button></div><label>Question<input class="survey-question-prompt" type="text" maxlength="500" required></label><label>Answer type<select class="survey-question-type"><option value="mcq">Multiple choice</option><option value="written">Written answer</option></select></label><div class="survey-options"><input type="text" maxlength="200" placeholder="Option 1" required><input type="text" maxlength="200" placeholder="Option 2" required><input type="text" maxlength="200" placeholder="Option 3"><input type="text" maxlength="200" placeholder="Option 4"></div>`;
+  question.querySelector(".survey-question-type").addEventListener("change", (event) => {
+    const options = question.querySelector(".survey-options");
+    const isMcq = event.target.value === "mcq";
+    options.hidden = !isMcq;
+    options.querySelectorAll("input").forEach((input, index) => { input.required = isMcq && index < 2; });
+  });
+  question.querySelector(".remove-survey-question").addEventListener("click", () => { question.remove(); renumberQuestions(); });
+  return question;
+}
+
+function renumberQuestions() { document.querySelectorAll(".survey-question-editor").forEach((question, index) => { question.querySelector("strong").textContent = `Question ${index + 1}`; }); }
+
+function createSurveyPanel() {
+  if (byId("surveyAdminPanel")) return byId("surveyAdminPanel");
+  const panel = document.createElement("section");
+  panel.id = "surveyAdminPanel";
+  panel.className = "survey-admin is-admin-section-hidden";
+  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results…</p></div></div>`;
+  byId("analyticsPanel").append(panel);
+  const editors = panel.querySelector("#surveyQuestionEditors");
+  editors.append(questionEditor(1));
+  panel.querySelector("#addSurveyQuestion").addEventListener("click", () => editors.append(questionEditor(editors.children.length + 1)));
+  panel.querySelector("#surveyEditor").addEventListener("submit", publishSurvey);
+  return panel;
+}
+
+async function publishSurvey(event) {
+  event.preventDefault();
+  const form = event.currentTarget, message = form.querySelector(".survey-admin-message"), button = event.submitter;
+  const questionNodes = [...form.querySelectorAll(".survey-question-editor")];
+  const questions = questionNodes.map((node, index) => {
+    const type = node.querySelector(".survey-question-type").value;
+    const options = type === "mcq" ? [...node.querySelectorAll(".survey-options input")].map((input) => input.value.trim()).filter(Boolean) : [];
+    return { position: index + 1, prompt: node.querySelector(".survey-question-prompt").value.trim(), question_type: type, options };
+  });
+  if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
+  button.disabled = true; message.textContent = "Publishing…";
+  const { error: closeError } = await supabase.from("surveys").update({ is_published: false }).eq("is_published", true);
+  if (closeError) { button.disabled = false; message.textContent = "Could not close the current opinion."; return; }
+  const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: true, published_at: new Date().toISOString() }).select("id").single();
+  const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
+  button.disabled = false;
+  if (questionsError) { message.textContent = "The opinion could not be published."; return; }
+  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; loadSurveyResults();
+}
+
+async function loadSurveyResults() {
+  const target = byId("surveyResults"); if (!target) return;
+  const { data: surveys, error } = await supabase.from("surveys").select("id,title,collect_name,is_published,created_at").order("created_at", { ascending: false }).limit(10);
+  if (error || !surveys?.length) { target.innerHTML = "<p>No opinions have been published yet.</p>"; return; }
+  const survey = surveys[0];
+  const [{ data: questions }, { data: responses }] = await Promise.all([supabase.from("survey_questions").select("id,prompt,question_type,options,position").eq("survey_id", survey.id).order("position"), supabase.from("survey_responses").select("id,respondent_name,submitted_at").eq("survey_id", survey.id)]);
+  const responseIds = (responses ?? []).map((response) => response.id);
+  const { data: answers } = responseIds.length ? await supabase.from("survey_answers").select("response_id,question_id,answer_text").in("response_id", responseIds) : { data: [] };
+  const responseById = new Map((responses ?? []).map((response) => [response.id, response]));
+  target.innerHTML = `<p><strong>${escapeHtml(survey.title)}</strong> · ${responses?.length ?? 0} response${responses?.length === 1 ? "" : "s"}${survey.is_published ? " · currently open" : ""}</p>${(questions ?? []).map((question) => {
+    const questionAnswers = (answers ?? []).filter((answer) => answer.question_id === question.id);
+    if (question.question_type === "mcq") { const counts = new Map(question.options.map((option) => [option, 0])); questionAnswers.forEach((answer) => counts.set(answer.answer_text, (counts.get(answer.answer_text) ?? 0) + 1)); const max = Math.max(1, ...counts.values()); return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${[...counts].map(([option, count]) => `<div class="survey-bar-row"><span>${escapeHtml(option)}</span><div class="survey-bar"><i style="width:${Math.round(count / max * 100)}%"></i></div><strong>${count}</strong></div>`).join("")}</article>`; }
+    return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${questionAnswers.length ? questionAnswers.map((answer) => `<p class="survey-written-answer">${survey.collect_name ? `<small>${escapeHtml(responseById.get(answer.response_id)?.respondent_name || "Unnamed")}</small>` : ""}${escapeHtml(answer.answer_text)}</p>`).join("") : "<p>No written responses yet.</p>"}</article>`;
+  }).join("")}`;
 }
 
 async function loadAnalytics() {
@@ -165,8 +242,9 @@ async function initializeAdmin() {
   showAdmin();
   createSectionNav();
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
+  createSurveyPanel();
   setSection("traffic");
-  try { await Promise.all([loadAnalytics(), loadVisibility(visibilityPanel)]); } catch (loadError) { console.error("Admin data could not be loaded.", loadError); }
+  try { await Promise.all([loadAnalytics(), loadVisibility(visibilityPanel), loadSurveyResults()]); } catch (loadError) { console.error("Admin data could not be loaded.", loadError); }
 }
 
 supabase.auth.onAuthStateChange((event, session) => {
