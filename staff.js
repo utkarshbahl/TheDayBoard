@@ -1,1 +1,29 @@
-import{supabase as e}from"./supabase.js";const t=e=>document.getElementById(e);function a(){t("loginPanel").classList.add("hidden"),t("updatePanel").classList.remove("hidden"),t("newNumber").focus()}async function n(){const{data:a}=await e.from("laundry_status").select("ready_token").eq("id",1).single();a&&(t("newNumber").value=a.ready_token)}t("loginForm").addEventListener("submit",async s=>{s.preventDefault();const i=s.submitter;i.disabled=!0,i.textContent="Signing in…";const{error:d}=await e.auth.signInWithPassword({email:t("staffEmail").value.trim(),password:t("staffPassword").value});i.disabled=!1,i.textContent="Sign in",d?t("loginMessage").textContent="Check the email and password, then try again.":(a(),n())}),t("updateForm").addEventListener("submit",async a=>{a.preventDefault();const n=a.submitter;n.disabled=!0,n.textContent="Updating…";const{error:s}=await e.from("laundry_status").update({ready_token:Number(t("newNumber").value)}).eq("id",1);n.disabled=!1,n.textContent="Update live board",t("updateMessage").style.color=s?"#b94331":"#438022",t("updateMessage").textContent=s?`Could not update: ${s.message}`:"Done! Students can see the new number."}),t("signOut").addEventListener("click",async()=>{await e.auth.signOut(),location.reload()});const{data:{session:s}}=await e.auth.getSession();s&&(a(),n());
+import { supabase } from "./supabase.js";
+
+const form = document.getElementById("updateForm");
+const number = document.getElementById("newNumber");
+const message = document.getElementById("updateMessage");
+
+async function loadToken() {
+  const { data, error } = await supabase.from("laundry_status").select("ready_token").eq("id", 1).single();
+  if (error) throw error;
+  number.value = data.ready_token;
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = event.submitter;
+  button.disabled = true;
+  button.textContent = "Updating…";
+  const { error } = await supabase.from("laundry_status").update({ ready_token: Number(number.value) }).eq("id", 1);
+  button.disabled = false;
+  button.textContent = "Update live board";
+  message.style.color = error ? "#b94331" : "#438022";
+  message.textContent = error ? `Could not update: ${error.message}` : "Done! Students can see the new number.";
+});
+
+loadToken().catch((error) => {
+  message.style.color = "#b94331";
+  message.textContent = "Could not load the current token.";
+  console.error("Laundry token could not be loaded.", error);
+});
