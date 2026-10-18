@@ -1,6 +1,25 @@
 import "./section-visibility.js?v=20261016";
 
 const isOpinionsPage = /\/surveys(?:\.html)?\/?$/.test(location.pathname);
+const isClubsPage = /\/clubs(?:\.html)?\/?$/.test(location.pathname);
+document.querySelectorAll(".nav-links").forEach((nav) => {
+  if (nav.querySelector('a[href="clubs.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "nav-link";
+  link.href = "clubs.html";
+  link.innerHTML = "Campus <b>Clubs</b>";
+  if (isClubsPage) link.setAttribute("aria-current", "page");
+  nav.insertBefore(link, nav.querySelector('a[href="surveys.html"]'));
+});
+document.querySelectorAll(".campus-dropdown").forEach((nav) => {
+  if (nav.querySelector('a[href="clubs.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "campus-nav-link";
+  link.href = "clubs.html";
+  link.innerHTML = '<span>Campus <b>Clubs</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  if (isClubsPage) link.setAttribute("aria-current", "page");
+  nav.insertBefore(link, nav.querySelector('a[href="surveys.html"]'));
+});
 document.querySelectorAll(".nav-links").forEach((nav) => {
   if (nav.querySelector('a[href="surveys.html"]')) return;
   const link = document.createElement("a");
