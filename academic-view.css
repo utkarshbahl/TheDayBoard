@@ -1,0 +1,9 @@
+.academic-view-switch{display:inline-flex;gap:4px;margin-top:46px;padding:5px;border:1px solid var(--line);border-radius:999px;background:var(--surface-muted)}
+.academic-view-tab{min-height:42px;padding:10px 17px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:800 12px Manrope;cursor:pointer;transition:background-color .18s,color .18s,box-shadow .18s}
+.academic-view-tab:hover{color:var(--ink)}
+.academic-view-tab.is-active{background:var(--ink);color:var(--surface);box-shadow:0 2px 5px rgba(20,40,31,.18)}
+.academic-view-tab:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.academic-view-panel[hidden]{display:none}
+.academic-view-panel .curriculum-controls{margin-top:26px}
+.academic-view-panel.academic-help{margin-top:26px}
+@media(max-width:700px){.academic-view-switch{display:flex;width:100%;margin-top:34px}.academic-view-tab{flex:1;padding-left:10px;padding-right:10px;font-size:11px}}

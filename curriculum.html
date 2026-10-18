@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20261019">
+  <link rel="stylesheet" href="academic-view.css?v=20261019">
 </head>
 <body>
   <main>
@@ -43,9 +44,15 @@
 
     <section class="curriculum-page wrap">
       <header class="curriculum-heading"><p class="section-kicker">B.TECH ONLY</p><h1>Academic help</h1><p>Explore your B.Tech courses and calculate your SGPA for the selected semester.</p></header>
-      <div class="curriculum-controls" aria-label="Curriculum filters"><div id="branchTabs" class="branch-tabs" role="tablist" aria-label="B.Tech branches"></div><div id="semesterTabs" class="semester-tabs" aria-label="Semesters"></div></div>
-      <section class="course-panel" aria-live="polite"><div class="course-panel-heading"><div><p id="courseBranch" class="section-kicker"></p><h2 id="courseSemester"></h2></div><p id="courseCredits" class="credit-total"></p></div><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Code</th><th>Course</th><th>Credits</th></tr></thead><tbody id="courseRows"></tbody></table></div><p id="courseNote" class="course-note"></p></section>
-      <section class="academic-help" aria-labelledby="academicHelpTitle"><div class="academic-help-heading"><div><p class="section-kicker">ACADEMIC HELP</p><h2 id="academicHelpTitle">Calculate your SGPA</h2></div><p>Pick a grade for each course. Credits are filled from the selected curriculum.</p></div><div class="grade-scale" aria-label="Grade point scale"><span>A <b>10</b></span><span>AB <b>9</b></span><span>B <b>8</b></span><span>BC <b>7</b></span><span>C <b>6</b></span><span>CD <b>5</b></span><span>D <b>4</b></span><span>F <b>0</b></span></div><div id="sgpaRows" class="sgpa-rows"></div><div class="sgpa-result"><div><span>SGPA</span><strong id="sgpaValue">0.00</strong></div><p id="sgpaSummary">Select grades to see your weighted average.</p></div></section>
+      <div class="academic-view-switch" role="tablist" aria-label="Academic help view">
+        <button id="curriculumTab" class="academic-view-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="curriculumView">Course curriculum</button>
+        <button id="sgpaTab" class="academic-view-tab" type="button" role="tab" aria-selected="false" aria-controls="sgpaView">SGPA calculator</button>
+      </div>
+      <section id="curriculumView" class="academic-view-panel" role="tabpanel" aria-labelledby="curriculumTab">
+        <div class="curriculum-controls" aria-label="Curriculum filters"><div id="branchTabs" class="branch-tabs" role="tablist" aria-label="B.Tech branches"></div><div id="semesterTabs" class="semester-tabs" aria-label="Semesters"></div></div>
+        <section class="course-panel" aria-live="polite"><div class="course-panel-heading"><div><p id="courseBranch" class="section-kicker"></p><h2 id="courseSemester"></h2></div><p id="courseCredits" class="credit-total"></p></div><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Code</th><th>Course</th><th>Credits</th></tr></thead><tbody id="courseRows"></tbody></table></div><p id="courseNote" class="course-note"></p></section>
+      </section>
+      <section id="sgpaView" class="academic-view-panel academic-help" role="tabpanel" aria-labelledby="sgpaTab" hidden><div class="academic-help-heading"><div><p class="section-kicker">ACADEMIC HELP</p><h2 id="academicHelpTitle">Calculate your SGPA</h2></div><p>Pick a grade for each course. Credits are filled from the selected curriculum.</p></div><div class="grade-scale" aria-label="Grade point scale"><span>A <b>10</b></span><span>AB <b>9</b></span><span>B <b>8</b></span><span>BC <b>7</b></span><span>C <b>6</b></span><span>CD <b>5</b></span><span>D <b>4</b></span><span>F <b>0</b></span></div><div id="sgpaRows" class="sgpa-rows"></div><div class="sgpa-result"><div><span>SGPA</span><strong id="sgpaValue">0.00</strong></div><p id="sgpaSummary">Select grades to see your weighted average.</p></div></section>
       <section class="academic-calendar" aria-labelledby="calendarTitle">
         <div class="calendar-copy">
           <p class="section-kicker">IMPORTANT DATES</p>
@@ -63,6 +70,7 @@
   </main>
   <footer class="wrap site-footer-update"><span data-last-updated>Last updated: Loading...</span><a class="admin-access" href="admin.html">Admin</a></footer>
   <script type="module" src="nav.js?v=20261022"></script>
+  <script type="module" src="academic-view.js"></script>
   <script type="module" src="curriculum.js"></script>
   <script type="module" src="sgpa.js"></script>
   <script type="module" src="traffic.js"></script>
