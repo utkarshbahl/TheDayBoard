@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20261019">
-  <link rel="stylesheet" href="academic-view.css?v=20261019">
+  <link rel="stylesheet" href="academic-view.css?v=20261019-2">
 </head>
 <body>
   <main>
@@ -63,10 +63,10 @@
             <div><span>EVEN SEMESTER</span><strong>Jan 4–May 19, 2027</strong><small>Classes begin Jan 4 · end-term exams May 6–19</small></div>
             <div><span>SUMMER TERM</span><strong>May 31–Jul 16, 2027</strong><small>Student vacation begins May 20</small></div>
           </div>
-          <section class="upcoming-holidays" aria-labelledby="upcomingHolidaysTitle">
-            <div class="upcoming-holidays-heading"><div><p class="section-kicker">HOLIDAYS</p><h3 id="upcomingHolidaysTitle">Upcoming institute holidays</h3></div><p id="upcomingHolidaysSummary"></p></div>
+          <details class="upcoming-holidays">
+            <summary class="upcoming-holidays-heading"><div><p class="section-kicker">HOLIDAYS</p><h3 id="upcomingHolidaysTitle">Upcoming institute holidays</h3></div><span id="upcomingHolidaysSummary"></span><span class="upcoming-holidays-chevron" aria-hidden="true"></span></summary>
             <ul id="upcomingHolidaysList" class="upcoming-holidays-list" aria-live="polite"></ul>
-          </section>
+          </details>
         </div>
         <div class="calendar-links"><a class="calendar-link" href="https://lnmiit.ac.in/uploaded_files/Academic-Calendar-2026-27.pdf" target="_blank" rel="noopener">Academic calendar <span aria-hidden="true">↗</span></a><a class="calendar-link calendar-link-secondary" href="https://lnmiit.ac.in/uploaded_files/List-of-Holiday-2026.pdf" target="_blank" rel="noopener">Holiday calendar <span aria-hidden="true">↗</span></a></div>
       </section>
