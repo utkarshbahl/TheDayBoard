@@ -1,1 +1,70 @@
-<!doctype html> <html lang=en> <head> <meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"> <title>Academic Help | DayBoard</title><meta name=description content="Semester-wise B.Tech curriculum for LNMIIT students."> <link rel=icon href=assets/ethers-club-icon.png type=image/png><link rel=manifest href=manifest.webmanifest><link rel=apple-touch-icon href=assets/ethers-club-icon.png> <meta name=theme-color content=#14281f><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin> <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel=stylesheet><link rel=stylesheet href=styles.css?v=20261014> </head> <body> <main> <nav class="nav wrap"><div class=nav-start> <a class="brand brand-desktop" href=laundry.html aria-label="DayBoard home"><img class=brand-mark src=assets/ethers-club-icon.png alt=""><span>Day<b>Board</b></span></a> <details class=campus-menu><summary class=campus-trigger aria-label="Open DayBoard services"><img class=brand-mark src=assets/ethers-club-icon.png alt=""><span>Day<b>Board</b></span><span class=campus-chevron aria-hidden=true></span></summary><nav class=campus-dropdown aria-label="Campus services"><span class=campus-dropdown-label>Campus services</span><a class=campus-nav-link href=laundry.html><span>Laundry <b>Status</b></span><span class=campus-link-arrow></span></a><a class=campus-nav-link href=mess-menu.html><span>Mess <b>Menu</b></span><span class=campus-link-arrow></span></a><a class=campus-nav-link href=bus-timings.html><span>Bus <b>Timings</b></span><span class=campus-link-arrow></span></a><a class=campus-nav-link href=curriculum.html aria-current=page><span>Academic <b>Help</b></span><span class=campus-link-arrow></span></a><a class=campus-nav-link href=campus-map.html><span>Campus <b>Map</b></span><span class=campus-link-arrow></span></a> </nav></details> <div class=nav-links aria-label="Campus services"><a class=nav-link href=laundry.html>Laundry <b>Status</b></a><a class=nav-link href=mess-menu.html>Mess <b>Menu</b></a><a class=nav-link href=bus-timings.html>Bus <b>Timings</b></a><a class=nav-link href=curriculum.html aria-current=page>Academic <b>Help</b></a><a class=nav-link href=campus-map.html>Campus <b>Map</b></a> </div> </div><div class=nav-actions><button class=theme-toggle type=button aria-label="Switch colour scheme" aria-pressed=false onclick="const n=document.documentElement.dataset.theme===&quot;lime&quot;?&quot;dusk&quot;:&quot;lime&quot;;document.documentElement.dataset.theme=n;this.setAttribute(&quot;aria-pressed&quot;,String(n===&quot;lime&quot;));this.querySelector(&quot;[data-theme-toggle-label]&quot;).textContent=n===&quot;lime&quot;?&quot;Lime&quot;:&quot;Dusk&quot;;try{localStorage.setItem(&quot;lnmiit-theme&quot;,n)}catch(e){}event.stopImmediatePropagation()"><span class=theme-toggle-dot aria-hidden=true></span><span data-theme-toggle-label>Dusk</span></button></div></nav> <section class="curriculum-page wrap"> <header class=curriculum-heading><p class=section-kicker>B.TECH ONLY</p><h1>Academic help</h1><p>Explore your B.Tech courses and calculate your SGPA for the selected semester.</p></header> <div class=curriculum-controls aria-label="Curriculum filters"><div id=branchTabs class=branch-tabs role=tablist aria-label="B.Tech branches"></div><div id=semesterTabs class=semester-tabs aria-label=Semesters></div></div> <section class=course-panel aria-live=polite><div class=course-panel-heading><div><p id=courseBranch class=section-kicker></p><h2 id=courseSemester></h2></div><p id=courseCredits class=credit-total></p></div><div class=course-table-wrap><table class=course-table><thead><tr><th>Code</th><th>Course</th><th>Credits</th></tr></thead><tbody id=courseRows></tbody></table></div><p id=courseNote class=course-note></p></section> <section class=academic-help aria-labelledby=academicHelpTitle><div class=academic-help-heading><div><p class=section-kicker>ACADEMIC HELP</p><h2 id=academicHelpTitle>Calculate your SGPA</h2></div><p>Pick a grade for each course. Credits are filled from the selected curriculum.</p></div><div class=grade-scale aria-label="Grade point scale"><span>A <b>10</b></span><span>AB <b>9</b></span><span>B <b>8</b></span><span>BC <b>7</b></span><span>C <b>6</b></span><span>CD <b>5</b></span><span>D <b>4</b></span><span>F <b>0</b></span></div><div id=sgpaRows class=sgpa-rows></div><div class=sgpa-result><div><span>SGPA</span><strong id=sgpaValue>0.00</strong></div><p id=sgpaSummary>Select grades to see your weighted average.</p></div></section> </section> </main> <footer class="wrap site-footer-update"><span data-last-updated>Last updated: Loading...</span><a class=admin-access href=admin.html>Admin</a></footer><script type=module src=nav.js?v=20261022></script><script type=module src=curriculum.js></script><script type=module src=sgpa.js></script><script type=module src=traffic.js></script> </body> </html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Academic Help | DayBoard</title>
+  <meta name="description" content="Semester-wise B.Tech curriculum for LNMIIT students.">
+  <link rel="icon" href="assets/ethers-club-icon.png" type="image/png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/ethers-club-icon.png">
+  <meta name="theme-color" content="#14281f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261019">
+</head>
+<body>
+  <main>
+    <nav class="nav wrap">
+      <div class="nav-start">
+        <a class="brand brand-desktop" href="index.html" aria-label="DayBoard home"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span>Day<b>Board</b></span></a>
+        <details class="campus-menu">
+          <summary class="campus-trigger" aria-label="Open DayBoard services"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span>Day<b>Board</b></span><span class="campus-chevron" aria-hidden="true"></span></summary>
+          <nav class="campus-dropdown" aria-label="Campus services">
+            <span class="campus-dropdown-label">Campus services</span>
+            <a class="campus-nav-link" href="index.html"><span>Laundry <b>Status</b></span><span class="campus-link-arrow"></span></a>
+            <a class="campus-nav-link" href="mess-menu.html"><span>Mess <b>Menu</b></span><span class="campus-link-arrow"></span></a>
+            <a class="campus-nav-link" href="bus-timings.html"><span>Bus <b>Timings</b></span><span class="campus-link-arrow"></span></a>
+            <a class="campus-nav-link" href="curriculum.html" aria-current="page"><span>Academic <b>Help</b></span><span class="campus-link-arrow"></span></a>
+            <a class="campus-nav-link" href="campus-map.html"><span>Campus <b>Map</b></span><span class="campus-link-arrow"></span></a>
+          </nav>
+        </details>
+        <div class="nav-links" aria-label="Campus services">
+          <a class="nav-link" href="index.html">Laundry <b>Status</b></a>
+          <a class="nav-link" href="mess-menu.html">Mess <b>Menu</b></a>
+          <a class="nav-link" href="bus-timings.html">Bus <b>Timings</b></a>
+          <a class="nav-link" href="curriculum.html" aria-current="page">Academic <b>Help</b></a>
+          <a class="nav-link" href="campus-map.html">Campus <b>Map</b></a>
+        </div>
+      </div>
+      <div class="nav-actions"><button class="theme-toggle" type="button" aria-label="Switch colour scheme" aria-pressed="false" onclick="const n=document.documentElement.dataset.theme===&quot;lime&quot;?&quot;dusk&quot;:&quot;lime&quot;;document.documentElement.dataset.theme=n;this.setAttribute(&quot;aria-pressed&quot;,String(n===&quot;lime&quot;));this.querySelector(&quot;[data-theme-toggle-label]&quot;).textContent=n===&quot;lime&quot;?&quot;Lime&quot;:&quot;Dusk&quot;;try{localStorage.setItem(&quot;lnmiit-theme&quot;,n)}catch(e){}event.stopImmediatePropagation()"><span class="theme-toggle-dot" aria-hidden="true"></span><span data-theme-toggle-label>Dusk</span></button></div>
+    </nav>
+
+    <section class="curriculum-page wrap">
+      <header class="curriculum-heading"><p class="section-kicker">B.TECH ONLY</p><h1>Academic help</h1><p>Explore your B.Tech courses and calculate your SGPA for the selected semester.</p></header>
+      <div class="curriculum-controls" aria-label="Curriculum filters"><div id="branchTabs" class="branch-tabs" role="tablist" aria-label="B.Tech branches"></div><div id="semesterTabs" class="semester-tabs" aria-label="Semesters"></div></div>
+      <section class="course-panel" aria-live="polite"><div class="course-panel-heading"><div><p id="courseBranch" class="section-kicker"></p><h2 id="courseSemester"></h2></div><p id="courseCredits" class="credit-total"></p></div><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Code</th><th>Course</th><th>Credits</th></tr></thead><tbody id="courseRows"></tbody></table></div><p id="courseNote" class="course-note"></p></section>
+      <section class="academic-help" aria-labelledby="academicHelpTitle"><div class="academic-help-heading"><div><p class="section-kicker">ACADEMIC HELP</p><h2 id="academicHelpTitle">Calculate your SGPA</h2></div><p>Pick a grade for each course. Credits are filled from the selected curriculum.</p></div><div class="grade-scale" aria-label="Grade point scale"><span>A <b>10</b></span><span>AB <b>9</b></span><span>B <b>8</b></span><span>BC <b>7</b></span><span>C <b>6</b></span><span>CD <b>5</b></span><span>D <b>4</b></span><span>F <b>0</b></span></div><div id="sgpaRows" class="sgpa-rows"></div><div class="sgpa-result"><div><span>SGPA</span><strong id="sgpaValue">0.00</strong></div><p id="sgpaSummary">Select grades to see your weighted average.</p></div></section>
+      <section class="academic-calendar" aria-labelledby="calendarTitle">
+        <div class="calendar-copy">
+          <p class="section-kicker">IMPORTANT DATES</p>
+          <h2 id="calendarTitle">Academic calendar 2026–27</h2>
+          <p>Key dates from LNMIIT’s official calendar. Check the source document for the complete schedule.</p>
+          <div class="calendar-highlights">
+            <div><span>ODD SEMESTER</span><strong>Aug 10–Dec 15, 2026</strong><small>Classes begin Aug 10 · end-term exams Dec 4–15</small></div>
+            <div><span>EVEN SEMESTER</span><strong>Jan 4–May 19, 2027</strong><small>Classes begin Jan 4 · end-term exams May 6–19</small></div>
+            <div><span>SUMMER TERM</span><strong>May 31–Jul 16, 2027</strong><small>Student vacation begins May 20</small></div>
+          </div>
+        </div>
+        <a class="calendar-link" href="https://lnmiit.ac.in/uploaded_files/Academic-Calendar-2026-27.pdf" target="_blank" rel="noopener">Open official calendar <span aria-hidden="true">↗</span></a>
+      </section>
+    </section>
+  </main>
+  <footer class="wrap site-footer-update"><span data-last-updated>Last updated: Loading...</span><a class="admin-access" href="admin.html">Admin</a></footer>
+  <script type="module" src="nav.js?v=20261022"></script>
+  <script type="module" src="curriculum.js"></script>
+  <script type="module" src="sgpa.js"></script>
+  <script type="module" src="traffic.js"></script>
+</body>
+</html>
