@@ -41,7 +41,8 @@ async function renderSelectedSurvey(survey, surveys) {
     return;
   }
   const { data: questions, error } = await supabase.rpc("get_survey_questions", { p_survey_id: survey.id, p_password: password });
-  if (error || !questions?.length) { showEmpty(); return; }
+  if (error) { mount.innerHTML = `<div class="survey-empty"><p class="section-kicker">COULD NOT OPEN OPINION</p><h2>Unable to load this opinion</h2><p>Please refresh and try again. If this continues, the administrator needs to rerun the password migration.</p></div>`; console.error("Survey questions could not be loaded.", error); return; }
+  if (!questions?.length) { mount.innerHTML = `<div class="survey-empty"><p class="section-kicker">NO QUESTIONS</p><h2>This opinion is not ready yet</h2><p>Please choose another opinion or check back later.</p></div>`; return; }
   renderSurvey(survey, questions, surveys, password);
 }
 

@@ -60,3 +60,6 @@ grant execute on function public.get_survey_questions(uuid, text) to anon, authe
 revoke all on function public.submit_survey_response(uuid, text, jsonb, text) from public;
 grant execute on function public.submit_survey_response(uuid, text, jsonb, text) to anon, authenticated;
 revoke execute on function public.submit_survey_response(uuid, text, jsonb) from anon, authenticated;
+
+-- Makes the new view and RPC functions available to Supabase's API immediately.
+notify pgrst, 'reload schema';
