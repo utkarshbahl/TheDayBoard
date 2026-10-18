@@ -1,4 +1,4 @@
-const CACHE_NAME = "dayboard-shell-v4";
+const CACHE_NAME = "dayboard-shell-v5";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -10,6 +10,7 @@ const APP_SHELL = [
   "/clubs.html",
   "/about.html",
   "/styles.css?v=20261020",
+  "/nav-rail.css?v=1",
   "/nav.js?v=20261023",
   "/curriculum.js",
   "/sgpa.js",
