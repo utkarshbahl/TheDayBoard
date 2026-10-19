@@ -45,7 +45,17 @@ byId("updateForm").addEventListener("submit", async (event) => {
   button.disabled = false;
   button.textContent = "Update live board";
   byId("updateMessage").style.color = error ? "#b94331" : "#438022";
-  byId("updateMessage").textContent = error ? `Could not update: ${error.message}` : "Done! Students can see the new number.";
+  if (error) {
+    byId("updateMessage").textContent = `Could not update: ${error.message}`;
+    return;
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  const notification = await fetch("/api/push-notify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token || ""}` },
+    body: JSON.stringify({ readyToken: Number(byId("newNumber").value) }),
+  }).then(async (response) => response.ok ? response.json() : null).catch(() => null);
+  byId("updateMessage").textContent = notification ? `Done! ${notification.sent} laundry alert${notification.sent === 1 ? "" : "s"} sent.` : "Done! Students can see the new number.";
 });
 
 byId("signOut").addEventListener("click", async () => {

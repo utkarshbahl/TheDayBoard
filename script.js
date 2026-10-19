@@ -1,1 +1,114 @@
-import{initializeApp as t}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";import{doc as e,getFirestore as a,onSnapshot as n}from"https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";const r=e(a(t({apiKey:"AIzaSyCtvIAHZs-8Dx-5E0tawonsIOCFF9P4uRs",authDomain:"laundry-lnm.firebaseapp.com",projectId:"laundry-lnm",storageBucket:"laundry-lnm.firebasestorage.app",messagingSenderId:"133361113684",appId:"1:133361113684:web:dfec439cc08d55c9edebc1"})),"laundry","status"),o=t=>document.getElementById(t),s=o("readyNumber"),i=o("rangeText");let u,f;const m="lnmiit-laundry-alert-token",p="lnmiit-laundry-alert-notified";function d(t){const e=Math.floor((Date.now()-new Date(t))/6e4);return e<1?"just now":e<60?`${e} min ago`:new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}function g(){const t=localStorage.getItem(m);return t===null?NaN:Number(t)}function h(t=""){const e=document.querySelector("#laundryAlertMessage");e&&(e.textContent=t)}function y(){const t=g(),e=document.querySelector("#laundryAlertTarget"),a=document.querySelector("#laundryAlertButton");t&&e&&(e.value=t),a&&(a.textContent=t?"Update alert":"Notify me")}async function v(){const t=g();if(!Number.isInteger(t)||t<0||u<t||localStorage.getItem(p)===String(t))return;if(!("Notification"in window)){h("Notifications are not supported by this browser.");return}if(Notification.permission==="default"){h("Allow notifications, then press Notify me again.");return}if(Notification.permission!=="granted"){h("Notifications are blocked. Enable them in your browser settings.");return}new Notification("Laundry is ready",{body:`Your token ${String(t).padStart(3,"0")} is ready for collection.`,icon:"assets/ethers-club-icon.png",tag:"lnmiit-laundry-ready"});localStorage.setItem(p,String(t));h(`Token ${String(t).padStart(3,"0")} is ready — notification sent.`)}function b(){const t=document.querySelector(".pickup-note");if(!t)return;const e=document.createElement("section");e.className="laundry-alert";e.innerHTML='<div><p class="laundry-alert-kicker">COLLECTION ALERT</p><strong>Get notified when your token is ready.</strong><p>Keep DayBoard open or installed while you wait.</p></div><form id="laundryAlertForm"><label for="laundryAlertTarget">My token</label><div><input id="laundryAlertTarget" type="number" min="0" inputmode="numeric" required placeholder="000"><button id="laundryAlertButton" type="submit">Notify me</button></div><p id="laundryAlertMessage" role="status"></p></form>';t.after(e);const a=document.createElement("style");a.textContent=".laundry-alert{display:flex;justify-content:space-between;gap:30px;align-items:center;width:min(100%,760px);margin:30px auto 0;padding:20px;border:1px solid var(--line);border-radius:9px;background:var(--surface-muted)}.laundry-alert-kicker{margin:0 0 7px;color:var(--muted);font:800 9px \"DM Mono\",monospace;letter-spacing:1px}.laundry-alert strong{font-size:15px}.laundry-alert p:not(.laundry-alert-kicker):not(#laundryAlertMessage){margin:6px 0 0;color:var(--muted);font-size:12px}.laundry-alert form{min-width:240px}.laundry-alert label{display:block;margin-bottom:6px;font-size:11px;font-weight:800}.laundry-alert form>div{display:flex;gap:7px}.laundry-alert input{width:86px;padding:10px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:700 14px \"DM Mono\",monospace}.laundry-alert button{padding:10px 12px;border:0;border-radius:5px;background:var(--ink);color:#fff;font:800 12px Manrope;cursor:pointer}.laundry-alert #laundryAlertMessage{min-height:16px;margin:7px 0 0;color:var(--muted);font-size:11px}@media(max-width:700px){.laundry-alert{align-items:stretch;flex-direction:column;gap:17px}.laundry-alert form{min-width:0}}";document.head.append(a);e.querySelector("form").addEventListener("submit",async t=>{t.preventDefault();const e=Number(document.querySelector("#laundryAlertTarget").value);if(!Number.isInteger(e)||e<0){h("Enter a valid token number.");return}if(!("Notification"in window)){h("Notifications are not supported by this browser.");return}let a=Notification.permission;if(a==="default")a=await Notification.requestPermission();if(a!=="granted"){h("Notification permission was not allowed.");return}localStorage.setItem(m,String(e));localStorage.removeItem(p);y();h(`We will alert you when token ${String(e).padStart(3,"0")} is ready.`);v()});y()}function l(t,e){const a=function(t){return String(t).padStart(3,"0")}(t);s.textContent=a,i.textContent=`${a} or lower`,u=t,f=e,o("updatedTime").textContent=d(e),o("dashboardToken").textContent=a,o("tokenCard").setAttribute("aria-busy","false"),v()}b();n(r,t=>{const e=Number(t.data()?.readyThrough);if(!t.exists()||!Number.isInteger(e)||e<0)return console.warn("Laundry status is unavailable or invalid."),o("rangeText").textContent="temporarily unavailable",o("updatedTime").textContent="unavailable",void o("tokenCard").setAttribute("aria-busy","false");l(e,t.updateTime?.toDate()??new Date)},t=>{console.warn("Laundry status could not be loaded.",t.message),o("rangeText").textContent="temporarily unavailable",o("updatedTime").textContent="unavailable",o("tokenCard").setAttribute("aria-busy","false")}),setInterval(()=>f&&(o("updatedTime").textContent=d(f)),6e4);
+import { supabase } from "./supabase.js";
+
+const byId = (id) => document.getElementById(id);
+const readyNumber = byId("readyNumber");
+const rangeText = byId("rangeText");
+let updatedAt;
+
+function padToken(token) {
+  return String(token).padStart(3, "0");
+}
+
+function relativeTime(value) {
+  const minutes = Math.floor((Date.now() - new Date(value)) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  return new Date(value).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+}
+
+function renderLaundryStatus(row) {
+  const token = Number(row?.ready_token);
+  if (!Number.isInteger(token) || token < 0) throw new Error("The laundry token is unavailable.");
+  const label = padToken(token);
+  updatedAt = row.updated_at;
+  readyNumber.textContent = label;
+  rangeText.textContent = `${label} or lower`;
+  byId("updatedTime").textContent = relativeTime(updatedAt);
+  byId("dashboardToken").textContent = label;
+  byId("tokenCard").setAttribute("aria-busy", "false");
+}
+
+async function loadLaundryStatus() {
+  const { data, error } = await supabase.from("laundry_status").select("ready_token,updated_at").eq("id", 1).single();
+  if (error) throw error;
+  renderLaundryStatus(data);
+}
+
+function showAlertMessage(message) {
+  const target = byId("laundryAlertMessage");
+  if (target) target.textContent = message;
+}
+
+function urlBase64ToUint8Array(value) {
+  const padding = "=".repeat((4 - value.length % 4) % 4);
+  const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
+  return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+}
+
+async function enablePushAlert(token) {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+    throw new Error("Push notifications are not supported by this browser.");
+  }
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") throw new Error("Notification permission was not allowed.");
+
+  const registration = await navigator.serviceWorker.ready;
+  const keyResponse = await fetch("/api/push-public-key");
+  const { publicKey } = await keyResponse.json();
+  if (!keyResponse.ok || !publicKey) throw new Error("Push notifications are not configured yet.");
+
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicKey),
+  });
+  const response = await fetch("/api/push-subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subscription, targetToken: token }),
+  });
+  if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error || "Your alert could not be saved.");
+}
+
+function addPushAlert() {
+  const note = document.querySelector(".pickup-note");
+  if (!note) return;
+  const panel = document.createElement("section");
+  panel.className = "laundry-alert";
+  panel.innerHTML = `<div><p class="laundry-alert-kicker">COLLECTION ALERT</p><strong>Get a push notification when your token is ready.</strong><p>You can close DayBoard after enabling the alert.</p></div><form id="laundryAlertForm"><label for="laundryAlertTarget">My token</label><div><input id="laundryAlertTarget" type="number" min="0" inputmode="numeric" required placeholder="000"><button type="submit">Enable alert</button></div><p id="laundryAlertMessage" role="status"></p></form>`;
+  note.after(panel);
+  panel.querySelector("form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = event.submitter;
+    const token = Number(byId("laundryAlertTarget").value);
+    if (!Number.isInteger(token) || token < 0) return showAlertMessage("Enter a valid token number.");
+    button.disabled = true;
+    showAlertMessage("Enabling push alert…");
+    try {
+      await enablePushAlert(token);
+      showAlertMessage(`You will be notified when token ${padToken(token)} is ready.`);
+    } catch (error) {
+      console.error("Push alert could not be enabled.", error);
+      showAlertMessage(error.message || "Your alert could not be enabled.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+function addAlertStyles() {
+  const style = document.createElement("style");
+  style.textContent = `.laundry-alert{display:flex;justify-content:space-between;gap:30px;align-items:center;width:min(100%,760px);margin:30px auto 0;padding:20px;border:1px solid var(--line);border-radius:9px;background:var(--surface-muted)}.laundry-alert-kicker{margin:0 0 7px;color:var(--muted);font:800 9px "DM Mono",monospace;letter-spacing:1px}.laundry-alert strong{font-size:15px}.laundry-alert p:not(.laundry-alert-kicker):not(#laundryAlertMessage){margin:6px 0 0;color:var(--muted);font-size:12px}.laundry-alert form{min-width:240px}.laundry-alert label{display:block;margin-bottom:6px;font-size:11px;font-weight:800}.laundry-alert form>div{display:flex;gap:7px}.laundry-alert input{width:86px;padding:10px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);font:700 14px "DM Mono",monospace}.laundry-alert button{padding:10px 12px;border:0;border-radius:5px;background:var(--ink);color:#fff;font:800 12px Manrope;cursor:pointer}.laundry-alert button:disabled{opacity:.65;cursor:wait}.laundry-alert #laundryAlertMessage{min-height:16px;margin:7px 0 0;color:var(--muted);font-size:11px}@media(max-width:700px){.laundry-alert{align-items:stretch;flex-direction:column;gap:17px}.laundry-alert form{min-width:0}}`;
+  document.head.append(style);
+}
+
+addAlertStyles();
+addPushAlert();
+loadLaundryStatus().catch((error) => {
+  console.error("Laundry status could not be loaded.", error);
+  rangeText.textContent = "temporarily unavailable";
+  byId("updatedTime").textContent = "unavailable";
+  byId("tokenCard").setAttribute("aria-busy", "false");
+});
+
+supabase.channel("laundry-status").on("postgres_changes", { event: "UPDATE", schema: "public", table: "laundry_status", filter: "id=eq.1" }, (payload) => renderLaundryStatus(payload.new)).subscribe();
+window.setInterval(() => { if (updatedAt) byId("updatedTime").textContent = relativeTime(updatedAt); }, 60_000);

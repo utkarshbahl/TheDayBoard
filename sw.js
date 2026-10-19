@@ -1,4 +1,4 @@
-const CACHE_NAME = "dayboard-shell-v8";
+const CACHE_NAME = "dayboard-shell-v9";
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -66,4 +66,20 @@ self.addEventListener("fetch", (event) => {
       })
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/index.html"))),
   );
+});
+
+self.addEventListener("push", (event) => {
+  const data = event.data?.json() || {};
+  event.waitUntil(self.registration.showNotification(data.title || "DayBoard", {
+    body: data.body || "You have a new update.",
+    icon: "/assets/ethers-club-icon.png",
+    badge: "/assets/ethers-club-icon.png",
+    tag: "dayboard-laundry-ready",
+    data: { url: data.url || "/laundry" },
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data?.url || "/laundry"));
 });
