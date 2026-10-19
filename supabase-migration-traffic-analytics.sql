@@ -4,7 +4,7 @@
 
 create table if not exists public.site_page_views (
   id bigint generated always as identity primary key,
-  page_path text not null check (page_path in ('/', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum')),
+  page_path text not null check (page_path in ('/', '/laundry', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum', '/clubs', '/surveys')),
   visitor_id uuid not null,
   created_at timestamptz not null default now()
 );
@@ -13,7 +13,7 @@ create table if not exists public.site_page_views (
 alter table public.site_page_views add column if not exists visitor_id uuid;
 alter table public.site_page_views drop constraint if exists site_page_views_page_path_check;
 alter table public.site_page_views add constraint site_page_views_page_path_check
-  check (page_path in ('/', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum'));
+  check (page_path in ('/', '/laundry', '/mess-menu', '/bus-timings', '/campus-map', '/curriculum', '/clubs', '/surveys'));
 
 create index if not exists site_page_views_created_at_idx on public.site_page_views (created_at desc);
 

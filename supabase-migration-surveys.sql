@@ -83,5 +83,5 @@ grant execute on function public.submit_survey_response(uuid, text, jsonb) to an
 
 -- Makes the Opinions item manageable through the existing visibility controls.
 alter table public.site_section_visibility drop constraint if exists site_section_visibility_section_key_check;
-alter table public.site_section_visibility add constraint site_section_visibility_section_key_check check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'campus-map', 'auth', 'surveys'));
+alter table public.site_section_visibility add constraint site_section_visibility_section_key_check check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'campus-map', 'clubs', 'auth', 'surveys'));
 insert into public.site_section_visibility (section_key, is_public) values ('surveys', true) on conflict (section_key) do nothing;

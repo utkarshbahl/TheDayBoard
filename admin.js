@@ -5,11 +5,13 @@ let adminSurveys = [];
 let selectedAdminSurveyId = null;
 let surveyResultsLoaded = false;
 const pageNames = {
-  "/": "Laundry status",
+  "/": "Home",
+  "/laundry": "Laundry status",
   "/mess-menu": "Mess menu",
   "/bus-timings": "Bus timings",
   "/campus-map": "Campus map",
   "/curriculum": "Academic Help",
+  "/clubs": "Campus clubs",
   "/surveys": "Campus opinions",
 };
 const sections = [
@@ -18,6 +20,7 @@ const sections = [
   ["bus", "Bus timings"],
   ["curriculum", "Academic Help"],
   ["campus-map", "Campus map"],
+  ["clubs", "Campus clubs"],
   ["surveys", "Campus opinions"],
 ];
 
