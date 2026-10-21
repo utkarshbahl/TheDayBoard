@@ -1,1 +1,10 @@
-{"$schema":"https://openapi.vercel.sh/vercel.json","cleanUrls":true,"rewrites":[{"source":"/laundry","destination":"/laundry.html"}]}
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "cleanUrls": true,
+    "rewrites": [
+        {
+            "source": "/laundry",
+            "destination": "/laundry.html"
+        }
+    ]
+}
