@@ -1,4 +1,5 @@
 import "./section-visibility.js?v=20261016";
+import "./brand.js?v=20261021";
 
 const isOpinionsPage = /\/surveys(?:\.html)?\/?$/.test(location.pathname);
 const isClubsPage = /\/clubs(?:\.html)?\/?$/.test(location.pathname);

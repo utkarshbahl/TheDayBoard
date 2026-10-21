@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Academic Help | DayBoard</title>
+  <title>Academic Help | TheDayBoard</title>
   <meta name="description" content="Semester-wise B.Tech curriculum for LNMIIT students.">
   <link rel="icon" href="assets/ethers-club-icon.png" type="image/png">
   <link rel="manifest" href="manifest.webmanifest">
@@ -12,16 +12,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261020"><link rel="stylesheet" href="nav-rail.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=20261022"><link rel="stylesheet" href="nav-rail.css?v=1">
   <link rel="stylesheet" href="academic-view.css?v=20261019-2">
 </head>
 <body>
   <main>
     <nav class="nav wrap">
       <div class="nav-start">
-        <a class="brand brand-desktop" href="index.html" aria-label="DayBoard home"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span>Day<b>Board</b></span></a>
+        <a class="brand brand-desktop" href="index.html"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span><span class="brand-byline" data-site-credit>by Ethers Club</span></span></a>
         <details class="campus-menu">
-          <summary class="campus-trigger" aria-label="Open DayBoard services"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span>Day<b>Board</b></span><span class="campus-chevron" aria-hidden="true"></span></summary>
+          <summary class="campus-trigger"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span><span class="brand-byline" data-site-credit>by Ethers Club</span></span><span class="campus-chevron" aria-hidden="true"></span></summary>
           <nav class="campus-dropdown" aria-label="Campus services">
             <span class="campus-dropdown-label">Campus services</span>
             <a class="campus-nav-link" href="laundry.html"><span>Laundry <b>Status</b></span><span class="campus-link-arrow"></span></a>
@@ -41,7 +41,7 @@
           <a class="nav-link" href="surveys.html">Campus <b>Opinions</b></a>
         </div>
       </div>
-      <div class="nav-actions"><button class="theme-toggle" type="button" aria-label="Switch colour scheme" aria-pressed="false" onclick="const n=document.documentElement.dataset.theme===&quot;lime&quot;?&quot;dusk&quot;:&quot;lime&quot;;document.documentElement.dataset.theme=n;this.setAttribute(&quot;aria-pressed&quot;,String(n===&quot;lime&quot;));this.querySelector(&quot;[data-theme-toggle-label]&quot;).textContent=n===&quot;lime&quot;?&quot;Lime&quot;:&quot;Dusk&quot;;try{localStorage.setItem(&quot;lnmiit-theme&quot;,n)}catch(e){}event.stopImmediatePropagation()"><span class="theme-toggle-dot" aria-hidden="true"></span><span data-theme-toggle-label>Dusk</span></button></div>
+      <div class="nav-actions"><button class="theme-toggle" type="button" aria-label="Switch colour scheme: Lime or Dusk" aria-pressed="false" onclick="const n=document.documentElement.dataset.theme===&quot;lime&quot;?&quot;dusk&quot;:&quot;lime&quot;;document.documentElement.dataset.theme=n;this.setAttribute(&quot;aria-pressed&quot;,String(n===&quot;dusk&quot;));this.querySelector(&quot;[data-theme-toggle-label]&quot;).textContent=n===&quot;lime&quot;?&quot;Lime&quot;:&quot;Dusk&quot;;try{localStorage.setItem(&quot;lnmiit-theme&quot;,n)}catch(e){}event.stopImmediatePropagation()"><span class="theme-toggle-dot" aria-hidden="true"></span><span data-theme-toggle-label>Dusk</span></button></div>
     </nav>
 
     <section class="curriculum-page wrap">
@@ -74,8 +74,8 @@
       </section>
     </section>
   </main>
-  <footer class="wrap site-footer-update"><span data-last-updated>Last updated: Loading...</span><a class="admin-access" href="admin.html">Admin</a></footer>
-  <script type="module" src="nav.js?v=20261023"></script>
+  <footer class="wrap site-footer-update"><span class="site-credit"><span data-site-name>TheDayBoard</span> <b data-site-credit>by Ethers Club</b></span><span data-last-updated>Last updated: Loading...</span><a class="admin-access" href="admin.html">Admin</a></footer>
+  <script type="module" src="nav.js?v=20261025"></script>
   <script type="module" src="academic-view.js"></script>
   <script type="module" src="upcoming-holidays.js"></script>
   <script type="module" src="curriculum.js"></script>

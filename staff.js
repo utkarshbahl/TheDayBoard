@@ -1,4 +1,5 @@
 import { supabase } from "./supabase.js";
+import "./brand.js?v=20261021";
 
 const byId = (id) => document.getElementById(id);
 
