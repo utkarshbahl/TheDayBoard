@@ -2,7 +2,7 @@ const CACHE_NAME = "thedayboard-shell-v9";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/home.css?v=1",
+  "/home.css?v=2",
   "/laundry.html",
   "/curriculum.html",
   "/mess-menu.html",
@@ -11,7 +11,7 @@ const APP_SHELL = [
   "/surveys.html",
   "/clubs.html",
   "/about.html",
-  "/styles.css?v=20261022",
+  "/styles.css?v=20261023",
   "/nav-rail.css?v=1",
   "/nav.js?v=20261025",
   "/brand.js?v=20261021",
