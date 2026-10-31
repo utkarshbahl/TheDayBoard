@@ -1,7 +1,6 @@
 import { supabase } from "./supabase.js";
 
 const FALLBACK_NAME = "TheDayBoard";
-const FALLBACK_CREDIT = "by Ethers Club";
 
 const applyText = (selector, value, fallback) => {
   if (!value || value === fallback) return;
@@ -10,9 +9,22 @@ const applyText = (selector, value, fallback) => {
   });
 };
 
-export const applySiteIdentity = ({ site_name, site_credit } = {}) => {
+export const applySiteIdentity = ({ site_name } = {}) => {
   applyText("[data-site-name]", site_name, FALLBACK_NAME);
-  applyText("[data-site-credit]", site_credit, FALLBACK_CREDIT);
+};
+
+const removeClubCredits = () => {
+  document.querySelectorAll("[data-site-credit]").forEach((element) => element.remove());
+  document.querySelectorAll(".about-creator").forEach((element) => element.remove());
+  document.querySelectorAll(".about-copy h1").forEach((element) => {
+    element.textContent = "TheDayBoard for an easier campus day.";
+  });
+  document.title = document.title.replace(/\s*\|\s*Ethers Club/gi, "");
+  document.querySelectorAll('meta[name="description"]').forEach((element) => {
+    element.content = element.content
+      .replace(/by Ethers Club/gi, "")
+      .replace(/the Ethers Club team behind/gi, "the team behind");
+  });
 };
 
 export async function loadSiteIdentity() {
@@ -32,4 +44,5 @@ export async function loadSiteIdentity() {
   applySiteIdentity(identity);
 }
 
+removeClubCredits();
 loadSiteIdentity();

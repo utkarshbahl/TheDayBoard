@@ -32,3 +32,5 @@ html[data-theme=dusk] .theme-toggle-dot{background:var(--lime);box-shadow:0 0 0 
 /* First-paint loader: this lives in the head stylesheet so cached content is
    covered before any page script has a chance to run. */
 html::before,html::after{position:fixed;z-index:9999;content:"";pointer-events:none;transition:opacity .36s ease,visibility .36s ease}html::before{inset:0;background:var(--paper)}html::after{top:50%;left:50%;width:64px;height:64px;border-radius:50%;background:#14281f url("assets/ethers-club-icon.png") center/64px 64px no-repeat;box-shadow:0 0 0 12px var(--paper),0 0 0 13px var(--line);transform:translate(-50%,-50%);animation:dayboard-first-load 1.25s ease-in-out infinite}html.dayboard-ready::before,html.dayboard-ready::after{visibility:hidden;opacity:0}@keyframes dayboard-first-load{50%{transform:translate(-50%,-50%) scale(.88) rotate(-8deg)}}@media(prefers-reduced-motion:reduce){html::before,html::after{transition-duration:.01ms;animation-duration:.01ms}}
+/* Credits are intentionally removed before JavaScript is available. */
+[data-site-credit],.brand-byline{display:none!important}

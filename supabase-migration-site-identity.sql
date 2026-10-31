@@ -10,7 +10,7 @@
 
   insert into public.site_settings (key, value) values
     ('site_name', 'TheDayBoard'),
-    ('site_credit', 'by Ethers Club')
+    ('site_credit', '')
   on conflict (key) do nothing;
 
   alter table public.site_settings enable row level security;
