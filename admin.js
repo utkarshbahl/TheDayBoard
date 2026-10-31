@@ -39,7 +39,7 @@ adminStyle.textContent = `
   .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font: 13px Manrope; }
   .survey-admin textarea { min-height: 80px; resize: vertical; } .survey-admin input[type=checkbox] { margin-right: 8px; accent-color: var(--ink); }
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: #fff; }
-  .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
+  .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
 `;
 document.head.append(adminStyle);
@@ -104,6 +104,14 @@ function setSection(section) {
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 
+function withRequestTimeout(request, timeoutMs = 20000) {
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error("The request timed out. Check your connection and try again.")), timeoutMs);
+  });
+  return Promise.race([request, timeout]).finally(() => window.clearTimeout(timeoutId));
+}
+
 function questionEditor(number) {
   const question = document.createElement("fieldset");
   question.className = "survey-question-editor";
@@ -140,7 +148,8 @@ function createSurveyPanel() {
 
 async function publishSurvey(event) {
   event.preventDefault();
-  const form = event.currentTarget, message = form.querySelector(".survey-admin-message"), button = event.submitter;
+  const form = event.currentTarget, message = form.querySelector(".survey-admin-message"), button = event.submitter || form.querySelector(".survey-publish");
+  if (button.disabled) return;
   const questionNodes = [...form.querySelectorAll(".survey-question-editor")];
   const questions = questionNodes.map((node, index) => {
     const type = node.querySelector(".survey-question-type").value;
@@ -148,17 +157,31 @@ async function publishSurvey(event) {
     return { position: index + 1, prompt: node.querySelector(".survey-question-prompt").value.trim(), question_type: type, options };
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
-  button.disabled = true; message.textContent = "Publishing…";
+  button.disabled = true; message.textContent = "Publishing…"; message.classList.remove("is-error");
   supabase.rpc("clean_abandoned_survey_drafts").catch((error) => console.warn("Abandoned survey drafts could not be cleaned.", error));
-  const { data: survey, error: surveyError } = await supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: false }).select("id").single();
-  const { error: questionsError } = surveyError ? { error: surveyError } : await supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id })));
-  const enteredPassword = byId("surveyPassword").value;
-  const { error: passwordError } = questionsError || !enteredPassword ? { error: questionsError } : await supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: enteredPassword });
-  button.disabled = false;
-  if (passwordError) { if (survey?.id) await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
-  const { error: publishError } = await supabase.from("surveys").update({ is_published: true, published_at: new Date().toISOString() }).eq("id", survey.id);
-  if (publishError) { await supabase.from("surveys").delete().eq("id", survey.id); message.textContent = "The opinion could not be published."; return; }
-  form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; surveyResultsLoaded = true; loadSurveyResults(true);
+  let survey;
+  try {
+    const { data, error: surveyError } = await withRequestTimeout(supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: false }).select("id").single());
+    survey = data;
+    if (surveyError) throw surveyError;
+    const { error: questionsError } = await withRequestTimeout(supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id }))));
+    if (questionsError) throw questionsError;
+    const enteredPassword = byId("surveyPassword").value;
+    if (enteredPassword) {
+      const { error: passwordError } = await withRequestTimeout(supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: enteredPassword }));
+      if (passwordError) throw passwordError;
+    }
+    const { error: publishError } = await withRequestTimeout(supabase.from("surveys").update({ is_published: true, published_at: new Date().toISOString() }).eq("id", survey.id));
+    if (publishError) throw publishError;
+    form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; surveyResultsLoaded = true; loadSurveyResults(true);
+  } catch (error) {
+    console.error("Survey publication failed.", error);
+    if (survey?.id) supabase.from("surveys").delete().eq("id", survey.id).then(({ error: deleteError }) => { if (deleteError) console.warn("Survey draft could not be removed.", deleteError); });
+    message.classList.add("is-error");
+    message.textContent = error?.message || "The opinion could not be published. Please try again.";
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function loadSurveyResults(refresh = false) {
