@@ -7,6 +7,11 @@ refreshStyles.rel = "stylesheet";
 refreshStyles.href = "site-refresh.css?v=20261031";
 document.head.append(refreshStyles);
 
+const heritageStyles = document.createElement("link");
+heritageStyles.rel = "stylesheet";
+heritageStyles.href = "heritage-theme.css?v=20261031";
+document.head.append(heritageStyles);
+
 const byId = (id) => document.getElementById(id);
 
 const navigationStyle = document.createElement("style");

@@ -10,6 +10,12 @@ if (!document.querySelector('link[href^="site-refresh.css"]')) {
   refreshStyles.href = "site-refresh.css?v=20261031";
   document.head.append(refreshStyles);
 }
+if (!document.querySelector('link[href^="heritage-theme.css"]')) {
+  const heritageStyles = document.createElement("link");
+  heritageStyles.rel = "stylesheet";
+  heritageStyles.href = "heritage-theme.css?v=20261031";
+  document.head.append(heritageStyles);
+}
 
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
