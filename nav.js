@@ -1,6 +1,10 @@
 import "./section-visibility.js?v=20261016";
 import "./brand.js?v=20261021";
 
+const navLayoutStyle = document.createElement("style");
+navLayoutStyle.textContent = `@media (min-width: 901px) { .nav-start { flex: 1; min-width: 0; } .nav-links { flex: 1; justify-content: space-between; gap: 12px; } .nav-link { white-space: nowrap; } }`;
+document.head.append(navLayoutStyle);
+
 const isOpinionsPage = /\/surveys(?:\.html)?\/?$/.test(location.pathname);
 const isClubsPage = /\/clubs(?:\.html)?\/?$/.test(location.pathname);
 const isPlacementsPage = /\/placements(?:\.html)?\/?$/.test(location.pathname);
