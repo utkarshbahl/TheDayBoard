@@ -1,5 +1,6 @@
 import { supabase } from "./supabase.js";
 import "./brand.js?v=20261021";
+import "./ui-polish.js";
 
 const byId = (id) => document.getElementById(id);
 let adminSurveys = [];

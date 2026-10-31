@@ -1,5 +1,6 @@
 import "./section-visibility.js?v=20261016";
 import "./brand.js?v=20261021";
+import "./ui-polish.js";
 
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
