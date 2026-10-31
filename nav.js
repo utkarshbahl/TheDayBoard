@@ -2,21 +2,6 @@ import "./section-visibility.js?v=20261016";
 import "./brand.js?v=20261021";
 import "./ui-polish.js";
 
-// Loaded from the shared navigation module so each public view receives the
-// same responsive finish without repeating a stylesheet tag in every page.
-if (!document.querySelector('link[href^="site-refresh.css"]')) {
-  const refreshStyles = document.createElement("link");
-  refreshStyles.rel = "stylesheet";
-  refreshStyles.href = "site-refresh.css?v=20261031";
-  document.head.append(refreshStyles);
-}
-if (!document.querySelector('link[href^="heritage-theme.css"]')) {
-  const heritageStyles = document.createElement("link");
-  heritageStyles.rel = "stylesheet";
-  heritageStyles.href = "heritage-theme.css?v=20261031";
-  document.head.append(heritageStyles);
-}
-
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
   @media (min-width: 901px) { .nav-start { flex: 1; min-width: 0; } .nav-links { flex: 1; justify-content: space-between; gap: 12px; } .nav-link { white-space: nowrap; } .nav-actions { margin-left: 32px; } }

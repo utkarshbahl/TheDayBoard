@@ -2,16 +2,6 @@ import { supabase } from "./supabase.js";
 import "./brand.js?v=20261021";
 import "./ui-polish.js";
 
-const refreshStyles = document.createElement("link");
-refreshStyles.rel = "stylesheet";
-refreshStyles.href = "site-refresh.css?v=20261031";
-document.head.append(refreshStyles);
-
-const heritageStyles = document.createElement("link");
-heritageStyles.rel = "stylesheet";
-heritageStyles.href = "heritage-theme.css?v=20261031";
-document.head.append(heritageStyles);
-
 const byId = (id) => document.getElementById(id);
 let adminSurveys = [];
 let selectedAdminSurveyId = null;
