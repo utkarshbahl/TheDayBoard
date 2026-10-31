@@ -3,6 +3,37 @@ import "./brand.js?v=20261021";
 
 const isOpinionsPage = /\/surveys(?:\.html)?\/?$/.test(location.pathname);
 const isClubsPage = /\/clubs(?:\.html)?\/?$/.test(location.pathname);
+const isPlacementsPage = /\/placements(?:\.html)?\/?$/.test(location.pathname);
+document.querySelectorAll('.nav-link[href="curriculum.html"], .campus-nav-link[href="curriculum.html"]').forEach((link) => {
+  link.innerHTML = link.classList.contains("campus-nav-link") ? '<span><b>Academics</b></span><span class="campus-link-arrow" aria-hidden="true"></span>' : '<b>Academics</b>';
+});
+document.querySelectorAll('.service-card[href="curriculum.html"] strong').forEach((title) => { title.innerHTML = "<b>Academics</b>"; });
+document.querySelectorAll(".service-grid").forEach((grid) => {
+  if (grid.querySelector('a[href="placements.html"]')) return;
+  const card = document.createElement("a");
+  card.className = "service-card";
+  card.href = "placements.html";
+  card.innerHTML = '<span class="service-number">08</span><strong><b>Placements</b></strong><small>Follow live Batch 2027 placement updates.</small><i aria-hidden="true">→</i>';
+  grid.append(card);
+});
+document.querySelectorAll(".nav-links").forEach((nav) => {
+  if (nav.querySelector('a[href="placements.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "nav-link";
+  link.href = "placements.html";
+  link.innerHTML = "<b>Placements</b>";
+  if (isPlacementsPage) link.setAttribute("aria-current", "page");
+  nav.insertBefore(link, nav.querySelector('a[href="clubs.html"], a[href="surveys.html"]'));
+});
+document.querySelectorAll(".campus-dropdown").forEach((nav) => {
+  if (nav.querySelector('a[href="placements.html"]')) return;
+  const link = document.createElement("a");
+  link.className = "campus-nav-link";
+  link.href = "placements.html";
+  link.innerHTML = '<span><b>Placements</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  if (isPlacementsPage) link.setAttribute("aria-current", "page");
+  nav.insertBefore(link, nav.querySelector('a[href="clubs.html"], a[href="surveys.html"]'));
+});
 document.querySelectorAll(".nav-links").forEach((nav) => {
   if (nav.querySelector('a[href="clubs.html"]')) return;
   const link = document.createElement("a");

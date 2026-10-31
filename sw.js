@@ -1,10 +1,11 @@
-const CACHE_NAME = "thedayboard-shell-v9";
+const CACHE_NAME = "thedayboard-shell-v10";
 const APP_SHELL = [
   "/",
   "/index.html",
   "/home.css?v=2",
   "/laundry.html",
   "/curriculum.html",
+  "/placements.html",
   "/mess-menu.html",
   "/bus-timings.html",
   "/campus-map.html",
@@ -16,6 +17,8 @@ const APP_SHELL = [
   "/nav.js?v=20261025",
   "/brand.js?v=20261021",
   "/curriculum.js",
+  "/placements.js?v=1",
+  "/placements.css?v=1",
   "/sgpa.js",
   "/service-tables.js",
   "/section-visibility.js?v=20261016",
