@@ -158,27 +158,20 @@ async function publishSurvey(event) {
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
   button.disabled = true; message.textContent = "Publishing…"; message.classList.remove("is-error");
-  supabase.rpc("clean_abandoned_survey_drafts").catch((error) => console.warn("Abandoned survey drafts could not be cleaned.", error));
-  let survey;
   try {
-    const { data, error: surveyError } = await withRequestTimeout(supabase.from("surveys").insert({ title: byId("surveyTitle").value.trim(), description: byId("surveyDescription").value.trim(), collect_name: byId("surveyCollectName").checked, is_published: false }).select("id").single());
-    survey = data;
-    if (surveyError) throw surveyError;
-    const { error: questionsError } = await withRequestTimeout(supabase.from("survey_questions").insert(questions.map((question) => ({ ...question, survey_id: survey.id }))));
-    if (questionsError) throw questionsError;
-    const enteredPassword = byId("surveyPassword").value;
-    if (enteredPassword) {
-      const { error: passwordError } = await withRequestTimeout(supabase.rpc("set_survey_password", { p_survey_id: survey.id, p_password: enteredPassword }));
-      if (passwordError) throw passwordError;
-    }
-    const { error: publishError } = await withRequestTimeout(supabase.from("surveys").update({ is_published: true, published_at: new Date().toISOString() }).eq("id", survey.id));
-    if (publishError) throw publishError;
-    form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = survey.id; surveyResultsLoaded = true; loadSurveyResults(true);
+    const { data: surveyId, error } = await withRequestTimeout(supabase.rpc("publish_survey", {
+      p_title: byId("surveyTitle").value.trim(),
+      p_description: byId("surveyDescription").value.trim(),
+      p_collect_name: byId("surveyCollectName").checked,
+      p_password: byId("surveyPassword").value,
+      p_questions: questions,
+    }));
+    if (error) throw error;
+    form.reset(); form.querySelector("#surveyQuestionEditors").replaceChildren(questionEditor(1)); message.textContent = "Opinion published."; selectedAdminSurveyId = surveyId; surveyResultsLoaded = true; loadSurveyResults(true);
   } catch (error) {
     console.error("Survey publication failed.", error);
-    if (survey?.id) supabase.from("surveys").delete().eq("id", survey.id).then(({ error: deleteError }) => { if (deleteError) console.warn("Survey draft could not be removed.", deleteError); });
     message.classList.add("is-error");
-    message.textContent = error?.message || "The opinion could not be published. Please try again.";
+    message.textContent = error?.code === "PGRST202" ? "The Opinions database migration has not been run yet." : (error?.message || "The opinion could not be published. Please try again.");
   } finally {
     button.disabled = false;
   }
