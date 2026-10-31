@@ -22,6 +22,7 @@ navLayoutStyle.textContent = `
   .enhanced-ui .placement-stat:hover, .enhanced-ui .traffic-stat:hover, .enhanced-ui .survey-choice:hover { transform: translateY(-3px); box-shadow: 0 9px 20px rgba(20,40,31,.09); }
   .enhanced-ui [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s cubic-bezier(.16,1,.3,1); }
   .enhanced-ui [data-reveal].is-revealed { opacity: 1; transform: none; }
+  @media (max-width: 700px) { .enhanced-ui body { background: var(--paper); } }
   @media (prefers-reduced-motion: reduce) { .enhanced-ui *, .enhanced-ui *::before, .enhanced-ui *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } .enhanced-ui [data-reveal] { opacity: 1; transform: none; } }
 `;
 document.head.append(navLayoutStyle);

@@ -17,6 +17,7 @@ if (!document.getElementById("dayboard-ui-polish")) {
     .admin-page .traffic-stat { box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 8px 20px rgba(20,40,31,.08); }
     .staff-page .desk-card { transition: transform .25s ease, box-shadow .25s ease; }
     .staff-page .desk-card:hover { transform: translateY(-3px); box-shadow: 13px 15px 0 var(--lime); }
+    @media (max-width: 700px) { body { background-image: none; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
   `;
   document.head.append(style);
