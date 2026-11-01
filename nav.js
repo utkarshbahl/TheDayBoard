@@ -1,6 +1,7 @@
 import "./section-visibility.js?v=20261016";
 import "./brand.js?v=20261021";
 import "./ui-polish.js";
+import { supabase } from "./supabase.js";
 
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
@@ -36,6 +37,31 @@ document.querySelectorAll(".nav-actions").forEach((actions) => {
   link.textContent = "Sign in";
   actions.prepend(link);
 });
+const updateSignInState = (session) => {
+  document.querySelectorAll(".sign-in-link").forEach((link) => {
+    if (!session) {
+      link.textContent = "Sign in";
+      link.setAttribute("aria-label", "Sign in");
+      link.classList.remove("is-signed-in");
+      return;
+    }
+    link.textContent = "Signed in";
+    link.setAttribute("aria-label", `Signed in as ${session.user.email || "your account"}`);
+    link.title = session.user.email || "Signed in";
+    link.classList.add("is-signed-in");
+  });
+};
+
+supabase.auth.getSession()
+  .then(({ data: { session }, error }) => {
+    if (error) {
+      console.error("Sign-in state could not be loaded.", error);
+      return;
+    }
+    updateSignInState(session);
+  })
+  .catch((error) => console.error("Sign-in state could not be loaded.", error));
+supabase.auth.onAuthStateChange((_event, session) => updateSignInState(session));
 const revealTargets = document.querySelectorAll(".service-card, .placement-stat, .placement-record, .survey-choice, .club-card, .route-group, .course-panel, .map-frame, .notice-card");
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const revealObserver = new IntersectionObserver((entries, observer) => entries.forEach((entry) => {

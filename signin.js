@@ -50,6 +50,11 @@ supabase.auth.onAuthStateChange((_event, nextSession) => updateSession(nextSessi
 button?.addEventListener("click", async () => {
   button.disabled = true;
   message.textContent = "";
+  if (!["http:", "https:"].includes(window.location.protocol)) {
+    button.disabled = false;
+    message.textContent = "Google sign-in needs the site opened through an HTTP or HTTPS server. File previews cannot receive the OAuth callback.";
+    return;
+  }
   const redirectTo = new URL("index.html", window.location.href).href;
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
