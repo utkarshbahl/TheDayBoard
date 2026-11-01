@@ -11,9 +11,7 @@ const themeKey = "lnmiit-theme";
 const root = document.documentElement;
 const requestedReturn = new URLSearchParams(window.location.search).get("return");
 const returnPath = requestedReturn && requestedReturn.startsWith("/") && !requestedReturn.startsWith("//") ? requestedReturn : "/";
-const getAuthOrigin = () => window.location.hostname.endsWith(".vercel.app")
-  ? "https://thedayboard.vercel.app"
-  : window.location.origin;
+const AUTH_REDIRECT_ORIGIN = "https://thedayboard.vercel.app";
 let currentTheme = "light";
 try {
   const savedTheme = localStorage.getItem(themeKey);
@@ -66,7 +64,7 @@ button?.addEventListener("click", async () => {
   message.textContent = "";
   const options = {};
   if (["http:", "https:"].includes(window.location.protocol)) {
-    options.redirectTo = `${getAuthOrigin()}${returnPath}`;
+    options.redirectTo = `${AUTH_REDIRECT_ORIGIN}${returnPath}`;
   }
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
