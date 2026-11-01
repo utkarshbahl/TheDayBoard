@@ -15,7 +15,7 @@ export const applySiteIdentity = ({ site_name } = {}) => {
 };
 
 const announcementStyle = document.createElement("style");
-announcementStyle.textContent = `.site-announcement{display:flex;align-items:flex-start;gap:14px;max-width:1116px;margin:14px auto 0;padding:13px 16px;border:1px solid var(--accent);border-radius:8px;background:var(--surface);color:var(--ink);font-size:13px;line-height:1.5}.site-announcement.is-important{background:var(--accent)}.site-announcement strong{display:block;margin-bottom:2px;font-size:10px;letter-spacing:1px;text-transform:uppercase}.site-announcement p{margin:0;flex:1}.site-announcement button{border:0;background:transparent;color:inherit;font:800 18px/1 Manrope;cursor:pointer;padding:0 2px}@media(max-width:700px){.site-announcement{margin:10px 21px 0}}`;
+announcementStyle.textContent = `.site-announcement{display:flex;align-items:flex-start;gap:14px;max-width:1116px;margin:14px auto 0;padding:13px 16px;border:1px solid var(--accent);border-radius:8px;background:var(--surface);color:var(--ink);font-size:13px;line-height:1.5}.site-announcement.is-important{background:var(--accent)}.site-announcement strong{display:block;margin-bottom:2px;font-size:10px;letter-spacing:1px;text-transform:uppercase}.site-announcement p{margin:0;flex:1}.site-announcement button{flex:0 0 auto;align-self:flex-start;margin:0 -3px 0 0;border:0;background:transparent;color:inherit;font:800 18px/1 Manrope;cursor:pointer;padding:0 2px}@media(max-width:700px){.site-announcement{margin:10px 21px 0}}`;
 document.head.append(announcementStyle);
 
 const showAnnouncement = ({ announcement_text, announcement_visible, announcement_important } = {}) => {
