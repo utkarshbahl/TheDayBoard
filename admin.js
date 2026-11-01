@@ -137,7 +137,7 @@ async function loadUsers() {
   if (!list || !total || list.dataset.loaded === "true") return;
   const { data, error } = await supabase.rpc("admin_list_users");
   if (error) {
-    list.innerHTML = "<p>Users could not be loaded. Run the updated Supabase migration first.</p>";
+    list.innerHTML = `<p>Users could not be loaded: ${escapeHtml(error.message || "Unknown database error")}</p>`;
     console.error("Admin users could not be loaded.", error);
     return;
   }

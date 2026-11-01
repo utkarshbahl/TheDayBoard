@@ -61,3 +61,5 @@ $$;
 
 revoke all on function public.admin_list_users() from public;
 grant execute on function public.admin_list_users() to authenticated;
+
+notify pgrst, 'reload schema';
