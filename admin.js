@@ -102,6 +102,13 @@ function createSectionNav() {
 }
 
 function setSection(section) {
+  const validSections = ["traffic", "users", "surveys", "visibility"];
+  if (!validSections.includes(section)) section = "traffic";
+  try {
+    localStorage.setItem("dayboard-admin-section", section);
+  } catch (error) {
+    console.error("Admin section preference could not be saved.", error);
+  }
   [".analytics-topline", ".analytics-subtitle", ".traffic-stats", ".traffic-breakdown"].forEach((selector) => {
     document.querySelector(selector)?.classList.toggle("is-admin-section-hidden", section !== "traffic");
   });
@@ -342,7 +349,14 @@ async function initializeAdmin() {
   createUsersPanel();
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
   createSurveyPanel();
-  setSection("traffic");
+  let savedSection = "traffic";
+  try {
+    const storedSection = localStorage.getItem("dayboard-admin-section");
+    if (storedSection) savedSection = storedSection;
+  } catch (error) {
+    console.error("Admin section preference could not be read.", error);
+  }
+  setSection(savedSection);
   try { await Promise.all([loadAnalytics(), loadVisibility(visibilityPanel)]); } catch (loadError) { console.error("Admin data could not be loaded.", loadError); }
 }
 

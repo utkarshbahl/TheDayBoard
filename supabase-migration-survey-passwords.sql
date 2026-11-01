@@ -8,9 +8,10 @@ alter table public.surveys add column if not exists password_hash text;
 
 drop policy if exists "Anyone can read published surveys" on public.surveys;
 drop policy if exists "Anyone can read questions for published surveys" on public.survey_questions;
-create or replace view public.open_survey_index with (security_barrier = true) as
+create or replace view public.open_survey_index with (security_barrier = true, security_invoker = true) as
   select id, title, description, collect_name, password_protected, published_at
   from public.surveys where is_published = true;
+alter view public.open_survey_index set (security_invoker = true);
 grant select on public.open_survey_index to anon, authenticated;
 
 create or replace function public.set_survey_password(p_survey_id uuid, p_password text)
