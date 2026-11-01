@@ -21,10 +21,13 @@
         <h1>Sign in</h1>
         <p class="signin-help">Use your Google account to save your preferences and access personalized campus features.</p>
         <button id="googleSignIn" class="signin-google" type="button">Continue with Google</button>
+        <p id="signinSession" class="signin-session" hidden></p>
+        <button id="signOut" class="signin-signout" type="button" hidden>Sign out</button>
         <p id="signinMessage" class="signin-message" role="status" aria-live="polite"></p>
       </div>
     </section>
   </main>
+  <script>document.documentElement.classList.add("dayboard-ready");</script>
   <script type="module" src="signin.js"></script>
 </body>
 </html>
