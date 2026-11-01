@@ -16,7 +16,7 @@ const summaryElement = document.querySelector("#sgpaSummary");
 
 if (rowsElement && courseRowsElement && valueElement && summaryElement) {
   const gradeOptions = Object.keys(gradePoints)
-    .map((grade) => `<option value="${grade}">${grade} Â· ${gradePoints[grade]}</option>`)
+    .map((grade) => `<option value="${grade}">${grade} \u00b7 ${gradePoints[grade]}</option>`)
     .join("");
 
   const calculate = () => {
@@ -34,7 +34,7 @@ if (rowsElement && courseRowsElement && valueElement && summaryElement) {
 
     valueElement.textContent = gradedCredits ? (weightedPoints / gradedCredits).toFixed(2) : "0.00";
     summaryElement.textContent = gradedCredits
-      ? `${gradedCourses} course${gradedCourses === 1 ? "" : "s"} Â· ${gradedCredits} graded credits`
+      ? `${gradedCourses} course${gradedCourses === 1 ? "" : "s"} \u00b7 ${gradedCredits} graded credits`
       : "Select grades to see your weighted average.";
   };
 

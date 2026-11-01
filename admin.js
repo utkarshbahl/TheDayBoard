@@ -136,7 +136,7 @@ function createSurveyPanel() {
   const panel = document.createElement("section");
   panel.id = "surveyAdminPanel";
   panel.className = "survey-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading resultsâ€¦</p></div></div>`;
+  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results?</p></div></div>`;
   panel.querySelector("p").textContent = "Publish as many open opinions as needed. Each can contain multiple-choice and written questions.";
   byId("analyticsPanel").append(panel);
   const editors = panel.querySelector("#surveyQuestionEditors");
@@ -160,7 +160,7 @@ async function publishSurvey(event) {
     return { position: index + 1, prompt: node.querySelector(".survey-question-prompt").value.trim(), question_type: type, options };
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
-  button.disabled = true; message.textContent = "Publishingâ€¦"; message.classList.remove("is-error");
+  button.disabled = true; message.textContent = "Publishing?"; message.classList.remove("is-error");
   try {
     const { data: surveyId, error } = await withRequestTimeout(supabase.rpc("publish_survey", {
       p_title: byId("surveyTitle").value.trim(),
@@ -192,7 +192,7 @@ async function loadSurveyResults(refresh = false) {
   const responseIds = (responses ?? []).map((response) => response.id);
   const { data: answers } = responseIds.length ? await supabase.from("survey_answers").select("response_id,question_id,answer_text").in("response_id", responseIds) : { data: [] };
   const responseById = new Map((responses ?? []).map((response) => [response.id, response]));
-  target.innerHTML = `<p><strong>${escapeHtml(survey.title)}</strong> Â· ${responses?.length ?? 0} response${responses?.length === 1 ? "" : "s"}${survey.is_published ? " Â· currently open" : ""}</p>${(questions ?? []).map((question) => {
+  target.innerHTML = `<p><strong>${escapeHtml(survey.title)}</strong> \u00b7 ${responses?.length ?? 0} response${responses?.length === 1 ? "" : "s"}${survey.is_published ? " \u00b7 currently open" : ""}</p>${(questions ?? []).map((question) => {
     const questionAnswers = (answers ?? []).filter((answer) => answer.question_id === question.id);
     if (question.question_type === "mcq") { const counts = new Map(question.options.map((option) => [option, 0])); questionAnswers.forEach((answer) => counts.set(answer.answer_text, (counts.get(answer.answer_text) ?? 0) + 1)); const max = Math.max(1, ...counts.values()); return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${[...counts].map(([option, count]) => `<div class="survey-bar-row"><span>${escapeHtml(option)}</span><div class="survey-bar"><i style="width:${Math.round(count / max * 100)}%"></i></div><strong>${count}</strong></div>`).join("")}</article>`; }
     return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${questionAnswers.length ? questionAnswers.map((answer) => `<p class="survey-written-answer">${survey.collect_name ? `<small>${escapeHtml(responseById.get(answer.response_id)?.respondent_name || "Unnamed")}</small>` : ""}${escapeHtml(answer.answer_text)}</p>`).join("") : "<p>No written responses yet.</p>"}</article>`;
@@ -218,7 +218,7 @@ async function editSelectedSurvey() {
 
 async function deleteSelectedSurvey() {
   const survey = adminSurveys.find((item) => item.id === selectedAdminSurveyId);
-  if (!survey || !confirm(`Delete â€œ${survey.title}â€ and all of its responses? This cannot be undone.`)) return;
+  if (!survey || !confirm(`Delete "${survey.title}" and all of its responses? This cannot be undone.`)) return;
   const { error } = await supabase.from("surveys").delete().eq("id", survey.id);
   if (error) { alert("The opinion could not be deleted."); return; }
   selectedAdminSurveyId = null; loadSurveyResults(true);

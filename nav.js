@@ -61,7 +61,7 @@ document.querySelectorAll(".service-grid").forEach((grid) => {
   const card = document.createElement("a");
   card.className = "service-card";
   card.href = "placements.html";
-  card.innerHTML = '<span class="service-number">08</span><strong><b>Placements</b></strong><small>Follow live Batch 2027 placement updates.</small><i aria-hidden="true">â†’</i>';
+  card.innerHTML = '<span class="service-number">08</span><strong><b>Placements</b></strong><small>Follow live Batch 2027 placement updates.</small><i aria-hidden="true">\u2192</i>';
   grid.append(card);
 });
 document.querySelectorAll(".nav-links").forEach((nav) => {
