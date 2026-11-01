@@ -56,6 +56,29 @@ cards().forEach((card) => {
     renderQuickAccess();
   });
   card.append(button);
+  const shareButton = document.createElement("button");
+  shareButton.className = "share-service";
+  shareButton.type = "button";
+  shareButton.textContent = "↗";
+  shareButton.setAttribute("aria-label", "Share service");
+  shareButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const title = card.querySelector("strong")?.textContent.replace(/\s+/g, " ").trim() || "Campus service";
+    const url = new URL(card.href, location.href).href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `TheDayBoard — ${title}`, text: `Open ${title} on TheDayBoard`, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        shareButton.textContent = "✓";
+        window.setTimeout(() => { shareButton.textContent = "↗"; }, 1400);
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") console.error("Service link could not be shared.", error);
+    }
+  });
+  card.append(shareButton);
 });
 document.querySelector("#clearQuickAccess")?.addEventListener("click", () => { writePinned([]); renderQuickAccess(); });
 renderQuickAccess();
@@ -76,4 +99,15 @@ if (input && status) {
         : "";
   };
   input.addEventListener("input", update);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "/" && document.activeElement !== input && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) {
+      event.preventDefault();
+      input.focus();
+    }
+    if (event.key === "Escape" && document.activeElement === input && input.value) {
+      input.value = "";
+      update();
+      input.blur();
+    }
+  });
 }
