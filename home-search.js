@@ -31,19 +31,11 @@ const renderQuickAccess = () => {
     link.textContent = card.querySelector("strong")?.textContent.replace(/\s+/g, " ").trim() || "Campus service";
     return link;
   }));
-  cards().forEach((card) => {
-    const path = new URL(card.href, location.href).pathname;
-    const button = card.querySelector(".pin-service");
-    if (button) {
-      const active = pinned.includes(path);
-      button.setAttribute("aria-pressed", String(active));
-      button.setAttribute("aria-label", active ? "Unpin service" : "Pin service");
-      button.textContent = active ? "★" : "☆";
-    }
-  });
 };
 
-cards().forEach((card) => {
+const enhanceCard = (card) => {
+  if (card.dataset.enhanced === "true") return;
+  card.dataset.enhanced = "true";
   const path = new URL(card.href, location.href).pathname;
   const button = document.createElement("button");
   button.className = "pin-service";
@@ -79,7 +71,17 @@ cards().forEach((card) => {
     }
   });
   card.append(shareButton);
-});
+};
+cards().forEach(enhanceCard);
+const serviceGrid = document.querySelector(".service-grid");
+if (serviceGrid) {
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+      if (node instanceof HTMLElement && node.matches(".service-card")) enhanceCard(node);
+    }));
+    renderQuickAccess();
+  }).observe(serviceGrid, { childList: true });
+}
 document.querySelector("#clearQuickAccess")?.addEventListener("click", () => { writePinned([]); renderQuickAccess(); });
 renderQuickAccess();
 
