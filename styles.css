@@ -39,6 +39,10 @@ html[data-theme=dusk] .next-meal-shared{color:var(--muted)}
 html[data-theme=dusk] .menu-day-header,html[data-theme=dusk] .menu th,html[data-theme=dusk] .menu tbody th{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .menu td,html[data-theme=dusk] .menu th{border-color:var(--line)}
 html[data-theme=dusk] .menu .shared{background:var(--surface-muted);color:var(--muted)}
+html[data-theme=dusk] button:not(.theme-toggle),html[data-theme=dusk] input[type=button],html[data-theme=dusk] input[type=submit],html[data-theme=dusk] select{background:var(--surface);color:var(--ink);border-color:var(--line)}
+html[data-theme=dusk] button:not(.theme-toggle):hover,html[data-theme=dusk] input[type=button]:hover,html[data-theme=dusk] input[type=submit]:hover,html[data-theme=dusk] select:hover{background:var(--menu-hover);color:var(--ink)}
+html[data-theme=dusk] .calendar-link,html[data-theme=dusk] .survey-publish{background:var(--accent);color:var(--active-ink);border-color:var(--accent)}
+html[data-theme=dusk] .calendar-link:hover,html[data-theme=dusk] .survey-publish:hover{background:var(--accent);color:var(--active-ink)}
 html[data-theme=dusk] .academic-calendar{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .academic-calendar p:not(.section-kicker){color:var(--muted)}
 html[data-theme=dusk] .calendar-highlights span,html[data-theme=dusk] .calendar-highlights small{color:var(--muted)}
