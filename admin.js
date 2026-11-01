@@ -53,7 +53,7 @@ function initializeTheme() {
   const applyTheme = (theme) => {
     root.toggleAttribute("data-theme", theme === "dusk");
     themeToggle.setAttribute("aria-pressed", String(theme === "dusk"));
-    themeLabel.textContent = theme === "dusk" ? "Light" : "Dusk";
+    themeLabel.textContent = theme === "dusk" ? "Dark" : "Light";
   };
   let theme = "light";
   try { theme = localStorage.getItem("lnmiit-theme") || "light"; } catch (error) { console.error("Theme preference could not be read.", error); }

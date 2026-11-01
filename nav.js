@@ -119,6 +119,15 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   nav.append(link);
 });
 
+const navOrder = ["laundry.html", "mess-menu.html", "bus-timings.html", "curriculum.html", "campus-map.html", "placements.html", "clubs.html", "surveys.html"];
+document.querySelectorAll(".nav-links, .campus-dropdown").forEach((nav) => {
+  const links = new Map([...nav.querySelectorAll("a[href]")].map((link) => [link.getAttribute("href"), link]));
+  navOrder.forEach((path) => {
+    const link = links.get(path);
+    if (link) nav.append(link);
+  });
+});
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch((error) => {
     console.error("Offline support could not be enabled.", error);
@@ -173,7 +182,7 @@ window.setInterval(updateLiveTime, 60_000);
   const applyTheme = (theme) => {
     root.dataset.theme = theme;
     toggle.setAttribute("aria-pressed", String(theme === "dusk"));
-    label.textContent = theme === "dusk" ? "Light" : "Dusk";
+    label.textContent = theme === "dusk" ? "Dark" : "Light";
   };
 
   applyTheme(storedTheme === "dusk" ? "dusk" : "light");
