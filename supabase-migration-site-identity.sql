@@ -10,7 +10,10 @@
 
   insert into public.site_settings (key, value) values
     ('site_name', 'TheDayBoard'),
-    ('site_credit', '')
+    ('site_credit', ''),
+    ('announcement_text', ''),
+    ('announcement_visible', 'false'),
+    ('announcement_important', 'false')
   on conflict (key) do nothing;
 
   alter table public.site_settings enable row level security;
