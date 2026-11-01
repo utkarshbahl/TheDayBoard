@@ -261,6 +261,10 @@ const updateLiveTime = () => {
 updateLiveTime();
 window.setInterval(updateLiveTime, 60_000);
 
+const themeVisibilityStyle = document.createElement("style");
+themeVisibilityStyle.textContent = ".theme-toggle[hidden]{display:none!important}";
+document.head.append(themeVisibilityStyle);
+
 (() => {
   const themeKey = "lnmiit-theme";
   const root = document.documentElement;

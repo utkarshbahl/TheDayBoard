@@ -9,6 +9,9 @@ const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 
 const themeKey = "lnmiit-theme";
 const root = document.documentElement;
+const themeStyle = document.createElement("style");
+themeStyle.textContent = ".theme-toggle[hidden]{display:none!important}";
+document.head.append(themeStyle);
 const requestedReturn = new URLSearchParams(window.location.search).get("return");
 const returnPath = requestedReturn && requestedReturn.startsWith("/") && !requestedReturn.startsWith("//") ? requestedReturn : "/";
 const AUTH_REDIRECT_ORIGIN = "https://thedayboard.vercel.app";

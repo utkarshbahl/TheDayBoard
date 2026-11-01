@@ -33,6 +33,7 @@ const themeToggle = byId("adminThemeToggle");
 const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 const adminStyle = document.createElement("style");
 adminStyle.textContent = `
+  .theme-toggle[hidden] { display: none !important; }
   .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
   .admin-section-nav button.is-active { background: var(--ink); color: var(--on-dark); border-color: var(--ink); }
