@@ -36,15 +36,6 @@ const personalizeUserInterface = (session) => {
   document.querySelectorAll("[data-user-name]").forEach((element) => {
     element.textContent = name;
   });
-  document.querySelectorAll(".nav-actions").forEach((actions) => {
-    if (actions.querySelector(".user-greeting")) return;
-    const greeting = document.createElement("span");
-    greeting.className = "user-greeting";
-    greeting.textContent = `Hi, ${name}`;
-    greeting.title = session.user.email || name;
-    greeting.setAttribute("aria-label", `Signed in as ${name}`);
-    actions.prepend(greeting);
-  });
 };
 
 personalizeUserInterface(initialSession);
