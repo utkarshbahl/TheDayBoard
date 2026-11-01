@@ -9,9 +9,15 @@ const getSafeReturnPath = () => {
   return requestedPath;
 };
 
+const { data: authSetting, error: authSettingError } = await supabase
+  .from("site_section_visibility")
+  .select("is_public")
+  .eq("section_key", "auth")
+  .maybeSingle();
+if (authSettingError) console.error("Sign-in requirement could not be loaded.", authSettingError);
 const { data: { session: initialSession }, error: initialSessionError } = await supabase.auth.getSession();
 if (initialSessionError) console.error("Authentication state could not be loaded.", initialSessionError);
-if (!initialSession) {
+if (authSetting?.is_public === false && !initialSession) {
   const returnPath = `${location.pathname}${location.search}`;
   const signInUrl = new URL("signin.html", location.href);
   signInUrl.searchParams.set("return", returnPath);

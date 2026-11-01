@@ -18,6 +18,7 @@ const pageNames = {
   "/surveys": "Campus opinions",
 };
 const sections = [
+  ["auth", "Sign-in requirement"],
   ["laundry", "Laundry status"],
   ["mess", "Mess menu"],
   ["bus", "Bus timings"],
@@ -307,7 +308,7 @@ function renderVisibility(panel, rows) {
     button.className = "visibility-toggle";
     button.dataset.sectionKey = key;
     button.dataset.isPublic = String(isPublic);
-    button.textContent = isPublic ? "Public" : "Hidden";
+    button.textContent = key === "auth" ? (isPublic ? "Optional" : "Required") : (isPublic ? "Public" : "Hidden");
     button.setAttribute("aria-pressed", String(isPublic));
     row.append(name, button);
     return row;
@@ -331,7 +332,9 @@ async function updateVisibility(panel, button) {
     return;
   }
   button.dataset.isPublic = String(data.is_public);
-  button.textContent = data.is_public ? "Public" : "Hidden";
+  button.textContent = button.dataset.sectionKey === "auth"
+    ? (data.is_public ? "Optional" : "Required")
+    : (data.is_public ? "Public" : "Hidden");
   button.setAttribute("aria-pressed", String(data.is_public));
 }
 

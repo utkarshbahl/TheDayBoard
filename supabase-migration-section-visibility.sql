@@ -31,7 +31,7 @@
     ('campus-map', true),
     ('clubs', true),
     ('surveys', true),
-    ('auth', true)
+    ('auth', false)
   on conflict (section_key) do nothing;
 
   alter table public.site_section_visibility enable row level security;

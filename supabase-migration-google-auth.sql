@@ -28,6 +28,10 @@ using ((select auth.uid()) = id);
 
 grant select on public.user_profiles to authenticated;
 
+insert into public.site_section_visibility (section_key, is_public)
+values ('auth', false)
+on conflict (section_key) do nothing;
+
 create or replace function public.admin_list_users()
 returns table (
   id uuid,
