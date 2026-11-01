@@ -40,6 +40,9 @@ const enhanceCard = (card) => {
   const button = document.createElement("button");
   button.className = "pin-service";
   button.type = "button";
+  button.textContent = readPinned().includes(path) ? "★" : "☆";
+  button.setAttribute("aria-pressed", String(readPinned().includes(path)));
+  button.setAttribute("aria-label", button.getAttribute("aria-pressed") === "true" ? "Unpin service" : "Pin service");
   button.addEventListener("click", (event) => {
     event.preventDefault();
     const pinned = readPinned();
