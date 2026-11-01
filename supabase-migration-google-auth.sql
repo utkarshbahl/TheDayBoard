@@ -12,28 +12,10 @@ create table if not exists public.user_profiles (
 
 alter table public.user_profiles enable row level security;
 
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = ''
-as $$
-begin
-  insert into public.user_profiles (id, email, display_name, avatar_url)
-  values (
-    new.id,
-    new.email,
-    coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'),
-    new.raw_user_meta_data ->> 'avatar_url'
-  )
-  on conflict (id) do nothing;
-  return new;
-end;
-$$;
-
+-- Profiles are optional. Never attach a failing trigger to auth.users because
+-- a profile write must not prevent Google from creating the authenticated user.
 drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-after insert or update of email, raw_user_meta_data on auth.users
-for each row execute function public.handle_new_user();
+drop function if exists public.handle_new_user();
 
 drop policy if exists "Users can view their own profile" on public.user_profiles;
 create policy "Users can view their own profile"

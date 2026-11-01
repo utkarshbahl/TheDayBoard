@@ -3,6 +3,17 @@ import "./brand.js?v=20261021";
 import "./ui-polish.js";
 import { supabase } from "./supabase.js";
 
+const authErrorParams = new URLSearchParams(`${location.search}${location.hash.replace(/^#/, "&")}`);
+const authError = authErrorParams.get("error_description") || authErrorParams.get("error");
+if (authError) {
+  const notice = document.createElement("p");
+  notice.className = "auth-status-notice";
+  notice.setAttribute("role", "alert");
+  notice.textContent = `Sign-in could not be completed: ${authError.replace(/\+/g, " ")}`;
+  document.querySelector("main")?.prepend(notice);
+  history.replaceState(null, "", location.pathname);
+}
+
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
   @media (min-width: 901px) { .nav-start { flex: 1; min-width: 0; } .nav-links { flex: 1; justify-content: space-between; gap: 12px; } .nav-link { white-space: nowrap; } .nav-actions { margin-left: 32px; } }
