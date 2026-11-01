@@ -26,21 +26,39 @@ html[data-theme=dusk] .admin-page .admin-login,html[data-theme=dusk] .admin-page
 html[data-theme=dusk] .service-card-featured,html[data-theme=dusk] .token-card,html[data-theme=dusk] .staff-section,html[data-theme=dusk] .sgpa-result{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .service-card-featured{border-color:var(--deep)}
 html[data-theme=dusk] .service-card-featured small{color:#c6c8c8}
+html[data-theme=dusk] .token-card{box-shadow:0 0 0 1px rgba(230,184,102,.28),0 18px 34px rgba(0,0,0,.32)}
 html[data-theme=dusk] .academic-view-tab.is-active{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .panel button:not(#signOut),html[data-theme=dusk] .survey-publish{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .calendar-link:hover,html[data-theme=dusk] .calendar-link:focus-visible{background:var(--accent);color:var(--active-ink)}
 html[data-theme=dusk] .calendar-link-secondary:hover,html[data-theme=dusk] .calendar-link-secondary:focus-visible{border-color:var(--accent);background:var(--surface);color:var(--ink)}
 html[data-theme=dusk] .calendar-highlights>div,html[data-theme=dusk] .upcoming-holidays-list li{border-color:var(--line)}
 html[data-theme=dusk] .brand-mark,html[data-theme=dusk] .home-byline-mark{background:var(--deep)}
-html[data-theme=dusk] .next-meal-card{background:var(--deep);color:var(--ink);box-shadow:7px 8px 0 var(--accent)}
+html[data-theme=dusk] .next-meal-card{background:var(--deep);color:var(--ink);box-shadow:0 0 0 1px rgba(230,184,102,.28),0 14px 28px rgba(0,0,0,.28)}
 html[data-theme=dusk] .next-meal-menu{background:rgba(255,255,255,.035)}
 html[data-theme=dusk] .next-meal-time,html[data-theme=dusk] .next-meal-menu p:last-child,html[data-theme=dusk] .next-meal-detail{color:var(--ink)}
 html[data-theme=dusk] .next-meal-shared{color:var(--muted)}
 html[data-theme=dusk] .menu-day-header,html[data-theme=dusk] .menu th,html[data-theme=dusk] .menu tbody th{background:var(--deep);color:var(--ink)}
 html[data-theme=dusk] .menu td,html[data-theme=dusk] .menu th{border-color:var(--line)}
 html[data-theme=dusk] .menu .shared{background:var(--surface-muted);color:var(--muted)}
-html[data-theme=dusk] button:not(.theme-toggle),html[data-theme=dusk] input[type=button],html[data-theme=dusk] input[type=submit],html[data-theme=dusk] select{background:var(--surface);color:var(--ink);border-color:var(--line)}
-html[data-theme=dusk] button:not(.theme-toggle):hover,html[data-theme=dusk] input[type=button]:hover,html[data-theme=dusk] input[type=submit]:hover,html[data-theme=dusk] select:hover{background:var(--menu-hover);color:var(--ink)}
+html[data-theme=dusk] button:not(.theme-toggle),html[data-theme=dusk] input[type=button],html[data-theme=dusk] input[type=submit]{background:var(--accent)!important;color:var(--active-ink)!important;border-color:var(--accent)!important}
+html[data-theme=dusk] button:not(.theme-toggle):hover,html[data-theme=dusk] input[type=button]:hover,html[data-theme=dusk] input[type=submit]:hover{background:var(--accent)!important;color:var(--active-ink)!important;filter:brightness(1.12)}
+html[data-theme=dusk] select{background:var(--surface);color:var(--ink);border-color:var(--line)}
+html[data-theme=dusk] select:hover{border-color:var(--accent)}
+html[data-theme=dusk] .survey-choice{background:var(--accent)!important;color:var(--active-ink)!important;border-color:var(--accent)!important}
+html[data-theme=dusk] .survey-choice span,html[data-theme=dusk] .survey-choice strong,html[data-theme=dusk] .survey-choice small,html[data-theme=dusk] .survey-choice b{color:var(--active-ink)!important}
+html[data-theme=dusk] .survey-choice span,html[data-theme=dusk] .survey-choice small{opacity:.72}
+html[data-theme=dusk] .survey-back{background:transparent!important;color:var(--ink)!important;border-color:transparent!important}
+html[data-theme=dusk] .route-group-header{background:var(--accent);color:var(--active-ink)}
+html[data-theme=dusk] .route-group{background:var(--surface);border-color:rgba(230,184,102,.34)}
+html[data-theme=dusk] .route-group-entry.weekend-divider{border-top-color:var(--accent)}
+html[data-theme=dusk] .campus-nav-link{background:var(--surface);color:var(--ink)}
+html[data-theme=dusk] .campus-nav-link:hover{background:var(--menu-hover)}
+html[data-theme=dusk] .campus-nav-link[aria-current=page]{background:var(--accent);color:var(--active-ink)}
+html[data-theme=dusk] .campus-nav-link[aria-current=page] .campus-link-arrow{color:var(--active-ink)}
+html[data-theme=dusk] .course-panel-heading{background:var(--deep);color:var(--ink)}
+html[data-theme=dusk] .course-table th{background:var(--surface-muted);color:var(--muted)}
+html[data-theme=dusk] .map-directions{background:var(--accent);color:var(--active-ink)}
+html[data-theme=dusk] .map-directions span{color:var(--active-ink)}
 html[data-theme=dusk] .calendar-link,html[data-theme=dusk] .survey-publish{background:var(--accent);color:var(--active-ink);border-color:var(--accent)}
 html[data-theme=dusk] .calendar-link:hover,html[data-theme=dusk] .survey-publish:hover{background:var(--accent);color:var(--active-ink)}
 html[data-theme=dusk] .academic-calendar{background:var(--deep);color:var(--ink)}
