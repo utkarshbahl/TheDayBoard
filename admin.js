@@ -327,8 +327,12 @@ byId("adminLoginForm").addEventListener("submit", async (event) => {
 });
 byId("adminGoogleLogin").addEventListener("click", async (event) => {
   event.currentTarget.disabled = true;
-  const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${location.origin}/admin.html` } });
-  if (error) { event.currentTarget.disabled = false; byId("adminMessage").textContent = "Google sign-in could not be started."; }
+  const redirectTo = new URL("admin.html", window.location.href).href;
+  const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
+  if (error) {
+    event.currentTarget.disabled = false;
+    byId("adminMessage").textContent = error.message || "Google sign-in could not be started. Check that Google OAuth is enabled in Supabase.";
+  }
 });
 byId("adminSignOut").addEventListener("click", () => supabase.auth.signOut());
 

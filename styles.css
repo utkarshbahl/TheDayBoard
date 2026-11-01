@@ -60,6 +60,8 @@ html[data-theme=dusk] .course-table th{background:var(--surface-muted);color:var
 html[data-theme=dusk] .map-directions{background:var(--accent);color:var(--active-ink)}
 html[data-theme=dusk] .map-directions span{color:var(--active-ink)}
 html[data-theme=dusk] .clubs-pulse>p{color:var(--active-ink)}
+html[data-theme=dusk] .admin-google-login{background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+html[data-theme=dusk] .admin-google-login:hover{background:var(--menu-hover)!important;color:var(--ink)!important;filter:none}
 html[data-theme=dusk] .calendar-link,html[data-theme=dusk] .survey-publish{background:var(--accent);color:var(--active-ink);border-color:var(--accent)}
 html[data-theme=dusk] .calendar-link:hover,html[data-theme=dusk] .survey-publish:hover{background:var(--accent);color:var(--active-ink)}
 html[data-theme=dusk] .academic-calendar{background:var(--deep);color:var(--ink)}
