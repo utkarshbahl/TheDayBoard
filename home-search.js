@@ -3,6 +3,33 @@ const status = document.querySelector("#serviceSearchStatus");
 const cards = () => [...document.querySelectorAll(".service-grid .service-card")];
 const PINNED_KEY = "dayboard-pinned-services";
 
+const updateRightNow = () => {
+  const title = document.querySelector("#rightNowTitle");
+  const text = document.querySelector("#rightNowText");
+  const link = document.querySelector("#rightNowLink");
+  const clock = document.querySelector("#currentTime");
+  if (!title || !text || !link || !clock) return;
+  const hour = new Date().getHours();
+  const suggestion = hour < 6
+    ? ["Campus map", "Find your way around campus.", "campus-map.html"]
+    : hour < 10
+      ? ["Mess menu", "Check breakfast before you head out.", "mess-menu.html"]
+      : hour < 14
+        ? ["Academic help", "Plan your classes and curriculum.", "curriculum.html"]
+        : hour < 17
+          ? ["Laundry status", "Check your collection token.", "laundry.html"]
+          : hour < 20
+            ? ["Bus timings", "Plan your evening journey.", "bus-timings.html"]
+            : ["Campus clubs", "See what is happening around campus.", "clubs.html"];
+  title.textContent = suggestion[0];
+  text.textContent = suggestion[1];
+  link.href = suggestion[2];
+  link.textContent = `Open ${suggestion[0].toLowerCase()}`;
+  clock.textContent = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" }).format(new Date());
+};
+updateRightNow();
+window.setInterval(updateRightNow, 60000);
+
 const readPinned = () => {
   try {
     const stored = JSON.parse(localStorage.getItem(PINNED_KEY) || "[]");
