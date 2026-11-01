@@ -36,7 +36,12 @@ themeToggle?.addEventListener("click", () => {
 });
 
 const updateSession = (session) => {
-  if (!session) return;
+  if (!session) {
+    button.hidden = false;
+    signOut.hidden = true;
+    sessionText.hidden = true;
+    return;
+  }
   button.hidden = true;
   sessionText.hidden = false;
   signOut.hidden = false;
@@ -46,6 +51,10 @@ const updateSession = (session) => {
 const { data: { session } } = await supabase.auth.getSession();
 updateSession(session);
 supabase.auth.onAuthStateChange((_event, nextSession) => updateSession(nextSession));
+
+if (window.location.hash.includes("access_token") || window.location.search.includes("code=")) {
+  history.replaceState(null, "", window.location.pathname);
+}
 
 button?.addEventListener("click", async () => {
   button.disabled = true;

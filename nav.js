@@ -63,6 +63,14 @@ const updateSignInState = (session) => {
   });
 };
 
+const authSessionNotice = (message) => {
+  const notice = document.createElement("p");
+  notice.className = "auth-status-notice";
+  notice.setAttribute("role", "status");
+  notice.textContent = message;
+  document.querySelector("main")?.prepend(notice);
+};
+
 supabase.auth.getSession()
   .then(({ data: { session }, error }) => {
     if (error) {
@@ -70,6 +78,9 @@ supabase.auth.getSession()
       return;
     }
     updateSignInState(session);
+    if (!session && (location.hash.includes("access_token") || location.search.includes("code="))) {
+      authSessionNotice("Your Google sign-in returned, but this browser did not save the session. Please sign in again from this same site address.");
+    }
   })
   .catch((error) => console.error("Sign-in state could not be loaded.", error));
 supabase.auth.onAuthStateChange((_event, session) => updateSignInState(session));
