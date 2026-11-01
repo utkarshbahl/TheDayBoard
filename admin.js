@@ -49,7 +49,6 @@ adminStyle.textContent = `
   .users-admin-list { border-top: 1px solid var(--line); } .users-admin-row { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13px; } .users-admin-row strong { display: block; } .users-admin-row small { display: block; margin-top: 4px; color: var(--muted); } .users-admin-date { color: var(--muted); white-space: nowrap; font: 11px "DM Mono", monospace; }
   .settings-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); } .settings-admin h2 { margin: 0 0 8px; font-size: 18px; } .settings-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; } .settings-admin label { display: block; margin-top: 16px; font-size: 12px; font-weight: 800; } .settings-admin input { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; } .settings-admin input[type=checkbox] { display: inline-block; width: auto; margin: 0 8px 0 0; padding: 0; accent-color: var(--ink); } .settings-admin-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; } .settings-admin-actions button { padding: 10px 14px; border: 0; border-radius: 5px; background: var(--ink); color: var(--on-dark); font: 800 12px Manrope; cursor: pointer; } .settings-admin-message { min-height: 18px; margin: 0 !important; }
   .settings-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); } .settings-admin h2 { margin: 0 0 8px; font-size: 18px; } .settings-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; } .settings-admin label { display: block; margin-top: 16px; font-size: 12px; font-weight: 800; } .settings-admin input { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; } .settings-admin input[type=checkbox] { display: inline-block; width: auto; margin: 0 8px 0 0; padding: 0; accent-color: var(--ink); } .settings-admin-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; } .settings-admin-actions button { padding: 10px 14px; border: 0; border-radius: 5px; background: var(--ink); color: var(--on-dark); font: 800 12px Manrope; cursor: pointer; } .settings-admin-message { min-height: 18px; margin: 0 !important; }
-  .theme-visibility-control { margin-top: 26px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); } .theme-visibility-control strong { display: block; font-size: 13px; } .theme-visibility-control label { display: block; margin-top: 10px; font-size: 12px; } .theme-visibility-control input { margin-right: 8px; accent-color: var(--ink); } .theme-visibility-control small { display: block; min-height: 17px; margin-top: 10px; color: var(--muted); }
   .admin-data-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; } .admin-data-actions button { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .admin-data-actions button:hover, .admin-data-actions button:focus-visible { border-color: var(--ink); } .users-admin-filter { display: block; width: 100%; margin: 16px 0; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; }
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
@@ -404,13 +403,14 @@ function createVisibilityPanel() {
   const panel = document.createElement("section");
   panel.id = "sectionVisibilityPanel";
   panel.className = "section-visibility";
-  panel.innerHTML = `<h2>Public section visibility</h2><p>Temporarily hide any campus section from visitors. Hidden sections are removed from navigation and direct visits show an unavailable message.</p><div class="section-visibility-list"></div><div class="theme-visibility-control"><strong>Theme control</strong><label><input id="themeEnabledSetting" type="checkbox"> Allow visitors to use the Light/Dark mode button</label><small id="themeVisibilityMessage" role="status"></small></div><p class="section-visibility-message" role="status"></p>`;
+  panel.innerHTML = `<h2>Public section visibility</h2><p>Temporarily hide any campus section from visitors. Hidden sections are removed from navigation and direct visits show an unavailable message.</p><div class="section-visibility-list"></div><p class="section-visibility-message" role="status"></p>`;
   byId("analyticsPanel").append(panel);
   panel.addEventListener("click", (event) => {
-    const button = event.target.closest(".visibility-toggle");
-    if (button) updateVisibility(panel, button);
+    const button = event.target.closest(".visibility-toggle, .theme-visibility-toggle");
+    if (!button) return;
+    if (button.classList.contains("theme-visibility-toggle")) updateThemeAvailability(panel, button);
+    else updateVisibility(panel, button);
   });
-  panel.querySelector("#themeEnabledSetting").addEventListener("change", () => updateThemeAvailability(panel));
   return panel;
 }
 
@@ -431,7 +431,23 @@ function renderVisibility(panel, rows) {
     button.setAttribute("aria-pressed", String(isPublic));
     row.append(name, button);
     return row;
-  }));
+  }), createThemeVisibilityRow(panel));
+}
+
+function createThemeVisibilityRow(panel) {
+  const row = document.createElement("div");
+  row.className = "section-visibility-row";
+  const name = document.createElement("strong");
+  name.textContent = "Light/Dark mode";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "visibility-toggle theme-visibility-toggle";
+  button.dataset.themeEnabled = "true";
+  button.textContent = "Loading";
+  button.disabled = true;
+  button.setAttribute("aria-label", "Change Light/Dark mode availability");
+  row.append(name, button);
+  return row;
 }
 
 async function loadVisibility(panel) {
@@ -440,23 +456,31 @@ async function loadVisibility(panel) {
   renderVisibility(panel, data ?? []);
   const { data: themeSetting, error: themeError } = await supabase.from("site_settings").select("value").eq("key", "theme_enabled").maybeSingle();
   if (themeError) throw themeError;
-  const themeToggleSetting = panel.querySelector("#themeEnabledSetting");
-  if (themeToggleSetting) themeToggleSetting.checked = themeSetting?.value !== "false";
+  const themeButton = panel.querySelector(".theme-visibility-toggle");
+  if (themeButton) {
+    const enabled = themeSetting?.value !== "false";
+    themeButton.dataset.themeEnabled = String(enabled);
+    themeButton.textContent = enabled ? "Enabled" : "Disabled";
+    themeButton.dataset.isPublic = String(enabled);
+    themeButton.disabled = false;
+  }
 }
 
-async function updateThemeAvailability(panel) {
-  const checkbox = panel.querySelector("#themeEnabledSetting");
-  const message = panel.querySelector("#themeVisibilityMessage");
-  checkbox.disabled = true;
-  const enabled = checkbox.checked;
-  const { error } = await supabase.from("site_settings").update({ value: String(enabled) }).eq("key", "theme_enabled");
-  checkbox.disabled = false;
-  if (error) {
-    checkbox.checked = !enabled;
-    message.textContent = `Could not save theme setting: ${error.message}`;
-    console.error("Theme availability could not be saved.", error);
+async function updateThemeAvailability(panel, button) {
+  const previous = button.dataset.themeEnabled === "true";
+  const enabled = !previous;
+  const message = panel.querySelector(".section-visibility-message");
+  button.disabled = true;
+  const { data, error } = await supabase.from("site_settings").update({ value: String(enabled) }).eq("key", "theme_enabled").select("key,value").maybeSingle();
+  button.disabled = false;
+  if (error || !data) {
+    message.textContent = error ? `Could not save theme setting: ${error.message}` : "Theme setting is missing. Run the site identity migration in Supabase first.";
+    console.error("Theme availability could not be saved.", error || new Error("theme_enabled setting is missing"));
     return;
   }
+  button.dataset.themeEnabled = String(enabled);
+  button.dataset.isPublic = String(enabled);
+  button.textContent = enabled ? "Enabled" : "Disabled";
   if (!enabled) {
     document.documentElement.removeAttribute("data-theme");
     themeToggle.hidden = true;
