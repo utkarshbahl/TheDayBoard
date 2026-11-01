@@ -48,6 +48,7 @@ adminStyle.textContent = `
   .users-admin-total small { display: block; margin-bottom: 8px; color: var(--accent); font: 10px "DM Mono", monospace; letter-spacing: 1px; }
   .users-admin-list { border-top: 1px solid var(--line); } .users-admin-row { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13px; } .users-admin-row strong { display: block; } .users-admin-row small { display: block; margin-top: 4px; color: var(--muted); } .users-admin-date { color: var(--muted); white-space: nowrap; font: 11px "DM Mono", monospace; }
   .settings-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); } .settings-admin h2 { margin: 0 0 8px; font-size: 18px; } .settings-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; } .settings-admin label { display: block; margin-top: 16px; font-size: 12px; font-weight: 800; } .settings-admin input { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; } .settings-admin-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; } .settings-admin-actions button { padding: 10px 14px; border: 0; border-radius: 5px; background: var(--ink); color: var(--on-dark); font: 800 12px Manrope; cursor: pointer; } .settings-admin-message { min-height: 18px; margin: 0 !important; }
+  .admin-data-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; } .admin-data-actions button { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .admin-data-actions button:hover, .admin-data-actions button:focus-visible { border-color: var(--ink); } .users-admin-filter { display: block; width: 100%; margin: 16px 0; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; }
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
@@ -96,6 +97,9 @@ function createSectionNav() {
   nav.setAttribute("aria-label", "Admin sections");
   nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><button type="button" data-section="settings">Settings</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option><option value="settings">Settings</option></select>`;
   byId("analyticsPanel").before(nav);
+  byId("analyticsPanel").querySelector(".analytics-topline")?.insertAdjacentHTML("beforeend", '<div class="admin-data-actions"><button type="button" id="refreshTraffic">Refresh</button><button type="button" id="exportTraffic">Export CSV</button></div>');
+  byId("refreshTraffic")?.addEventListener("click", () => loadAnalytics());
+  byId("exportTraffic")?.addEventListener("click", exportTraffic);
   nav.addEventListener("click", (event) => {
     const button = event.target.closest("[data-section]");
     if (button) setSection(button.dataset.section);
@@ -119,7 +123,7 @@ function setSection(section) {
   byId("usersAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "users");
   byId("settingsAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "settings");
   if (section === "surveys" && !surveyResultsLoaded) { surveyResultsLoaded = true; loadSurveyResults(); }
-  if (section === "users") loadUsers();
+  if (section === "users") loadUsers(true);
   if (section === "settings") loadSettings();
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
@@ -179,15 +183,29 @@ function createUsersPanel() {
   const panel = document.createElement("section");
   panel.id = "usersAdminPanel";
   panel.className = "users-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Registered users</h2><p>Google accounts that have signed in to TheDayBoard.</p><strong class="users-admin-total"><small>TOTAL USERS</small><span id="usersAdminTotal">-</span></strong><div id="usersAdminList" class="users-admin-list"><p>Loading users...</p></div>`;
+  panel.innerHTML = `<h2>Registered users</h2><p>Google accounts that have signed in to TheDayBoard.</p><strong class="users-admin-total"><small>TOTAL USERS</small><span id="usersAdminTotal">-</span></strong><div class="admin-data-actions"><button type="button" id="refreshUsers">Refresh users</button><button type="button" id="exportUsers">Export CSV</button></div><input id="usersAdminFilter" class="users-admin-filter" type="search" placeholder="Search by name or email" aria-label="Search users"><div id="usersAdminList" class="users-admin-list"><p>Loading users...</p></div>`;
   byId("analyticsPanel").append(panel);
+  byId("refreshUsers").addEventListener("click", () => loadUsers(true));
+  byId("exportUsers").addEventListener("click", exportUsers);
+  byId("usersAdminFilter").addEventListener("input", renderUsers);
   return panel;
 }
 
-async function loadUsers() {
+let adminUsers = [];
+
+function renderUsers() {
+  const list = byId("usersAdminList");
+  const filter = byId("usersAdminFilter")?.value.trim().toLowerCase() || "";
+  if (!list) return;
+  const users = adminUsers.filter((user) => `${user.display_name || ""} ${user.email || ""}`.toLowerCase().includes(filter));
+  list.innerHTML = users.length ? users.map((user) => `<div class="users-admin-row"><span><strong>${escapeHtml(user.display_name || "Unnamed user")}</strong><small>${escapeHtml(user.email || "No email")}</small></span><time class="users-admin-date">${new Date(user.created_at).toLocaleDateString()}</time></div>`).join("") : "<p>No matching users.</p>";
+}
+
+async function loadUsers(refresh = false) {
   const list = byId("usersAdminList");
   const total = byId("usersAdminTotal");
-  if (!list || !total || list.dataset.loaded === "true") return;
+  if (!list || !total || (list.dataset.loaded === "true" && !refresh)) return;
+  list.innerHTML = "<p>Loading users...</p>";
   const { data, error } = await supabase.rpc("admin_list_users");
   if (error) {
     list.innerHTML = `<p>Users could not be loaded: ${escapeHtml(error.message || "Unknown database error")}</p>`;
@@ -195,12 +213,40 @@ async function loadUsers() {
     return;
   }
   const users = data ?? [];
+  adminUsers = users;
   total.textContent = String(users.length);
   list.dataset.loaded = "true";
-  list.innerHTML = users.length ? users.map((user) => `<div class="users-admin-row"><span><strong>${escapeHtml(user.display_name || "Unnamed user")}</strong><small>${escapeHtml(user.email || "No email")}</small></span><time class="users-admin-date">${new Date(user.created_at).toLocaleDateString()}</time></div>`).join("") : "<p>No users have signed in yet.</p>";
+  renderUsers();
 }
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
+
+const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+function downloadCsv(filename, headers, rows) {
+  const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportUsers() {
+  if (!adminUsers.length) return;
+  downloadCsv("thedayboard-users.csv", ["Name", "Email", "Signed up"], adminUsers.map((user) => [user.display_name || "Unnamed user", user.email || "", new Date(user.created_at).toISOString()]));
+}
+
+async function exportTraffic() {
+  try {
+    const { data } = await supabase.rpc("get_site_traffic_analytics");
+    const breakdown = data?.breakdown || {};
+    downloadCsv("thedayboard-traffic.csv", ["Page", "Views (last 7 days)"], Object.entries(pageNames).map(([path, name]) => [name, breakdown[path] ?? 0]));
+  } catch (error) {
+    console.error("Traffic export failed.", error);
+  }
+}
 
 function withRequestTimeout(request, timeoutMs = 20000) {
   let timeoutId;
