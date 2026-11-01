@@ -25,6 +25,30 @@ if (authSetting?.is_public === false && !initialSession) {
   throw new Error("Authentication required.");
 }
 
+const getUserName = (session) => {
+  const metadata = session?.user?.user_metadata ?? {};
+  return metadata.full_name || metadata.name || session?.user?.email?.split("@")[0] || "there";
+};
+
+const personalizeUserInterface = (session) => {
+  if (!session) return;
+  const name = getUserName(session);
+  document.querySelectorAll("[data-user-name]").forEach((element) => {
+    element.textContent = name;
+  });
+  document.querySelectorAll(".nav-actions").forEach((actions) => {
+    if (actions.querySelector(".user-greeting")) return;
+    const greeting = document.createElement("span");
+    greeting.className = "user-greeting";
+    greeting.textContent = `Hi, ${name}`;
+    greeting.title = session.user.email || name;
+    greeting.setAttribute("aria-label", `Signed in as ${name}`);
+    actions.prepend(greeting);
+  });
+};
+
+personalizeUserInterface(initialSession);
+
 const authErrorParams = new URLSearchParams(`${location.search}${location.hash.replace(/^#/, "&")}`);
 const authError = authErrorParams.get("error_description") || authErrorParams.get("error");
 if (authError) {
@@ -105,7 +129,10 @@ supabase.auth.getSession()
     }
   })
   .catch((error) => console.error("Sign-in state could not be loaded.", error));
-supabase.auth.onAuthStateChange((_event, session) => updateSignInState(session));
+supabase.auth.onAuthStateChange((_event, session) => {
+  updateSignInState(session);
+  personalizeUserInterface(session);
+});
 const revealTargets = document.querySelectorAll(".service-card, .placement-stat, .placement-record, .survey-choice, .club-card, .route-group, .course-panel, .map-frame, .notice-card");
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const revealObserver = new IntersectionObserver((entries, observer) => entries.forEach((entry) => {
