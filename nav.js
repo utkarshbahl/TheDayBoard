@@ -5,13 +5,13 @@ import "./ui-polish.js";
 const navLayoutStyle = document.createElement("style");
 navLayoutStyle.textContent = `
   @media (min-width: 901px) { .nav-start { flex: 1; min-width: 0; } .nav-links { flex: 1; justify-content: space-between; gap: 12px; } .nav-link { white-space: nowrap; } .nav-actions { margin-left: 32px; } }
-  .enhanced-ui body { background: radial-gradient(circle at 8% -10%, rgba(215,250,82,.26), transparent 26rem), radial-gradient(circle at 96% 18%, rgba(215,250,82,.12), transparent 22rem), var(--paper); }
+  .enhanced-ui body { background: radial-gradient(circle at 8% -10%, rgba(200,139,85,.26), transparent 26rem), radial-gradient(circle at 96% 18%, rgba(200,139,85,.12), transparent 22rem), var(--paper); }
   .enhanced-ui .nav { border-bottom: 1px solid transparent; transition: border-color .25s ease, background-color .25s ease; }
   .enhanced-ui .nav:hover { border-color: var(--line); }
   .enhanced-ui .brand-mark { box-shadow: 0 5px 14px rgba(20,40,31,.18); transition: transform .25s ease, box-shadow .25s ease; }
   .enhanced-ui .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.05); box-shadow: 0 8px 18px rgba(20,40,31,.24); }
   .enhanced-ui .nav-link { position: relative; padding: 7px 0; transition: color .2s ease, transform .2s ease; }
-  .enhanced-ui .nav-link::after { position: absolute; right: 0; bottom: 1px; left: 0; height: 2px; border-radius: 999px; background: var(--lime); content: ""; transform: scaleX(0); transform-origin: right; transition: transform .22s ease; }
+  .enhanced-ui .nav-link::after { position: absolute; right: 0; bottom: 1px; left: 0; height: 2px; border-radius: 999px; background: var(--accent); content: ""; transform: scaleX(0); transform-origin: right; transition: transform .22s ease; }
   .enhanced-ui .nav-link:hover { opacity: 1; transform: translateY(-1px); }
   .enhanced-ui .nav-link:hover::after, .enhanced-ui .nav-link[aria-current=page]::after { transform: scaleX(1); transform-origin: left; }
   .enhanced-ui .theme-toggle { box-shadow: 0 3px 0 rgba(20,40,31,.08); transition: transform .2s ease, box-shadow .2s ease !important; }
@@ -61,7 +61,7 @@ document.querySelectorAll(".service-grid").forEach((grid) => {
   const card = document.createElement("a");
   card.className = "service-card";
   card.href = "placements.html";
-  card.innerHTML = '<span class="service-number">08</span><strong><b>Placements</b></strong><small>Follow live Batch 2027 placement updates.</small><i aria-hidden="true">→</i>';
+  card.innerHTML = '<span class="service-number">08</span><strong><b>Placements</b></strong><small>Follow live Batch 2027 placement updates.</small><i aria-hidden="true">â†’</i>';
   grid.append(card);
 });
 document.querySelectorAll(".nav-links").forEach((nav) => {
@@ -163,9 +163,9 @@ window.setInterval(updateLiveTime, 60_000);
   const label = toggle?.querySelector("[data-theme-toggle-label]");
   if (!toggle || !label) return;
 
-  let storedTheme = "lime";
+  let storedTheme = "light";
   try {
-    storedTheme = localStorage.getItem(themeKey) || "lime";
+    storedTheme = localStorage.getItem(themeKey) || "light";
   } catch (error) {
     console.error("Theme preference could not be read.", error);
   }
@@ -173,12 +173,12 @@ window.setInterval(updateLiveTime, 60_000);
   const applyTheme = (theme) => {
     root.dataset.theme = theme;
     toggle.setAttribute("aria-pressed", String(theme === "dusk"));
-    label.textContent = theme === "dusk" ? "Dusk" : "Lime";
+    label.textContent = theme === "dusk" ? "Light" : "Dusk";
   };
 
-  applyTheme(storedTheme === "dusk" ? "dusk" : "lime");
+  applyTheme(storedTheme === "dusk" ? "dusk" : "light");
   toggle.addEventListener("click", () => {
-    const theme = root.dataset.theme === "dusk" ? "lime" : "dusk";
+    const theme = root.dataset.theme === "dusk" ? "light" : "dusk";
     try {
       localStorage.setItem(themeKey, theme);
     } catch (error) {

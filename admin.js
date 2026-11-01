@@ -34,14 +34,14 @@ const adminStyle = document.createElement("style");
 adminStyle.textContent = `
   .admin-section-nav { display: flex; gap: 8px; max-width: 760px; margin: 0 auto 18px; }
   .admin-section-nav button, .admin-section-select { padding: 10px 13px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 700 12px Manrope; cursor: pointer; }
-  .admin-section-nav button.is-active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .admin-section-nav button.is-active { background: var(--ink); color: var(--on-dark); border-color: var(--ink); }
   .admin-section-select { display: none; width: 100%; }
   .is-admin-section-hidden { display: none; }
   .survey-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
   .survey-admin h2 { margin: 0 0 8px; font-size: 18px; } .survey-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; }
-  .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font: 13px Manrope; }
+  .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; }
   .survey-admin textarea { min-height: 80px; resize: vertical; } .survey-admin input[type=checkbox] { margin-right: 8px; accent-color: var(--ink); }
-  .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: #fff; }
+  .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
 `;
@@ -53,13 +53,13 @@ function initializeTheme() {
   const applyTheme = (theme) => {
     root.toggleAttribute("data-theme", theme === "dusk");
     themeToggle.setAttribute("aria-pressed", String(theme === "dusk"));
-    themeLabel.textContent = theme === "dusk" ? "Dusk" : "Lime";
+    themeLabel.textContent = theme === "dusk" ? "Light" : "Dusk";
   };
-  let theme = "lime";
-  try { theme = localStorage.getItem("lnmiit-theme") || "lime"; } catch (error) { console.error("Theme preference could not be read.", error); }
+  let theme = "light";
+  try { theme = localStorage.getItem("lnmiit-theme") || "light"; } catch (error) { console.error("Theme preference could not be read.", error); }
   applyTheme(theme);
   themeToggle.addEventListener("click", () => {
-    const next = root.hasAttribute("data-theme") ? "lime" : "dusk";
+    const next = root.hasAttribute("data-theme") ? "light" : "dusk";
     try { localStorage.setItem("lnmiit-theme", next); } catch (error) { console.error("Theme preference could not be saved.", error); }
     applyTheme(next);
   });
@@ -136,7 +136,7 @@ function createSurveyPanel() {
   const panel = document.createElement("section");
   panel.id = "surveyAdminPanel";
   panel.className = "survey-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results…</p></div></div>`;
+  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading resultsâ€¦</p></div></div>`;
   panel.querySelector("p").textContent = "Publish as many open opinions as needed. Each can contain multiple-choice and written questions.";
   byId("analyticsPanel").append(panel);
   const editors = panel.querySelector("#surveyQuestionEditors");
@@ -160,7 +160,7 @@ async function publishSurvey(event) {
     return { position: index + 1, prompt: node.querySelector(".survey-question-prompt").value.trim(), question_type: type, options };
   });
   if (!questions.length || questions.some((question) => !question.prompt || (question.question_type === "mcq" && question.options.length < 2))) { message.textContent = "Every question needs a prompt, and multiple-choice questions need at least two options."; return; }
-  button.disabled = true; message.textContent = "Publishing…"; message.classList.remove("is-error");
+  button.disabled = true; message.textContent = "Publishingâ€¦"; message.classList.remove("is-error");
   try {
     const { data: surveyId, error } = await withRequestTimeout(supabase.rpc("publish_survey", {
       p_title: byId("surveyTitle").value.trim(),
@@ -192,7 +192,7 @@ async function loadSurveyResults(refresh = false) {
   const responseIds = (responses ?? []).map((response) => response.id);
   const { data: answers } = responseIds.length ? await supabase.from("survey_answers").select("response_id,question_id,answer_text").in("response_id", responseIds) : { data: [] };
   const responseById = new Map((responses ?? []).map((response) => [response.id, response]));
-  target.innerHTML = `<p><strong>${escapeHtml(survey.title)}</strong> · ${responses?.length ?? 0} response${responses?.length === 1 ? "" : "s"}${survey.is_published ? " · currently open" : ""}</p>${(questions ?? []).map((question) => {
+  target.innerHTML = `<p><strong>${escapeHtml(survey.title)}</strong> Â· ${responses?.length ?? 0} response${responses?.length === 1 ? "" : "s"}${survey.is_published ? " Â· currently open" : ""}</p>${(questions ?? []).map((question) => {
     const questionAnswers = (answers ?? []).filter((answer) => answer.question_id === question.id);
     if (question.question_type === "mcq") { const counts = new Map(question.options.map((option) => [option, 0])); questionAnswers.forEach((answer) => counts.set(answer.answer_text, (counts.get(answer.answer_text) ?? 0) + 1)); const max = Math.max(1, ...counts.values()); return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${[...counts].map(([option, count]) => `<div class="survey-bar-row"><span>${escapeHtml(option)}</span><div class="survey-bar"><i style="width:${Math.round(count / max * 100)}%"></i></div><strong>${count}</strong></div>`).join("")}</article>`; }
     return `<article class="survey-result-card"><h3>${escapeHtml(question.prompt)}</h3>${questionAnswers.length ? questionAnswers.map((answer) => `<p class="survey-written-answer">${survey.collect_name ? `<small>${escapeHtml(responseById.get(answer.response_id)?.respondent_name || "Unnamed")}</small>` : ""}${escapeHtml(answer.answer_text)}</p>`).join("") : "<p>No written responses yet.</p>"}</article>`;
@@ -218,7 +218,7 @@ async function editSelectedSurvey() {
 
 async function deleteSelectedSurvey() {
   const survey = adminSurveys.find((item) => item.id === selectedAdminSurveyId);
-  if (!survey || !confirm(`Delete “${survey.title}” and all of its responses? This cannot be undone.`)) return;
+  if (!survey || !confirm(`Delete â€œ${survey.title}â€ and all of its responses? This cannot be undone.`)) return;
   const { error } = await supabase.from("surveys").delete().eq("id", survey.id);
   if (error) { alert("The opinion could not be deleted."); return; }
   selectedAdminSurveyId = null; loadSurveyResults(true);

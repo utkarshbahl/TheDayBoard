@@ -8,7 +8,7 @@ function showEmpty() {
 }
 
 function renderSurvey(survey, questions, surveys, password = "") {
-  mount.innerHTML = `<button class="survey-back" type="button">← All opinions</button><p class="section-kicker">OPEN OPINION</p><h2>${escapeHtml(survey.title)}</h2>${survey.description ? `<p class="survey-description">${escapeHtml(survey.description)}</p>` : ""}<form id="surveyForm">${survey.collect_name ? `<label class="survey-question"><span>Your name</span><input name="respondentName" type="text" maxlength="120" required autocomplete="name"></label>` : ""}${questions.map((question, index) => `<fieldset class="survey-question"><legend>${index + 1}. ${escapeHtml(question.prompt)}</legend>${question.question_type === "mcq" ? question.options.map((option) => `<label><input type="radio" name="${question.id}" value="${escapeHtml(option)}" required> <span>${escapeHtml(option)}</span></label>`).join("") : `<textarea name="${question.id}" maxlength="3000" required placeholder="Write your answer"></textarea>`}</fieldset>`).join("")}<button class="survey-submit" type="submit">Submit opinion</button><p class="survey-message" role="status"></p></form>`;
+  mount.innerHTML = `<button class="survey-back" type="button">â† All opinions</button><p class="section-kicker">OPEN OPINION</p><h2>${escapeHtml(survey.title)}</h2>${survey.description ? `<p class="survey-description">${escapeHtml(survey.description)}</p>` : ""}<form id="surveyForm">${survey.collect_name ? `<label class="survey-question"><span>Your name</span><input name="respondentName" type="text" maxlength="120" required autocomplete="name"></label>` : ""}${questions.map((question, index) => `<fieldset class="survey-question"><legend>${index + 1}. ${escapeHtml(question.prompt)}</legend>${question.question_type === "mcq" ? question.options.map((option) => `<label><input type="radio" name="${question.id}" value="${escapeHtml(option)}" required> <span>${escapeHtml(option)}</span></label>`).join("") : `<textarea name="${question.id}" maxlength="3000" required placeholder="Write your answer"></textarea>`}</fieldset>`).join("")}<button class="survey-submit" type="submit">Submit opinion</button><p class="survey-message" role="status"></p></form>`;
   mount.querySelector(".survey-back").addEventListener("click", () => renderSurveyChoices(surveys));
   mount.querySelector("#surveyForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -17,27 +17,27 @@ function renderSurvey(survey, questions, surveys, password = "") {
     const message = form.querySelector(".survey-message");
     const data = new FormData(form);
     const answers = Object.fromEntries(questions.map((question) => [question.id, String(data.get(question.id) || "")]));
-    button.disabled = true; message.classList.remove("is-error"); message.textContent = "Submitting…";
+    button.disabled = true; message.classList.remove("is-error"); message.textContent = "Submittingâ€¦";
     const { error } = await supabase.rpc("submit_survey_response", { p_survey_id: survey.id, p_name: String(data.get("respondentName") || ""), p_answers: answers, p_password: password });
     button.disabled = false;
     if (error) { message.classList.add("is-error"); message.textContent = error.message || "Your opinion could not be submitted."; return; }
-    form.reset(); button.remove(); message.textContent = "Thank you — your opinion has been submitted.";
+    form.reset(); button.remove(); message.textContent = "Thank you â€” your opinion has been submitted.";
   });
 }
 
 function renderSurveyChoices(surveys) {
-  mount.innerHTML = `<div class="survey-choice-heading"><p class="section-kicker">OPEN OPINIONS</p><h2>Choose an opinion</h2><p>Select an open campus opinion to share your feedback.</p></div><div class="survey-choice-list">${surveys.map((survey) => `<button class="survey-choice" type="button" data-survey-id="${survey.id}"><span>${survey.password_protected ? "PASSWORD PROTECTED" : "OPEN TO ALL"}</span><strong>${escapeHtml(survey.title)}</strong>${survey.description ? `<small>${escapeHtml(survey.description)}</small>` : ""}<b aria-hidden="true">→</b></button>`).join("")}</div>`;
+  mount.innerHTML = `<div class="survey-choice-heading"><p class="section-kicker">OPEN OPINIONS</p><h2>Choose an opinion</h2><p>Select an open campus opinion to share your feedback.</p></div><div class="survey-choice-list">${surveys.map((survey) => `<button class="survey-choice" type="button" data-survey-id="${survey.id}"><span>${survey.password_protected ? "PASSWORD PROTECTED" : "OPEN TO ALL"}</span><strong>${escapeHtml(survey.title)}</strong>${survey.description ? `<small>${escapeHtml(survey.description)}</small>` : ""}<b aria-hidden="true">â†’</b></button>`).join("")}</div>`;
   mount.querySelectorAll(".survey-choice").forEach((button) => button.addEventListener("click", () => renderSelectedSurvey(surveys.find((survey) => survey.id === button.dataset.surveyId), surveys)));
 }
 
 async function renderSelectedSurvey(survey, surveys) {
   if (!survey) return;
-  mount.innerHTML = "<p class=survey-loading>Loading opinion…</p>";
+  mount.innerHTML = "<p class=survey-loading>Loading opinionâ€¦</p>";
   let password = "";
   if (survey.password_protected) {
-    mount.innerHTML = `<button class="survey-back" type="button">← All opinions</button><div class="survey-lock"><p class="section-kicker">PASSWORD PROTECTED</p><h2>${escapeHtml(survey.title)}</h2><p>Enter the password shared by the survey organiser to continue.</p><form id="surveyUnlock"><input type="password" required autocomplete="current-password" placeholder="Survey password"><button class="survey-submit" type="submit">Continue</button><p class="survey-message" role="status"></p></form></div>`;
+    mount.innerHTML = `<button class="survey-back" type="button">â† All opinions</button><div class="survey-lock"><p class="section-kicker">PASSWORD PROTECTED</p><h2>${escapeHtml(survey.title)}</h2><p>Enter the password shared by the survey organiser to continue.</p><form id="surveyUnlock"><input type="password" required autocomplete="current-password" placeholder="Survey password"><button class="survey-submit" type="submit">Continue</button><p class="survey-message" role="status"></p></form></div>`;
     mount.querySelector(".survey-back").addEventListener("click", () => renderSurveyChoices(surveys));
-    mount.querySelector("#surveyUnlock").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.currentTarget; const message = form.querySelector(".survey-message"); const button = form.querySelector("button"); password = form.querySelector("input").value; button.disabled = true; message.classList.remove("is-error"); message.textContent = "Checking password…"; try { const { data, error } = await supabase.rpc("get_survey_questions", { p_survey_id: survey.id, p_password: password }); if (error || !data?.length) { message.classList.add("is-error"); message.textContent = "That password is incorrect. Please try again."; form.querySelector("input").focus(); return; } renderSurvey(survey, data, surveys, password); } catch (error) { console.error("Survey password could not be checked.", error); message.classList.add("is-error"); message.textContent = "The password could not be checked. Please try again."; } finally { button.disabled = false; } });
+    mount.querySelector("#surveyUnlock").addEventListener("submit", async (event) => { event.preventDefault(); const form = event.currentTarget; const message = form.querySelector(".survey-message"); const button = form.querySelector("button"); password = form.querySelector("input").value; button.disabled = true; message.classList.remove("is-error"); message.textContent = "Checking passwordâ€¦"; try { const { data, error } = await supabase.rpc("get_survey_questions", { p_survey_id: survey.id, p_password: password }); if (error || !data?.length) { message.classList.add("is-error"); message.textContent = "That password is incorrect. Please try again."; form.querySelector("input").focus(); return; } renderSurvey(survey, data, surveys, password); } catch (error) { console.error("Survey password could not be checked.", error); message.classList.add("is-error"); message.textContent = "The password could not be checked. Please try again."; } finally { button.disabled = false; } });
     return;
   }
   const { data: questions, error } = await supabase.rpc("get_survey_questions", { p_survey_id: survey.id, p_password: password });

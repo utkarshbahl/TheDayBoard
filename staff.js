@@ -23,7 +23,7 @@ byId("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = event.submitter;
   button.disabled = true;
-  button.textContent = "Signing in…";
+  button.textContent = "Signing inâ€¦";
   const { error } = await supabase.auth.signInWithPassword({
     email: byId("staffEmail").value.trim(),
     password: byId("staffPassword").value,
@@ -42,7 +42,7 @@ byId("updateForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = event.submitter;
   button.disabled = true;
-  button.textContent = "Updating…";
+  button.textContent = "Updatingâ€¦";
   const { error } = await supabase.from("laundry_status").update({ ready_token: Number(byId("newNumber").value) }).eq("id", 1);
   button.disabled = false;
   button.textContent = "Update live board";
