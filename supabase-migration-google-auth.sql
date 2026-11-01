@@ -47,12 +47,12 @@ begin
   return query
   select
     users.id,
-    users.email,
+    users.email::text,
     coalesce(
       users.raw_user_meta_data ->> 'full_name',
       users.raw_user_meta_data ->> 'name',
-      users.email
-    ),
+      users.email::text
+    )::text,
     users.created_at
   from auth.users as users
   order by users.created_at desc;

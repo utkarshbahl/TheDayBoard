@@ -3,6 +3,22 @@ import "./brand.js?v=20261021";
 import "./ui-polish.js";
 import { supabase } from "./supabase.js";
 
+const getSafeReturnPath = () => {
+  const requestedPath = new URLSearchParams(location.search).get("return");
+  if (!requestedPath || !requestedPath.startsWith("/") || requestedPath.startsWith("//")) return "/";
+  return requestedPath;
+};
+
+const { data: { session: initialSession }, error: initialSessionError } = await supabase.auth.getSession();
+if (initialSessionError) console.error("Authentication state could not be loaded.", initialSessionError);
+if (!initialSession) {
+  const returnPath = `${location.pathname}${location.search}`;
+  const signInUrl = new URL("signin.html", location.href);
+  signInUrl.searchParams.set("return", returnPath);
+  location.replace(signInUrl.href);
+  throw new Error("Authentication required.");
+}
+
 const authErrorParams = new URLSearchParams(`${location.search}${location.hash.replace(/^#/, "&")}`);
 const authError = authErrorParams.get("error_description") || authErrorParams.get("error");
 if (authError) {

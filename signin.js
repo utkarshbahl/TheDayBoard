@@ -9,6 +9,8 @@ const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 
 const themeKey = "lnmiit-theme";
 const root = document.documentElement;
+const requestedReturn = new URLSearchParams(window.location.search).get("return");
+const returnPath = requestedReturn && requestedReturn.startsWith("/") && !requestedReturn.startsWith("//") ? requestedReturn : "/";
 let currentTheme = "light";
 try {
   const savedTheme = localStorage.getItem(themeKey);
@@ -61,7 +63,7 @@ button?.addEventListener("click", async () => {
   message.textContent = "";
   const options = {};
   if (["http:", "https:"].includes(window.location.protocol)) {
-    options.redirectTo = `${window.location.origin}/`;
+    options.redirectTo = `${window.location.origin}${returnPath}`;
   }
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
