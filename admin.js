@@ -56,7 +56,10 @@ function initializeTheme() {
     themeLabel.textContent = theme === "dusk" ? "Dark" : "Light";
   };
   let theme = "light";
-  try { theme = localStorage.getItem("lnmiit-theme") || "light"; } catch (error) { console.error("Theme preference could not be read.", error); }
+  try {
+    const savedTheme = localStorage.getItem("lnmiit-theme");
+    theme = savedTheme === "dusk" || savedTheme === "light" ? savedTheme : "light";
+  } catch (error) { console.error("Theme preference could not be read.", error); }
   applyTheme(theme);
   themeToggle.addEventListener("click", () => {
     const next = root.hasAttribute("data-theme") ? "light" : "dusk";

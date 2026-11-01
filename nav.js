@@ -174,7 +174,8 @@ window.setInterval(updateLiveTime, 60_000);
 
   let storedTheme = "light";
   try {
-    storedTheme = localStorage.getItem(themeKey) || "light";
+    const savedTheme = localStorage.getItem(themeKey);
+    storedTheme = savedTheme === "dusk" || savedTheme === "light" ? savedTheme : "light";
   } catch (error) {
     console.error("Theme preference could not be read.", error);
   }
