@@ -50,10 +50,13 @@ supabase.auth.onAuthStateChange((_event, nextSession) => updateSession(nextSessi
 button?.addEventListener("click", async () => {
   button.disabled = true;
   message.textContent = "";
-  const redirectTo = new URL("index.html", window.location.href).href;
+  const options = {};
+  if (["http:", "https:"].includes(window.location.protocol)) {
+    options.redirectTo = `${window.location.origin}/`;
+  }
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo },
+    options,
   });
   if (error) {
     button.disabled = false;

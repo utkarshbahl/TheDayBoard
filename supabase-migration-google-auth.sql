@@ -15,7 +15,7 @@ alter table public.user_profiles enable row level security;
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
-security definer set search_path = public
+security definer set search_path = ''
 as $$
 begin
   insert into public.user_profiles (id, email, display_name, avatar_url)
@@ -25,11 +25,7 @@ begin
     coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'),
     new.raw_user_meta_data ->> 'avatar_url'
   )
-  on conflict (id) do update set
-    email = excluded.email,
-    display_name = excluded.display_name,
-    avatar_url = excluded.avatar_url,
-    updated_at = now();
+  on conflict (id) do nothing;
   return new;
 end;
 $$;
@@ -43,3 +39,5 @@ drop policy if exists "Users can view their own profile" on public.user_profiles
 create policy "Users can view their own profile"
 on public.user_profiles for select to authenticated
 using ((select auth.uid()) = id);
+
+grant select on public.user_profiles to authenticated;
