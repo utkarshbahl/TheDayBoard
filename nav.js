@@ -32,7 +32,7 @@ document.querySelectorAll(".nav-actions").forEach((actions) => {
   if (actions.querySelector(".sign-in-link")) return;
   const link = document.createElement("a");
   link.className = "sign-in-link";
-  link.href = "admin.html";
+  link.href = "signin.html";
   link.textContent = "Sign in";
   actions.prepend(link);
 });
