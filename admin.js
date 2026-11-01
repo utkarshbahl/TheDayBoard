@@ -47,6 +47,7 @@ adminStyle.textContent = `
   .users-admin-total { display: block; margin: 18px 0; padding: 18px; border-radius: 8px; background: var(--ink); color: var(--on-dark); font: 700 30px "DM Mono", monospace; }
   .users-admin-total small { display: block; margin-bottom: 8px; color: var(--accent); font: 10px "DM Mono", monospace; letter-spacing: 1px; }
   .users-admin-list { border-top: 1px solid var(--line); } .users-admin-row { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13px; } .users-admin-row strong { display: block; } .users-admin-row small { display: block; margin-top: 4px; color: var(--muted); } .users-admin-date { color: var(--muted); white-space: nowrap; font: 11px "DM Mono", monospace; }
+  .settings-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); } .settings-admin h2 { margin: 0 0 8px; font-size: 18px; } .settings-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; } .settings-admin label { display: block; margin-top: 16px; font-size: 12px; font-weight: 800; } .settings-admin input { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; } .settings-admin-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; } .settings-admin-actions button { padding: 10px 14px; border: 0; border-radius: 5px; background: var(--ink); color: var(--on-dark); font: 800 12px Manrope; cursor: pointer; } .settings-admin-message { min-height: 18px; margin: 0 !important; }
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
@@ -93,7 +94,7 @@ function createSectionNav() {
   nav.id = "adminSectionNav";
   nav.className = "admin-section-nav";
   nav.setAttribute("aria-label", "Admin sections");
-  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option></select>`;
+  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><button type="button" data-section="settings">Settings</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option><option value="settings">Settings</option></select>`;
   byId("analyticsPanel").before(nav);
   nav.addEventListener("click", (event) => {
     const button = event.target.closest("[data-section]");
@@ -103,7 +104,7 @@ function createSectionNav() {
 }
 
 function setSection(section) {
-  const validSections = ["traffic", "users", "surveys", "visibility"];
+  const validSections = ["traffic", "users", "surveys", "visibility", "settings"];
   if (!validSections.includes(section)) section = "traffic";
   try {
     localStorage.setItem("dayboard-admin-section", section);
@@ -116,11 +117,62 @@ function setSection(section) {
   byId("sectionVisibilityPanel")?.classList.toggle("is-admin-section-hidden", section !== "visibility");
   byId("surveyAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "surveys");
   byId("usersAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "users");
+  byId("settingsAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "settings");
   if (section === "surveys" && !surveyResultsLoaded) { surveyResultsLoaded = true; loadSurveyResults(); }
   if (section === "users") loadUsers();
+  if (section === "settings") loadSettings();
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
+}
+
+function createSettingsPanel() {
+  const panel = document.createElement("section");
+  panel.id = "settingsAdminPanel";
+  panel.className = "settings-admin is-admin-section-hidden";
+  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
+  byId("analyticsPanel").append(panel);
+  byId("siteSettingsForm").addEventListener("submit", saveSettings);
+  return panel;
+}
+
+async function loadSettings() {
+  const nameInput = byId("siteNameSetting");
+  const creditInput = byId("siteCreditSetting");
+  if (!nameInput || !creditInput || nameInput.dataset.loaded === "true") return;
+  const { data, error } = await supabase.from("site_settings").select("key,value").in("key", ["site_name", "site_credit"]);
+  if (error) {
+    byId("siteSettingsMessage").textContent = `Settings could not be loaded: ${error.message}`;
+    console.error("Site settings could not be loaded.", error);
+    return;
+  }
+  const values = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+  nameInput.value = values.site_name || "TheDayBoard";
+  creditInput.value = values.site_credit || "";
+  nameInput.dataset.loaded = "true";
+}
+
+async function saveSettings(event) {
+  event.preventDefault();
+  const message = byId("siteSettingsMessage");
+  const updates = [
+    { key: "site_name", value: byId("siteNameSetting").value.trim() },
+    { key: "site_credit", value: byId("siteCreditSetting").value.trim() },
+  ];
+  if (!updates[0].value) {
+    message.textContent = "Site name is required.";
+    return;
+  }
+  const results = await Promise.all(updates.map((setting) =>
+    supabase.from("site_settings").update({ value: setting.value }).eq("key", setting.key),
+  ));
+  const error = results.find((result) => result.error)?.error;
+  if (error) {
+    message.textContent = `Settings could not be saved: ${error.message}`;
+    console.error("Site settings could not be saved.", error);
+    return;
+  }
+  message.textContent = "Settings saved.";
 }
 
 function createUsersPanel() {
@@ -350,6 +402,7 @@ async function initializeAdmin() {
   showAdmin();
   createSectionNav();
   createUsersPanel();
+  createSettingsPanel();
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
   createSurveyPanel();
   let savedSection = "traffic";
