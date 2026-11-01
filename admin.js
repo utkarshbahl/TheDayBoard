@@ -41,6 +41,11 @@ adminStyle.textContent = `
   .survey-admin h2 { margin: 0 0 8px; font-size: 18px; } .survey-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; }
   .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; }
   .survey-admin textarea { min-height: 80px; resize: vertical; } .survey-admin input[type=checkbox] { margin-right: 8px; accent-color: var(--ink); }
+  .users-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .users-admin h2 { margin: 0 0 8px; font-size: 18px; } .users-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .users-admin-total { display: block; margin: 18px 0; padding: 18px; border-radius: 8px; background: var(--ink); color: var(--on-dark); font: 700 30px "DM Mono", monospace; }
+  .users-admin-total small { display: block; margin-bottom: 8px; color: var(--accent); font: 10px "DM Mono", monospace; letter-spacing: 1px; }
+  .users-admin-list { border-top: 1px solid var(--line); } .users-admin-row { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 13px; } .users-admin-row strong { display: block; } .users-admin-row small { display: block; margin-top: 4px; color: var(--muted); } .users-admin-date { color: var(--muted); white-space: nowrap; font: 11px "DM Mono", monospace; }
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
@@ -87,7 +92,7 @@ function createSectionNav() {
   nav.id = "adminSectionNav";
   nav.className = "admin-section-nav";
   nav.setAttribute("aria-label", "Admin sections");
-  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option></select>`;
+  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option></select>`;
   byId("analyticsPanel").before(nav);
   nav.addEventListener("click", (event) => {
     const button = event.target.closest("[data-section]");
@@ -102,10 +107,37 @@ function setSection(section) {
   });
   byId("sectionVisibilityPanel")?.classList.toggle("is-admin-section-hidden", section !== "visibility");
   byId("surveyAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "surveys");
+  byId("usersAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "users");
   if (section === "surveys" && !surveyResultsLoaded) { surveyResultsLoaded = true; loadSurveyResults(); }
+  if (section === "users") loadUsers();
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
+}
+
+function createUsersPanel() {
+  const panel = document.createElement("section");
+  panel.id = "usersAdminPanel";
+  panel.className = "users-admin is-admin-section-hidden";
+  panel.innerHTML = `<h2>Registered users</h2><p>Google accounts that have signed in to TheDayBoard.</p><strong class="users-admin-total"><small>TOTAL USERS</small><span id="usersAdminTotal">-</span></strong><div id="usersAdminList" class="users-admin-list"><p>Loading users...</p></div>`;
+  byId("analyticsPanel").append(panel);
+  return panel;
+}
+
+async function loadUsers() {
+  const list = byId("usersAdminList");
+  const total = byId("usersAdminTotal");
+  if (!list || !total || list.dataset.loaded === "true") return;
+  const { data, error } = await supabase.rpc("admin_list_users");
+  if (error) {
+    list.innerHTML = "<p>Users could not be loaded. Run the updated Supabase migration first.</p>";
+    console.error("Admin users could not be loaded.", error);
+    return;
+  }
+  const users = data ?? [];
+  total.textContent = String(users.length);
+  list.dataset.loaded = "true";
+  list.innerHTML = users.length ? users.map((user) => `<div class="users-admin-row"><span><strong>${escapeHtml(user.display_name || "Unnamed user")}</strong><small>${escapeHtml(user.email || "No email")}</small></span><time class="users-admin-date">${new Date(user.created_at).toLocaleDateString()}</time></div>`).join("") : "<p>No users have signed in yet.</p>";
 }
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
@@ -300,12 +332,14 @@ async function initializeAdmin() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return showLogin();
   const { data: profile, error } = await supabase.from("user_profiles").select("is_active").eq("id", session.user.id).maybeSingle();
-  if (error || profile?.is_active !== true || session.user.app_metadata?.role !== "admin") {
+  const isAdmin = session.user.app_metadata?.role === "admin";
+  if (error || !isAdmin || (profile && profile.is_active !== true)) {
     await supabase.auth.signOut();
     return showLogin("This account is not authorized for the admin dashboard.");
   }
   showAdmin();
   createSectionNav();
+  createUsersPanel();
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
   createSurveyPanel();
   setSection("traffic");

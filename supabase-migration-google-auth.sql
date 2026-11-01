@@ -6,9 +6,13 @@ create table if not exists public.user_profiles (
   email text,
   display_name text,
   avatar_url text,
+  is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.user_profiles
+  add column if not exists is_active boolean not null default true;
 
 alter table public.user_profiles enable row level security;
 
@@ -23,3 +27,37 @@ on public.user_profiles for select to authenticated
 using ((select auth.uid()) = id);
 
 grant select on public.user_profiles to authenticated;
+
+create or replace function public.admin_list_users()
+returns table (
+  id uuid,
+  email text,
+  display_name text,
+  created_at timestamptz
+)
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if (select auth.jwt() -> 'app_metadata' ->> 'role') <> 'admin' then
+    raise exception 'Administrator access required';
+  end if;
+
+  return query
+  select
+    users.id,
+    users.email,
+    coalesce(
+      users.raw_user_meta_data ->> 'full_name',
+      users.raw_user_meta_data ->> 'name',
+      users.email
+    ),
+    users.created_at
+  from auth.users as users
+  order by users.created_at desc;
+end;
+$$;
+
+revoke all on function public.admin_list_users() from public;
+grant execute on function public.admin_list_users() to authenticated;
