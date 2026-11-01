@@ -4,11 +4,36 @@ const button = document.querySelector("#googleSignIn");
 const message = document.querySelector("#signinMessage");
 const sessionText = document.querySelector("#signinSession");
 const signOut = document.querySelector("#signOut");
+const themeToggle = document.querySelector(".theme-toggle");
+const themeLabel = themeToggle?.querySelector("[data-theme-toggle-label]");
 
 const themeKey = "lnmiit-theme";
 const root = document.documentElement;
-const savedTheme = localStorage.getItem(themeKey);
-if (savedTheme === "dusk") root.dataset.theme = "dusk";
+let currentTheme = "light";
+try {
+  const savedTheme = localStorage.getItem(themeKey);
+  currentTheme = savedTheme === "dusk" || savedTheme === "light" ? savedTheme : "light";
+} catch (error) {
+  console.error("Theme preference could not be read.", error);
+}
+
+const applyTheme = (theme) => {
+  currentTheme = theme;
+  root.dataset.theme = theme;
+  themeToggle?.setAttribute("aria-pressed", String(theme === "dusk"));
+  if (themeLabel) themeLabel.textContent = theme === "dusk" ? "Dark" : "Light";
+};
+
+applyTheme(currentTheme);
+themeToggle?.addEventListener("click", () => {
+  const nextTheme = currentTheme === "dusk" ? "light" : "dusk";
+  try {
+    localStorage.setItem(themeKey, nextTheme);
+  } catch (error) {
+    console.error("Theme preference could not be saved.", error);
+  }
+  applyTheme(nextTheme);
+});
 
 const updateSession = (session) => {
   if (!session) return;
