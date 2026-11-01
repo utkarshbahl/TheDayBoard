@@ -225,9 +225,9 @@ document.querySelectorAll(".nav-links, .campus-dropdown").forEach((nav) => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js").catch((error) => {
-    console.error("Offline support could not be enabled.", error);
-  });
+  navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" })
+    .then((registration) => registration.update())
+    .catch((error) => console.error("Offline support could not be enabled.", error));
 }
 
 document.querySelectorAll(".campus-menu").forEach((menu) => {
