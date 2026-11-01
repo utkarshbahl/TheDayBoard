@@ -28,6 +28,14 @@ navLayoutStyle.textContent = `
 document.head.append(navLayoutStyle);
 
 document.documentElement.classList.add("enhanced-ui");
+document.querySelectorAll(".nav-actions").forEach((actions) => {
+  if (actions.querySelector(".sign-in-link")) return;
+  const link = document.createElement("a");
+  link.className = "sign-in-link";
+  link.href = "admin.html";
+  link.textContent = "Sign in";
+  actions.prepend(link);
+});
 const revealTargets = document.querySelectorAll(".service-card, .placement-stat, .placement-record, .survey-choice, .club-card, .route-group, .course-panel, .map-frame, .notice-card");
 if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const revealObserver = new IntersectionObserver((entries, observer) => entries.forEach((entry) => {
