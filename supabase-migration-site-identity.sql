@@ -11,6 +11,7 @@
   insert into public.site_settings (key, value) values
     ('site_name', 'TheDayBoard'),
     ('site_credit', ''),
+    ('theme_enabled', 'true'),
     ('announcement_text', ''),
     ('announcement_visible', 'false'),
     ('announcement_important', 'false'),

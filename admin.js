@@ -74,6 +74,14 @@ function initializeTheme() {
     try { localStorage.setItem("lnmiit-theme", next); } catch (error) { console.error("Theme preference could not be saved.", error); }
     applyTheme(next);
   });
+  supabase.from("site_settings").select("value").eq("key", "theme_enabled").maybeSingle().then(({ data, error }) => {
+    if (error) { console.error("Theme availability could not be loaded.", error); return; }
+    if (data?.value === "false") {
+      applyTheme("light");
+      themeToggle.hidden = true;
+      try { localStorage.setItem("lnmiit-theme", "light"); } catch (storageError) { console.error("Light theme preference could not be saved.", storageError); }
+    }
+  });
 }
 
 function showLogin(message = "") {
@@ -134,7 +142,7 @@ function createSettingsPanel() {
   const panel = document.createElement("section");
   panel.id = "settingsAdminPanel";
   panel.className = "settings-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" name="announcement_visible" type="checkbox"> Show announcement across the site</label><label><input id="announcementImportantSetting" name="announcement_important" type="checkbox"> Mark announcement as important</label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
+  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label><input id="themeEnabledSetting" name="theme_enabled" type="checkbox"> Allow Light/Dark mode button for visitors</label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" name="announcement_visible" type="checkbox"> Show announcement across the site</label><label><input id="announcementImportantSetting" name="announcement_important" type="checkbox"> Mark announcement as important</label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
   byId("analyticsPanel").append(panel);
   byId("siteSettingsForm").addEventListener("submit", saveSettings);
   return panel;
@@ -144,7 +152,7 @@ async function loadSettings() {
   const nameInput = byId("siteNameSetting");
   const creditInput = byId("siteCreditSetting");
   if (!nameInput || !creditInput || nameInput.dataset.loaded === "true") return;
-  const { data, error } = await supabase.from("site_settings").select("key,value").in("key", ["site_name", "site_credit", "announcement_text", "announcement_visible", "announcement_important", "announcement_link", "announcement_expires"]);
+  const { data, error } = await supabase.from("site_settings").select("key,value").in("key", ["site_name", "site_credit", "theme_enabled", "announcement_text", "announcement_visible", "announcement_important", "announcement_link", "announcement_expires"]);
   if (error) {
     byId("siteSettingsMessage").textContent = `Settings could not be loaded: ${error.message}`;
     console.error("Site settings could not be loaded.", error);
@@ -153,6 +161,7 @@ async function loadSettings() {
   const values = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
   nameInput.value = values.site_name || "TheDayBoard";
   creditInput.value = values.site_credit || "";
+  byId("themeEnabledSetting").checked = values.theme_enabled !== "false";
   byId("announcementTextSetting").value = values.announcement_text || "";
   byId("announcementLinkSetting").value = values.announcement_link || "";
   byId("announcementExpiresSetting").value = values.announcement_expires ? values.announcement_expires.slice(0, 16) : "";
@@ -167,6 +176,7 @@ async function saveSettings(event) {
   const updates = [
     { key: "site_name", value: byId("siteNameSetting").value.trim() },
     { key: "site_credit", value: byId("siteCreditSetting").value.trim() },
+    { key: "theme_enabled", value: String(byId("themeEnabledSetting").checked) },
     { key: "announcement_text", value: byId("announcementTextSetting").value.trim() },
     { key: "announcement_link", value: byId("announcementLinkSetting").value.trim() },
     { key: "announcement_expires", value: byId("announcementExpiresSetting").value ? new Date(byId("announcementExpiresSetting").value).toISOString() : "" },
@@ -185,6 +195,13 @@ async function saveSettings(event) {
     message.textContent = `Settings could not be saved: ${error.message}`;
     console.error("Site settings could not be saved.", error);
     return;
+  }
+  if (byId("themeEnabledSetting").checked) {
+    if (themeToggle) themeToggle.hidden = false;
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    if (themeToggle) themeToggle.hidden = true;
+    try { localStorage.setItem("lnmiit-theme", "light"); } catch (storageError) { console.error("Light theme preference could not be saved.", storageError); }
   }
   message.textContent = "Settings saved.";
 }

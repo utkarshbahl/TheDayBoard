@@ -38,6 +38,14 @@ themeToggle?.addEventListener("click", () => {
   applyTheme(nextTheme);
 });
 
+const themeAvailability = await supabase.from("site_settings").select("value").eq("key", "theme_enabled").maybeSingle();
+if (themeAvailability.error) console.error("Theme availability could not be loaded.", themeAvailability.error);
+if (themeAvailability.data?.value === "false") {
+  applyTheme("light");
+  themeToggle?.setAttribute("hidden", "");
+  try { localStorage.setItem(themeKey, "light"); } catch (error) { console.error("Light theme preference could not be saved.", error); }
+}
+
 const updateSession = (session) => {
   if (!session) {
     button.hidden = false;

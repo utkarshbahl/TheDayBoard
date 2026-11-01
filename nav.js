@@ -293,3 +293,17 @@ window.setInterval(updateLiveTime, 60_000);
     applyTheme(theme);
   });
 })();
+
+async function applyThemeAvailability() {
+  const { data, error } = await supabase.from("site_settings").select("value").eq("key", "theme_enabled").maybeSingle();
+  if (error) {
+    console.error("Theme availability could not be loaded.", error);
+    return;
+  }
+  if (data?.value === "false") {
+    document.documentElement.dataset.theme = "light";
+    document.querySelectorAll(".theme-toggle").forEach((toggle) => { toggle.hidden = true; });
+    try { localStorage.setItem("lnmiit-theme", "light"); } catch (storageError) { console.error("Light theme preference could not be saved.", storageError); }
+  }
+}
+applyThemeAvailability();
