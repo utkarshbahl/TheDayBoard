@@ -28,6 +28,7 @@ const sections = [
   ["clubs", "Campus clubs"],
   ["surveys", "Campus opinions"],
   ["eateries", "Eateries"],
+  ["ai-chat", "AI Chat"],
 ];
 
 const themeToggle = byId("adminThemeToggle");
