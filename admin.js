@@ -3,6 +3,27 @@ import "./brand.js?v=20261021";
 import "./ui-polish.js";
 
 const byId = (id) => document.getElementById(id);
+function bindToggleButtons(root = document) {
+  root.querySelectorAll(".toggle-button[data-toggle-for]").forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    const input = byId(button.dataset.toggleFor);
+    if (!input) return;
+    const sync = () => {
+      button.dataset.checked = String(input.checked);
+      button.setAttribute("aria-pressed", String(input.checked));
+    };
+    button._syncToggle = sync;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      input.checked = !input.checked;
+      sync();
+    });
+    sync();
+  });
+}
+function syncToggleButtons(root = document) {
+  root.querySelectorAll(".toggle-button[data-toggle-for]").forEach((button) => button._syncToggle?.());
+}
 let adminSurveys = [];
 let selectedAdminSurveyId = null;
 let surveyResultsLoaded = false;
@@ -74,6 +95,7 @@ adminStyle.textContent = `
   .survey-question-editor { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; } .survey-question-editor-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; } .survey-question-editor-header strong { font-size: 13px; } .survey-question-editor button, .survey-admin-action { padding: 9px 11px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); font: 800 12px Manrope; cursor: pointer; } .survey-publish { margin-top: 18px; border: 0; background: var(--ink); color: var(--on-dark); }
   .survey-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; } .survey-options input { margin-top: 0 !important; } .survey-admin-message { min-height: 18px; margin: 12px 0 0 !important; } .survey-admin-message.is-error { color: var(--red); } .survey-results { margin-top: 34px; } .survey-result-card { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); } .survey-result-card h3 { margin: 0; font-size: 14px; } .survey-bar-row { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 2fr) 38px; gap: 10px; align-items: center; margin-top: 10px; font-size: 12px; } .survey-bar { height: 9px; overflow: hidden; border-radius: 999px; background: var(--line); } .survey-bar i { display: block; height: 100%; background: var(--ink); } .survey-written-answer { margin: 10px 0 0; padding: 11px; border-radius: 5px; background: var(--surface-muted); color: var(--ink) !important; font-size: 12px !important; white-space: pre-wrap; } .survey-written-answer small { display: block; margin-bottom: 5px; color: var(--muted); font: 10px "DM Mono", monospace; }
   @media (max-width: 700px) { .admin-section-nav { display: block; } .admin-section-nav button { display: none; } .admin-section-select { display: block; } }
+  .admin-page .toggle-input { position: absolute; width: 1px !important; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; } .admin-page .toggle-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 11px 18px; border: 0; border-radius: 8px; background: #e4eee5; color: #23402e; font: 800 12px Manrope; cursor: pointer; transition: background-color .18s, transform .18s, box-shadow .18s; } .admin-page .toggle-button::before { content: "✓"; display: grid; place-items: center; width: 20px; height: 20px; margin-right: 9px; border-radius: 5px; background: var(--ink); color: var(--on-dark); font-size: 13px; } .admin-page .toggle-button[data-checked=false] { background: #f0d7d2; color: #7d3027; } .admin-page .toggle-button[data-checked=false]::before { content: "×"; background: #7d3027; } .admin-page .toggle-button:hover, .admin-page .toggle-button:focus-visible { transform: translateY(-1px); box-shadow: 0 4px 0 var(--line); outline: none; } .admin-page .admin-toggle-card .toggle-button { justify-content: flex-start; min-width: 154px; } .admin-page .admin-toggle-card { flex-wrap: wrap; }
 `;
 document.head.append(adminStyle);
 
@@ -168,9 +190,10 @@ function createSettingsPanel() {
   const panel = document.createElement("section");
   panel.id = "settingsAdminPanel";
   panel.className = "settings-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" name="announcement_visible" type="checkbox"> Show announcement across the site</label><label><input id="announcementImportantSetting" name="announcement_important" type="checkbox"> Mark announcement as important</label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
+  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" class="toggle-input" name="announcement_visible" type="checkbox"><button class="toggle-button" type="button" data-toggle-for="announcementVisibleSetting">Show announcement across the site</button></label><label><input id="announcementImportantSetting" class="toggle-input" name="announcement_important" type="checkbox"><button class="toggle-button" type="button" data-toggle-for="announcementImportantSetting">Mark announcement as important</button></label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
   byId("analyticsPanel").append(panel);
   byId("siteSettingsForm").addEventListener("submit", saveSettings);
+  bindToggleButtons(panel);
   return panel;
 }
 
@@ -192,6 +215,7 @@ async function loadSettings() {
   byId("announcementExpiresSetting").value = values.announcement_expires ? values.announcement_expires.slice(0, 16) : "";
   byId("announcementVisibleSetting").checked = values.announcement_visible === "true";
   byId("announcementImportantSetting").checked = values.announcement_important === "true";
+  syncToggleButtons(byId("settingsAdminPanel"));
   nameInput.dataset.loaded = "true";
 }
 
@@ -245,9 +269,10 @@ function createChatbotPanel() {
   const panel = document.createElement("section");
   panel.id = "chatbotAdminPanel";
   panel.className = "chatbot-admin-panel is-admin-section-hidden";
-  panel.innerHTML = `<h2>AI Chat controls</h2><p>Manage the chatbot separately from general site settings.</p><form id="chatbotSettingsForm"><label class="admin-toggle-card"><input id="chatbotEnabledSetting" type="checkbox"><span><strong>AI Chat visible</strong><small>Show the chatbot card, navigation link, and floating button.</small></span></label><label for="chatbotNameSetting">Assistant name<input id="chatbotNameSetting" maxlength="80"></label><label for="chatbotWelcomeSetting">Welcome message<input id="chatbotWelcomeSetting" maxlength="240"></label><label for="chatbotModelSetting">Pollinations model<select id="chatbotModelSetting"><option value="openai">OpenAI-compatible default</option><option value="mistral">Mistral</option><option value="openai-fast">OpenAI fast</option></select></label><label for="chatbotInstructionsSetting">Additional instructions<textarea id="chatbotInstructionsSetting" maxlength="1000"></textarea></label><div class="chatbot-admin-stats"><div class="chatbot-admin-stat"><small>TODAY</small><strong id="chatbotTodayRequests">-</strong></div><div class="chatbot-admin-stat"><small>LAST 7 DAYS</small><strong id="chatbotWeekRequests">-</strong></div><div class="chatbot-admin-stat"><small>ALL TIME</small><strong id="chatbotAllRequests">-</strong></div></div><div class="settings-admin-actions"><button type="submit">Save AI Chat</button><p id="chatbotSettingsMessage" class="chatbot-admin-message" role="status"></p></div></form>`;
+  panel.innerHTML = `<h2>AI Chat controls</h2><p>Manage the chatbot separately from general site settings.</p><form id="chatbotSettingsForm"><label class="admin-toggle-card"><input id="chatbotEnabledSetting" class="toggle-input" type="checkbox"><button class="toggle-button" type="button" data-toggle-for="chatbotEnabledSetting">AI Chat visible</button><span><strong>AI Chat visibility</strong><small>Show the chatbot card, navigation link, and floating button.</small></span></label><label for="chatbotNameSetting">Assistant name<input id="chatbotNameSetting" maxlength="80"></label><label for="chatbotWelcomeSetting">Welcome message<input id="chatbotWelcomeSetting" maxlength="240"></label><label for="chatbotModelSetting">Pollinations model<select id="chatbotModelSetting"><option value="openai">OpenAI-compatible default</option><option value="mistral">Mistral</option><option value="openai-fast">OpenAI fast</option></select></label><label for="chatbotInstructionsSetting">Additional instructions<textarea id="chatbotInstructionsSetting" maxlength="1000"></textarea></label><div class="chatbot-admin-stats"><div class="chatbot-admin-stat"><small>TODAY</small><strong id="chatbotTodayRequests">-</strong></div><div class="chatbot-admin-stat"><small>LAST 7 DAYS</small><strong id="chatbotWeekRequests">-</strong></div><div class="chatbot-admin-stat"><small>ALL TIME</small><strong id="chatbotAllRequests">-</strong></div></div><div class="settings-admin-actions"><button type="submit">Save AI Chat</button><p id="chatbotSettingsMessage" class="chatbot-admin-message" role="status"></p></div></form>`;
   byId("analyticsPanel").append(panel);
   byId("chatbotSettingsForm").addEventListener("submit", saveChatbotSettings);
+  bindToggleButtons(panel);
   return panel;
 }
 
@@ -263,6 +288,7 @@ async function loadChatbotSettings() {
   byId("chatbotWelcomeSetting").value = values.chatbot_welcome || "Hi! I’m your campus assistant. What would you like to know?";
   byId("chatbotModelSetting").value = values.chatbot_model || "openai-fast";
   byId("chatbotInstructionsSetting").value = values.chatbot_instructions || "";
+  syncToggleButtons(byId("chatbotAdminPanel"));
   loadChatbotAnalytics();
 }
 
@@ -428,9 +454,10 @@ function createSurveyPanel() {
   const panel = document.createElement("section");
   panel.id = "surveyAdminPanel";
   panel.className = "survey-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" type="checkbox">Collect respondent names (leave unchecked for anonymous opinions)</label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results?</p></div></div>`;
+  panel.innerHTML = `<h2>Publish an opinion</h2><p>Create one or more multiple-choice or written questions. Publishing a new opinion closes any currently published one.</p><form id="surveyEditor"><label>Title<input id="surveyTitle" type="text" maxlength="140" required></label><label>Description <textarea id="surveyDescription" maxlength="1000"></textarea></label><label><input id="surveyCollectName" class="toggle-input" type="checkbox"><button class="toggle-button" type="button" data-toggle-for="surveyCollectName">Collect respondent names</button></label><div id="surveyQuestionEditors"></div><button class="survey-admin-action" id="addSurveyQuestion" type="button">Add question</button><button class="survey-admin-action survey-publish" type="submit">Publish opinion</button><p class="survey-admin-message" role="status"></p></form><div class="survey-results"><h2>Opinion results</h2><div id="surveyResults"><p>Loading results?</p></div></div>`;
   panel.querySelector("p").textContent = "Publish as many open opinions as needed. Each can contain multiple-choice and written questions.";
   byId("analyticsPanel").append(panel);
+  bindToggleButtons(panel);
   const editors = panel.querySelector("#surveyQuestionEditors");
   const password = document.createElement("label");
   password.innerHTML = `Survey password (optional)<input id="surveyPassword" type="password" maxlength="200" autocomplete="new-password" placeholder="Leave blank for public access">`;
