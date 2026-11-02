@@ -84,7 +84,7 @@ const addEateriesNavigation = () => {
     const link = document.createElement("a");
     link.className = "nav-link";
     link.href = "eateries.html";
-    link.textContent = "Campus Eateries";
+    link.textContent = "Eateries";
     if (isEateriesPage) link.setAttribute("aria-current", "page");
     nav.append(link);
   });
@@ -93,7 +93,7 @@ const addEateriesNavigation = () => {
     const link = document.createElement("a");
     link.className = "campus-nav-link";
     link.href = "eateries.html";
-    link.innerHTML = '<span>Campus <b>Eateries</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+    link.innerHTML = '<span><b>Eateries</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
     if (isEateriesPage) link.setAttribute("aria-current", "page");
     nav.append(link);
   });
@@ -191,7 +191,11 @@ const isClubsPage = /\/clubs(?:\.html)?\/?$/.test(location.pathname);
 const isPlacementsPage = /\/placements(?:\.html)?\/?$/.test(location.pathname);
 function setNavLabel(path, label) {
   document.querySelectorAll(`.nav-link[href="${path}"], .campus-nav-link[href="${path}"]`).forEach((link) => {
-    link.innerHTML = link.classList.contains("campus-nav-link") ? `<span><b>${label}</b></span><span class="campus-link-arrow" aria-hidden="true"></span>` : `<b>${label}</b>`;
+    if (link.classList.contains("campus-nav-link")) {
+      link.innerHTML = `<span>${label}</span><span class="campus-link-arrow" aria-hidden="true"></span>`;
+    } else {
+      link.textContent = label;
+    }
   });
 }
 [
@@ -213,7 +217,7 @@ document.querySelectorAll(".nav-links").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "nav-link";
   link.href = "placements.html";
-  link.innerHTML = "<b>Placements</b>";
+  link.textContent = "Placements";
   if (isPlacementsPage) link.setAttribute("aria-current", "page");
   nav.insertBefore(link, nav.querySelector('a[href="clubs.html"], a[href="surveys.html"]'));
 });
@@ -222,7 +226,7 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "campus-nav-link";
   link.href = "placements.html";
-  link.innerHTML = '<span><b>Placements</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  link.innerHTML = '<span>Placements</span><span class="campus-link-arrow" aria-hidden="true"></span>';
   if (isPlacementsPage) link.setAttribute("aria-current", "page");
   nav.insertBefore(link, nav.querySelector('a[href="clubs.html"], a[href="surveys.html"]'));
 });
@@ -231,7 +235,7 @@ document.querySelectorAll(".nav-links").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "nav-link";
   link.href = "clubs.html";
-  link.innerHTML = "<b>Clubs</b>";
+  link.textContent = "Clubs";
   if (isClubsPage) link.setAttribute("aria-current", "page");
   nav.insertBefore(link, nav.querySelector('a[href="surveys.html"]'));
 });
@@ -240,7 +244,7 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "campus-nav-link";
   link.href = "clubs.html";
-  link.innerHTML = '<span><b>Clubs</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  link.innerHTML = '<span>Clubs</span><span class="campus-link-arrow" aria-hidden="true"></span>';
   if (isClubsPage) link.setAttribute("aria-current", "page");
   nav.insertBefore(link, nav.querySelector('a[href="surveys.html"]'));
 });
@@ -249,7 +253,7 @@ document.querySelectorAll(".nav-links").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "nav-link";
   link.href = "surveys.html";
-  link.innerHTML = "<b>Opinions</b>";
+  link.textContent = "Opinions";
   if (isOpinionsPage) link.setAttribute("aria-current", "page");
   nav.append(link);
 });
@@ -258,7 +262,7 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   const link = document.createElement("a");
   link.className = "campus-nav-link";
   link.href = "surveys.html";
-  link.innerHTML = '<span><b>Opinions</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+  link.innerHTML = '<span>Opinions</span><span class="campus-link-arrow" aria-hidden="true"></span>';
   if (isOpinionsPage) link.setAttribute("aria-current", "page");
   nav.append(link);
 });

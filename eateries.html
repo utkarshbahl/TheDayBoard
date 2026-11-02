@@ -12,26 +12,47 @@
     <nav class="nav wrap service-nav">
       <div class="nav-start">
         <a class="brand brand-desktop" href="index.html"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span><span class="brand-byline" data-site-credit>by Ethers Club</span></span></a>
-        <div class="nav-links" aria-label="Campus services"></div>
+        <div class="nav-links" aria-label="Campus services">
+          <a class="nav-link" href="laundry.html">Laundry</a><a class="nav-link" href="mess-menu.html">Mess</a><a class="nav-link" href="bus-timings.html">Bus</a><a class="nav-link" href="curriculum.html">Academics</a><a class="nav-link" href="campus-map.html">Map</a><a class="nav-link" href="placements.html">Placements</a><a class="nav-link" href="clubs.html">Clubs</a><a class="nav-link" href="surveys.html">Opinions</a>
+        </div>
       </div>
       <div class="nav-actions"><button class="theme-toggle" type="button" aria-label="Toggle Dusk dark mode" aria-pressed="false"><span class="theme-toggle-dot" aria-hidden="true"></span><span data-theme-toggle-label>Dusk</span></button></div>
     </nav>
     <section class="eateries-page wrap">
       <header class="eateries-heading">
         <p class="section-kicker">LNMIIT CAMPUS SERVICES</p>
-        <h1>Campus <b>eateries</b>.</h1>
+        <h1><b>Eateries</b>.</h1>
         <p>Find campus food spots in one place. Menus will be added here as they are provided.</p>
       </header>
+      <div class="eatery-tabs" role="tablist" aria-label="Campus eateries">
+        <button class="eatery-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="eatery-nescafe" data-eatery="nescafe">Nescafe</button>
+        <button class="eatery-tab" type="button" role="tab" aria-selected="false" aria-controls="eatery-kravers" data-eatery="kravers">Kravers</button>
+        <button class="eatery-tab" type="button" role="tab" aria-selected="false" aria-controls="eatery-cibus-veg" data-eatery="cibus-veg">Cibus Veg</button>
+        <button class="eatery-tab" type="button" role="tab" aria-selected="false" aria-controls="eatery-cibus-nonveg" data-eatery="cibus-nonveg">Cibus Non-Veg</button>
+        <button class="eatery-tab" type="button" role="tab" aria-selected="false" aria-controls="eatery-parlour" data-eatery="parlour">Campus Parlour</button>
+      </div>
       <section class="eatery-grid" aria-label="Campus eateries">
-        <article class="eatery-card eatery-card-featured"><span class="eatery-number">01</span><h2>Nescafe</h2><p>Drinks, snacks and quick bites.</p><span class="menu-placeholder">Menu coming soon</span></article>
-        <article class="eatery-card"><span class="eatery-number">02</span><h2>Kravers</h2><p>Quick meals and snacks on campus.</p><span class="menu-placeholder">Menu coming soon</span></article>
-        <article class="eatery-card"><span class="eatery-number">03</span><h2>Cibus Veg</h2><p>Vegetarian food options.</p><span class="menu-placeholder">Menu coming soon</span></article>
-        <article class="eatery-card"><span class="eatery-number">04</span><h2>Cibus Non-Veg</h2><p>Non-vegetarian food options.</p><span class="menu-placeholder">Menu coming soon</span></article>
-        <article class="eatery-card"><span class="eatery-number">05</span><h2>Campus Parlour</h2><p>Campus parlour menu and refreshments.</p><span class="menu-placeholder">Menu coming soon</span></article>
+        <article id="eatery-nescafe" class="eatery-card eatery-card-featured" role="tabpanel"><span class="eatery-number">01</span><h2>Nescafe</h2><p>Drinks, snacks and quick bites.</p><span class="menu-placeholder">Menu coming soon</span></article>
+        <article id="eatery-kravers" class="eatery-card" role="tabpanel" hidden><span class="eatery-number">02</span><h2>Kravers</h2><p>Quick meals and snacks on campus.</p><a class="eatery-menu-link" href="https://kraverskitchen.petpooja.site/" target="_blank" rel="noopener noreferrer">Open live menu <span aria-hidden="true">↗</span></a></article>
+        <article id="eatery-cibus-veg" class="eatery-card" role="tabpanel" hidden><span class="eatery-number">03</span><h2>Cibus Veg</h2><p>Vegetarian food options.</p><span class="menu-placeholder">Menu coming soon</span></article>
+        <article id="eatery-cibus-nonveg" class="eatery-card" role="tabpanel" hidden><span class="eatery-number">04</span><h2>Cibus Non-Veg</h2><p>Non-vegetarian food options.</p><span class="menu-placeholder">Menu coming soon</span></article>
+        <article id="eatery-parlour" class="eatery-card" role="tabpanel" hidden><span class="eatery-number">05</span><h2>Campus Parlour</h2><p>Campus parlour menu and refreshments.</p><span class="menu-placeholder">Menu coming soon</span></article>
       </section>
     </section>
   </main>
   <script>document.documentElement.classList.add("dayboard-ready");</script>
   <script type="module" src="nav.js?v=20261102"></script>
+  <script>
+    document.querySelectorAll(".eatery-tab").forEach((tab) => tab.addEventListener("click", () => {
+      document.querySelectorAll(".eatery-tab").forEach((item) => {
+        const active = item === tab;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-selected", String(active));
+      });
+      document.querySelectorAll(".eatery-card").forEach((card) => {
+        card.hidden = card.id !== tab.getAttribute("aria-controls");
+      });
+    }));
+  </script>
 </body>
 </html>
