@@ -1,7 +1,10 @@
-const CACHE_NAME = "thedayboard-shell-v11";
+const CACHE_NAME = "thedayboard-shell-v12";
 const APP_SHELL = [
   "/",
   "/index.html",
+  "/chatbot.html",
+  "/chatbot.css?v=1",
+  "/chatbot.js?v=1",
   "/home.css?v=2",
   "/laundry.html",
   "/curriculum.html",

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI Assistant | TheDayBoard</title>
+  <meta name="description" content="Ask the free TheDayBoard AI Assistant about campus services.">
+  <link rel="icon" href="assets/ethers-club-icon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css?v=20261023"><link rel="stylesheet" href="nav-rail.css?v=1"><link rel="stylesheet" href="chatbot.css?v=1">
+</head>
+<body>
+  <main>
+    <nav class="nav wrap">
+      <a class="brand" href="index.html"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span><span class="brand-byline" data-site-credit>by Ethers Club</span></span></a>
+      <div class="nav-actions"><a class="sign-in-link" href="signin.html">Sign in</a></div>
+    </nav>
+    <section class="chatbot-page wrap">
+      <header class="chatbot-heading">
+        <p class="section-kicker">FREE CAMPUS ASSISTANT</p>
+        <h1>Ask <b>TheDayBoard</b>.</h1>
+        <p>Get quick help with laundry, mess, buses, academics, clubs and campus services.</p>
+      </header>
+      <section class="chatbot-card" aria-label="AI chat">
+        <div class="chatbot-messages" id="chatMessages" aria-live="polite">
+          <div class="chat-message assistant">Hi! I’m your free campus assistant. What would you like to know?</div>
+        </div>
+        <form class="chatbot-form" id="chatForm">
+          <label class="sr-only" for="chatInput">Ask a question</label>
+          <input id="chatInput" type="text" maxlength="500" autocomplete="off" placeholder="Ask a campus question..." required>
+          <button type="submit" id="chatSend">Send <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="chatbot-note" id="chatStatus">Free to use. Please do not share passwords or private information.</p>
+      </section>
+    </section>
+  </main>
+  <script>document.documentElement.classList.add("dayboard-ready");</script>
+  <script type="module" src="chatbot.js?v=1"></script>
+</body>
+</html>
