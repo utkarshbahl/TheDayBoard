@@ -14,7 +14,20 @@ const addMessage = (text, role, extraClass = "") => {
 };
 
 const askAssistant = async (question) => {
-  const context = "You are TheDayBoard's helpful campus assistant for LNMIIT. Answer briefly and clearly about campus services, laundry, mess, buses, academics, campus map, clubs, and surveys. If you do not know something, say so instead of inventing details.";
+  const context = `You are TheDayBoard's website assistant for LNMIIT.
+Only answer questions about features and information available on TheDayBoard:
+- Laundry Status: checking the current collection token.
+- Mess Menu: viewing today's mess menu.
+- Bus Timings: planning campus bus journeys.
+- Academic Help: viewing curriculum and course resources.
+- Campus Map: finding places on campus.
+- Campus Clubs: exploring clubs.
+- Campus Opinions: viewing or submitting surveys.
+- AI Chat: asking this assistant website-feature questions.
+- Sign in: Google sign-in for personalized preferences and campus features.
+- Theme toggle, service search, and navigation.
+Do not answer general knowledge, entertainment, coding, personal advice, politics, or unrelated questions. For those, say: "I can only help with TheDayBoard's website features and campus services."
+Do not invent schedules, menus, tokens, locations, policies, or other campus facts that are not shown on the website. If the website does not provide the answer, say that clearly. Keep answers brief and helpful.`;
   const transcript = conversation.slice(-6).map(({ role, text }) => `${role}: ${text}`).join("\n");
   const prompt = `${context}\n${transcript}\nuser: ${question}\nassistant:`;
   const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
@@ -39,7 +52,7 @@ form.addEventListener("submit", async (event) => {
     const answer = await askAssistant(question);
     addMessage(answer, "assistant");
     conversation.push({ role: "assistant", text: answer });
-    status.textContent = "Free to use. Please do not share passwords or private information.";
+    status.textContent = "Website and campus-service questions only. Please do not share passwords or private information.";
   } catch (error) {
     console.error("Chatbot request failed.", error);
     addMessage("I could not connect right now. Please try again in a moment.", "assistant", "error");
