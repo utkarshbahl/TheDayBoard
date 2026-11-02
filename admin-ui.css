@@ -1,0 +1,99 @@
+.admin-page .chatbot-admin-panel form,
+.admin-page .chatbot-admin form,
+.admin-page .survey-admin form,
+.admin-page .settings-admin form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card),
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card),
+.admin-page .survey-admin form > label,
+.admin-page .settings-admin form > label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 18px;
+  font: 800 12px/1.2 Manrope, Arial, sans-serif;
+}
+
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) input,
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) select,
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) textarea,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) input,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) select,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) textarea,
+.admin-page .survey-admin form > label input,
+.admin-page .survey-admin form > label select,
+.admin-page .survey-admin form > label textarea,
+.admin-page .settings-admin form > label input {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 13px/1.3 Manrope, Arial, sans-serif;
+  outline: none;
+}
+
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) textarea,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) textarea,
+.admin-page .survey-admin form > label textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) input:focus,
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) select:focus,
+.admin-page .chatbot-admin-panel form > label:not(.admin-toggle-card) textarea:focus,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) input:focus,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) select:focus,
+.admin-page .chatbot-admin form > label:not(.admin-toggle-card) textarea:focus,
+.admin-page .survey-admin form > label input:focus,
+.admin-page .survey-admin form > label select:focus,
+.admin-page .survey-admin form > label textarea:focus,
+.admin-page .settings-admin form > label input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(200, 139, 85, .18);
+}
+
+.admin-page .chatbot-admin-panel form > .admin-toggle-card,
+.admin-page .chatbot-admin form > .admin-toggle-card,
+.admin-page .chatbot-admin-panel form > .chatbot-admin-stats,
+.admin-page .chatbot-admin form > .chatbot-admin-stats,
+.admin-page .chatbot-admin-panel form > .settings-admin-actions,
+.admin-page .chatbot-admin form > .settings-admin-actions {
+  grid-column: 1 / -1;
+}
+
+.admin-page .chatbot-admin-panel form > .admin-toggle-card,
+.admin-page .chatbot-admin form > .admin-toggle-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .admin-page .chatbot-admin-panel form,
+  .admin-page .chatbot-admin form,
+  .admin-page .survey-admin form,
+  .admin-page .settings-admin form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-page .chatbot-admin-panel form > .admin-toggle-card,
+  .admin-page .chatbot-admin form > .admin-toggle-card,
+  .admin-page .chatbot-admin-panel form > .chatbot-admin-stats,
+  .admin-page .chatbot-admin form > .chatbot-admin-stats,
+  .admin-page .chatbot-admin-panel form > .settings-admin-actions,
+  .admin-page .chatbot-admin form > .settings-admin-actions {
+    grid-column: auto;
+  }
+}
