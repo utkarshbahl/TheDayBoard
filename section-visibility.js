@@ -10,6 +10,7 @@ const sections = {
   clubs: { path: "/clubs", label: "Campus clubs" },
   surveys: { path: "/surveys", label: "Campus opinions" },
   eateries: { path: "/eateries", label: "Eateries" },
+  "ai-chat": { path: "/chatbot", label: "AI Chat" },
 };
 
 const normalizePath = (path) => {
@@ -41,7 +42,7 @@ function addUnavailableMessage(label) {
 function applyVisibility(rows) {
   const visibility = new Map(rows.map((row) => [row.section_key, row.is_public]));
 
-  document.querySelectorAll(".nav-link, .campus-nav-link, .service-card").forEach((link) => {
+  document.querySelectorAll(".nav-link, .campus-nav-link, .service-card, .chat-link, .floating-chat-link").forEach((link) => {
     const key = getSectionKey(normalizePath(new URL(link.href).pathname));
     if (key && visibility.get(key) === false) link.hidden = true;
   });

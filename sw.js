@@ -1,4 +1,4 @@
-const CACHE_NAME = "thedayboard-shell-v13";
+const CACHE_NAME = "thedayboard-shell-v14";
 const APP_SHELL = [
   "/",
   "/index.html",

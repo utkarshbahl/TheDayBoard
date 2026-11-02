@@ -40,6 +40,22 @@ adminStyle.textContent = `
   .admin-section-nav button.is-active { background: var(--ink); color: var(--on-dark); border-color: var(--ink); }
   .admin-section-select { display: none; width: 100%; }
   .is-admin-section-hidden { display: none; }
+  .section-visibility-row { min-height: 66px; padding: 12px 0; }
+  .visibility-toggle { min-width: 125px; min-height: 42px; padding: 11px 16px; border-radius: 7px; font-size: 12px; }
+  .visibility-toggle[data-is-public=true] { background: #dcebdd; color: #23402e; }
+  .visibility-toggle[data-is-public=false] { background: #f0d7d2; color: #7d3027; }
+  .order-admin, .chatbot-admin-panel { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .order-admin h2, .chatbot-admin-panel h2 { margin: 0 0 8px; font-size: 20px; }
+  .order-admin p, .chatbot-admin-panel > p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .section-order-list { display: grid; gap: 9px; margin: 20px 0; }
+  .section-order-item { display: flex; align-items: center; gap: 13px; width: 100%; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); text-align: left; cursor: grab; font: 700 14px Manrope; }
+  .section-order-item:hover, .section-order-item:focus-visible { border-color: var(--accent); box-shadow: 0 4px 10px rgba(32,38,45,.08); }
+  .section-order-item span:last-child { margin-left: auto; color: var(--muted); font: 10px "DM Mono", monospace; text-transform: uppercase; }
+  .order-grip { color: var(--accent); font-size: 21px; }
+  .order-admin > button, .chatbot-admin-panel button[type=submit] { padding: 12px 16px; border: 0; border-radius: 6px; background: var(--ink); color: var(--on-dark); font: 800 12px Manrope; cursor: pointer; }
+  .admin-toggle-card { display: flex !important; align-items: center; gap: 13px; margin: 18px 0 !important; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  .admin-toggle-card input { width: 22px !important; height: 22px; accent-color: var(--ink); }
+  .admin-toggle-card small { display: block; margin-top: 4px; color: var(--muted); font-weight: 400; }
   .survey-admin { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--line); }
   .survey-admin h2 { margin: 0 0 8px; font-size: 18px; } .survey-admin p { color: var(--muted); font-size: 13px; line-height: 1.6; }
   .survey-admin label { display: block; margin-top: 14px; font-size: 12px; font-weight: 800; } .survey-admin input[type=text], .survey-admin textarea, .survey-admin select { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); font: 13px Manrope; }
@@ -106,7 +122,7 @@ function createSectionNav() {
   nav.id = "adminSectionNav";
   nav.className = "admin-section-nav";
   nav.setAttribute("aria-label", "Admin sections");
-  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><button type="button" data-section="settings">Settings</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option><option value="settings">Settings</option></select>`;
+  nav.innerHTML = `<button type="button" data-section="traffic" class="is-active">Traffic</button><button type="button" data-section="users">Users</button><button type="button" data-section="surveys">Opinions</button><button type="button" data-section="visibility">Hide tabs</button><button type="button" data-section="order">Order</button><button type="button" data-section="chatbot">AI Chat</button><button type="button" data-section="settings">Settings</button><select class="admin-section-select" aria-label="Admin section"><option value="traffic">Traffic</option><option value="users">Users</option><option value="surveys">Opinions</option><option value="visibility">Hide tabs</option><option value="order">Order</option><option value="chatbot">AI Chat</option><option value="settings">Settings</option></select>`;
   byId("analyticsPanel").before(nav);
   byId("analyticsPanel").querySelector(".analytics-topline")?.insertAdjacentHTML("beforeend", '<div class="admin-data-actions"><button type="button" id="refreshTraffic">Refresh</button><button type="button" id="exportTraffic">Export CSV</button></div>');
   byId("refreshTraffic")?.addEventListener("click", () => loadAnalytics());
@@ -119,7 +135,7 @@ function createSectionNav() {
 }
 
 function setSection(section) {
-  const validSections = ["traffic", "users", "surveys", "visibility", "settings"];
+  const validSections = ["traffic", "users", "surveys", "visibility", "order", "chatbot", "settings"];
   if (!validSections.includes(section)) section = "traffic";
   try {
     localStorage.setItem("dayboard-admin-section", section);
@@ -133,9 +149,13 @@ function setSection(section) {
   byId("surveyAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "surveys");
   byId("usersAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "users");
   byId("settingsAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "settings");
+  byId("orderAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "order");
+  byId("chatbotAdminPanel")?.classList.toggle("is-admin-section-hidden", section !== "chatbot");
   if (section === "surveys" && !surveyResultsLoaded) { surveyResultsLoaded = true; loadSurveyResults(); }
   if (section === "users") loadUsers(true);
   if (section === "settings") loadSettings();
+  if (section === "order") loadOrder();
+  if (section === "chatbot") loadChatbotSettings();
   document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("is-active", button.dataset.section === section));
   const select = document.querySelector(".admin-section-select");
   if (select) select.value = section;
@@ -145,7 +165,7 @@ function createSettingsPanel() {
   const panel = document.createElement("section");
   panel.id = "settingsAdminPanel";
   panel.className = "settings-admin is-admin-section-hidden";
-  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" name="announcement_visible" type="checkbox"> Show announcement across the site</label><label><input id="announcementImportantSetting" name="announcement_important" type="checkbox"> Mark announcement as important</label><div class="chatbot-admin"><h3>AI Chat controls</h3><p>Control the public chatbot without editing code.</p><label><input id="chatbotEnabledSetting" type="checkbox"> Show chatbot and floating button</label><label for="chatbotNameSetting">Assistant name<input id="chatbotNameSetting" maxlength="80"></label><label for="chatbotWelcomeSetting">Welcome message<input id="chatbotWelcomeSetting" maxlength="240"></label><label for="chatbotModelSetting">Pollinations model<select id="chatbotModelSetting"><option value="openai">OpenAI-compatible default</option><option value="mistral">Mistral</option><option value="openai-fast">OpenAI fast</option></select></label><label for="chatbotInstructionsSetting">Additional instructions<textarea id="chatbotInstructionsSetting" maxlength="1000"></textarea></label><div class="chatbot-admin-stats"><div class="chatbot-admin-stat"><small>TODAY</small><strong id="chatbotTodayRequests">-</strong></div><div class="chatbot-admin-stat"><small>LAST 7 DAYS</small><strong id="chatbotWeekRequests">-</strong></div><div class="chatbot-admin-stat"><small>ALL TIME</small><strong id="chatbotAllRequests">-</strong></div></div><p id="chatbotSettingsMessage" class="chatbot-admin-message" role="status"></p></div><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
+  panel.innerHTML = `<h2>Site settings</h2><p>Change the public identity and publish a campus-wide announcement without editing the website files.</p><form id="siteSettingsForm"><label for="siteNameSetting">Site name<input id="siteNameSetting" name="site_name" maxlength="80" required></label><label for="siteCreditSetting">Credit or subtitle<input id="siteCreditSetting" name="site_credit" maxlength="120"></label><label for="announcementTextSetting">Announcement<input id="announcementTextSetting" name="announcement_text" maxlength="240" placeholder="Optional message for every visitor"></label><label for="announcementLinkSetting">Announcement link<input id="announcementLinkSetting" name="announcement_link" maxlength="300" placeholder="/surveys.html or https://..."></label><label for="announcementExpiresSetting">Announcement expires<input id="announcementExpiresSetting" name="announcement_expires" type="datetime-local"></label><label><input id="announcementVisibleSetting" name="announcement_visible" type="checkbox"> Show announcement across the site</label><label><input id="announcementImportantSetting" name="announcement_important" type="checkbox"> Mark announcement as important</label><div class="settings-admin-actions"><button type="submit">Save settings</button><p id="siteSettingsMessage" class="settings-admin-message" role="status"></p></div></form>`;
   byId("analyticsPanel").append(panel);
   byId("siteSettingsForm").addEventListener("submit", saveSettings);
   return panel;
@@ -169,13 +189,7 @@ async function loadSettings() {
   byId("announcementExpiresSetting").value = values.announcement_expires ? values.announcement_expires.slice(0, 16) : "";
   byId("announcementVisibleSetting").checked = values.announcement_visible === "true";
   byId("announcementImportantSetting").checked = values.announcement_important === "true";
-  byId("chatbotEnabledSetting").checked = values.chatbot_enabled !== "false";
-  byId("chatbotNameSetting").value = values.chatbot_name || "TheDayBoard AI";
-  byId("chatbotWelcomeSetting").value = values.chatbot_welcome || "Hi! I’m your campus assistant. What would you like to know?";
-  byId("chatbotModelSetting").value = values.chatbot_model || "openai-fast";
-  byId("chatbotInstructionsSetting").value = values.chatbot_instructions || "";
   nameInput.dataset.loaded = "true";
-  loadChatbotAnalytics();
 }
 
 async function loadChatbotAnalytics() {
@@ -201,11 +215,6 @@ async function saveSettings(event) {
     { key: "announcement_expires", value: byId("announcementExpiresSetting").value ? new Date(byId("announcementExpiresSetting").value).toISOString() : "" },
     { key: "announcement_visible", value: String(byId("announcementVisibleSetting").checked) },
     { key: "announcement_important", value: String(byId("announcementImportantSetting").checked) },
-    { key: "chatbot_enabled", value: String(byId("chatbotEnabledSetting").checked) },
-    { key: "chatbot_name", value: byId("chatbotNameSetting").value.trim() || "TheDayBoard AI" },
-    { key: "chatbot_welcome", value: byId("chatbotWelcomeSetting").value.trim() || "Hi! I’m your campus assistant. What would you like to know?" },
-    { key: "chatbot_model", value: byId("chatbotModelSetting").value },
-    { key: "chatbot_instructions", value: byId("chatbotInstructionsSetting").value.trim() },
   ];
   if (!updates[0].value) {
     message.textContent = "Site name is required.";
@@ -221,6 +230,101 @@ async function saveSettings(event) {
     return;
   }
   message.textContent = "Settings saved.";
+}
+
+const orderedSections = [
+  ["laundry.html", "Laundry"], ["mess-menu.html", "Mess"], ["bus-timings.html", "Bus"],
+  ["curriculum.html", "Academics"], ["campus-map.html", "Map"], ["placements.html", "Placements"],
+  ["clubs.html", "Clubs"], ["surveys.html", "Opinions"], ["chatbot.html", "AI Chat"], ["eateries.html", "Eateries"],
+];
+
+function createChatbotPanel() {
+  const panel = document.createElement("section");
+  panel.id = "chatbotAdminPanel";
+  panel.className = "chatbot-admin-panel is-admin-section-hidden";
+  panel.innerHTML = `<h2>AI Chat controls</h2><p>Manage the chatbot separately from general site settings.</p><form id="chatbotSettingsForm"><label class="admin-toggle-card"><input id="chatbotEnabledSetting" type="checkbox"><span><strong>AI Chat visible</strong><small>Show the chatbot card, navigation link, and floating button.</small></span></label><label for="chatbotNameSetting">Assistant name<input id="chatbotNameSetting" maxlength="80"></label><label for="chatbotWelcomeSetting">Welcome message<input id="chatbotWelcomeSetting" maxlength="240"></label><label for="chatbotModelSetting">Pollinations model<select id="chatbotModelSetting"><option value="openai">OpenAI-compatible default</option><option value="mistral">Mistral</option><option value="openai-fast">OpenAI fast</option></select></label><label for="chatbotInstructionsSetting">Additional instructions<textarea id="chatbotInstructionsSetting" maxlength="1000"></textarea></label><div class="chatbot-admin-stats"><div class="chatbot-admin-stat"><small>TODAY</small><strong id="chatbotTodayRequests">-</strong></div><div class="chatbot-admin-stat"><small>LAST 7 DAYS</small><strong id="chatbotWeekRequests">-</strong></div><div class="chatbot-admin-stat"><small>ALL TIME</small><strong id="chatbotAllRequests">-</strong></div></div><div class="settings-admin-actions"><button type="submit">Save AI Chat</button><p id="chatbotSettingsMessage" class="chatbot-admin-message" role="status"></p></div></form>`;
+  byId("analyticsPanel").append(panel);
+  byId("chatbotSettingsForm").addEventListener("submit", saveChatbotSettings);
+  return panel;
+}
+
+async function loadChatbotSettings() {
+  const { data, error } = await supabase.from("site_settings").select("key,value").in("key", ["chatbot_enabled", "chatbot_name", "chatbot_welcome", "chatbot_model", "chatbot_instructions"]);
+  if (error) {
+    byId("chatbotSettingsMessage").textContent = `AI Chat settings could not be loaded: ${error.message}`;
+    return;
+  }
+  const values = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+  byId("chatbotEnabledSetting").checked = values.chatbot_enabled !== "false";
+  byId("chatbotNameSetting").value = values.chatbot_name || "TheDayBoard AI";
+  byId("chatbotWelcomeSetting").value = values.chatbot_welcome || "Hi! I’m your campus assistant. What would you like to know?";
+  byId("chatbotModelSetting").value = values.chatbot_model || "openai-fast";
+  byId("chatbotInstructionsSetting").value = values.chatbot_instructions || "";
+  loadChatbotAnalytics();
+}
+
+async function saveChatbotSettings(event) {
+  event.preventDefault();
+  const enabled = byId("chatbotEnabledSetting").checked;
+  const updates = [
+    { key: "chatbot_enabled", value: String(enabled) },
+    { key: "chatbot_name", value: byId("chatbotNameSetting").value.trim() || "TheDayBoard AI" },
+    { key: "chatbot_welcome", value: byId("chatbotWelcomeSetting").value.trim() || "Hi! I’m your campus assistant. What would you like to know?" },
+    { key: "chatbot_model", value: byId("chatbotModelSetting").value },
+    { key: "chatbot_instructions", value: byId("chatbotInstructionsSetting").value.trim() },
+  ];
+  const results = await Promise.all(updates.map((setting) => supabase.from("site_settings").update({ value: setting.value }).eq("key", setting.key)));
+  const error = results.find((result) => result.error)?.error;
+  const message = byId("chatbotSettingsMessage");
+  if (error) {
+    message.textContent = `AI Chat settings could not be saved: ${error.message}`;
+    return;
+  }
+  const visibility = await supabase.from("site_section_visibility").update({ is_public: enabled }).eq("section_key", "ai-chat");
+  if (visibility.error) {
+    message.textContent = `AI Chat saved, but visibility could not be updated: ${visibility.error.message}`;
+    return;
+  }
+  message.textContent = enabled ? "AI Chat is visible." : "AI Chat is hidden everywhere.";
+}
+
+function createOrderPanel() {
+  const panel = document.createElement("section");
+  panel.id = "orderAdminPanel";
+  panel.className = "order-admin is-admin-section-hidden";
+  panel.innerHTML = `<h2>Section order</h2><p>Drag the handles to set the order used on desktop navigation, mobile navigation, and the home page.</p><div id="sectionOrderList" class="section-order-list"></div><button id="saveSectionOrder" type="button">Save section order</button><p id="sectionOrderMessage" class="settings-admin-message" role="status"></p>`;
+  byId("analyticsPanel").append(panel);
+  byId("saveSectionOrder").addEventListener("click", saveOrder);
+  return panel;
+}
+
+async function loadOrder() {
+  const { data } = await supabase.from("site_settings").select("value").eq("key", "nav_order").maybeSingle();
+  const saved = data?.value?.split(",").map((item) => item.trim()).filter(Boolean) || [];
+  const order = [...saved, ...orderedSections.map(([path]) => path).filter((path) => !saved.includes(path))];
+  const list = byId("sectionOrderList");
+  list.replaceChildren(...order.map((path) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "section-order-item";
+    item.draggable = true;
+    item.dataset.path = path;
+    item.innerHTML = `<span class="order-grip" aria-hidden="true">☷</span><strong>${orderedSections.find(([entry]) => entry === path)?.[1] || path}</strong><span>Drag</span>`;
+    item.addEventListener("dragstart", () => item.classList.add("is-dragging"));
+    item.addEventListener("dragend", () => item.classList.remove("is-dragging"));
+    item.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      const dragging = list.querySelector(".is-dragging");
+      if (dragging && dragging !== item) list.insertBefore(dragging, item);
+    });
+    return item;
+  }));
+}
+
+async function saveOrder() {
+  const value = [...document.querySelectorAll(".section-order-item")].map((item) => item.dataset.path).join(",");
+  const { error } = await supabase.from("site_settings").update({ value }).eq("key", "nav_order");
+  byId("sectionOrderMessage").textContent = error ? `Order could not be saved: ${error.message}` : "Order saved. Refresh the site to apply it.";
 }
 
 function createUsersPanel() {
@@ -546,6 +650,8 @@ async function initializeAdmin() {
   createSectionNav();
   createUsersPanel();
   createSettingsPanel();
+  createChatbotPanel();
+  createOrderPanel();
   const visibilityPanel = byId("sectionVisibilityPanel") || createVisibilityPanel();
   createSurveyPanel();
   let savedSection = "traffic";

@@ -17,6 +17,7 @@
     ('announcement_important', 'false'),
     ('announcement_link', ''),
     ('announcement_expires', '')
+    ,('nav_order', 'laundry.html,mess-menu.html,bus-timings.html,curriculum.html,campus-map.html,placements.html,clubs.html,surveys.html,chatbot.html,eateries.html')
   on conflict (key) do nothing;
 
   alter table public.site_settings enable row level security;

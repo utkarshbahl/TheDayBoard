@@ -99,6 +99,30 @@ const addEateriesNavigation = () => {
   });
 };
 addEateriesNavigation();
+const applyNavigationOrder = async () => {
+  const { data, error } = await supabase.from("site_settings").select("value").eq("key", "nav_order").maybeSingle();
+  if (error || !data?.value) {
+    if (error) console.error("Navigation order could not be loaded.", error);
+    return;
+  }
+  const order = data.value.split(",").map((path) => path.trim()).filter(Boolean);
+  document.querySelectorAll(".nav-links, .campus-dropdown").forEach((nav) => {
+    const links = new Map([...nav.querySelectorAll("a[href]")].map((link) => [link.getAttribute("href"), link]));
+    order.forEach((path) => {
+      const link = links.get(path);
+      if (link) nav.append(link);
+    });
+  });
+  const grid = document.querySelector(".service-grid");
+  if (grid) {
+    const cards = new Map([...grid.querySelectorAll(".service-card")].map((card) => [new URL(card.href, location.href).pathname.split("/").pop() || "index.html", card]));
+    order.forEach((path) => {
+      const card = cards.get(path);
+      if (card) grid.append(card);
+    });
+  }
+};
+applyNavigationOrder();
 supabase.from("site_settings").select("value").eq("key", "chatbot_enabled").maybeSingle().then(({ data, error }) => {
   if (error) {
     console.error("Chatbot visibility could not be loaded.", error);
@@ -267,7 +291,7 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   nav.append(link);
 });
 
-const navOrder = ["laundry.html", "mess-menu.html", "bus-timings.html", "curriculum.html", "campus-map.html", "placements.html", "clubs.html", "surveys.html", "eateries.html"];
+const navOrder = ["laundry.html", "mess-menu.html", "bus-timings.html", "curriculum.html", "campus-map.html", "placements.html", "clubs.html", "surveys.html", "chatbot.html", "eateries.html"];
 document.querySelectorAll(".nav-links, .campus-dropdown").forEach((nav) => {
   const links = new Map([...nav.querySelectorAll("a[href]")].map((link) => [link.getAttribute("href"), link]));
   navOrder.forEach((path) => {

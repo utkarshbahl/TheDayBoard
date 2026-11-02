@@ -7,8 +7,12 @@
       'mess',
       'bus',
       'curriculum',
+      'placements',
       'campus-map',
       'clubs',
+      'surveys',
+      'eateries',
+      'ai-chat',
       'auth'
     )),
     is_public boolean not null default true,
@@ -19,7 +23,7 @@
     drop constraint if exists site_section_visibility_section_key_check;
   alter table public.site_section_visibility
     add constraint site_section_visibility_section_key_check
-    check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'campus-map', 'clubs', 'surveys', 'eateries', 'auth'));
+    check (section_key in ('laundry', 'mess', 'bus', 'curriculum', 'placements', 'campus-map', 'clubs', 'surveys', 'eateries', 'ai-chat', 'auth'));
 
   -- Upgrade an existing installation with the login visibility row.
   insert into public.site_section_visibility (section_key, is_public)
@@ -32,6 +36,8 @@
     ('clubs', true),
     ('surveys', true),
     ('eateries', true),
+    ('ai-chat', true),
+    ('placements', true),
     ('auth', false)
   on conflict (section_key) do nothing;
 
