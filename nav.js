@@ -77,13 +77,29 @@ navLayoutStyle.textContent = `
 document.head.append(navLayoutStyle);
 
 document.documentElement.classList.add("enhanced-ui");
+if (!document.querySelector(".floating-chat-link")) {
+  const floatingChat = document.createElement("a");
+  floatingChat.className = "floating-chat-link";
+  floatingChat.href = "chatbot.html";
+  floatingChat.setAttribute("aria-label", "Open AI Chat");
+  floatingChat.innerHTML = '<span aria-hidden="true">✦</span><b>AI Chat</b>';
+  document.body.append(floatingChat);
+}
 document.querySelectorAll(".nav-actions").forEach((actions) => {
-  if (actions.querySelector(".sign-in-link")) return;
-  const link = document.createElement("a");
-  link.className = "sign-in-link";
-  link.href = "signin.html";
-  link.textContent = "Sign in";
-  actions.prepend(link);
+  if (!actions.querySelector(".chat-link")) {
+    const chatLink = document.createElement("a");
+    chatLink.className = "chat-link";
+    chatLink.href = "chatbot.html";
+    chatLink.textContent = "AI Chat";
+    actions.prepend(chatLink);
+  }
+  if (!actions.querySelector(".sign-in-link")) {
+    const link = document.createElement("a");
+    link.className = "sign-in-link";
+    link.href = "signin.html";
+    link.textContent = "Sign in";
+    actions.prepend(link);
+  }
 });
 const updateSignInState = (session) => {
   document.querySelectorAll(".sign-in-link").forEach((link) => {
