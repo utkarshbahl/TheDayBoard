@@ -77,6 +77,28 @@ navLayoutStyle.textContent = `
 document.head.append(navLayoutStyle);
 
 document.documentElement.classList.add("enhanced-ui");
+const addEateriesNavigation = () => {
+  const isEateriesPage = /\/eateries(?:\.html)?\/?$/.test(location.pathname);
+  document.querySelectorAll(".nav-links").forEach((nav) => {
+    if (nav.querySelector('a[href="eateries.html"]')) return;
+    const link = document.createElement("a");
+    link.className = "nav-link";
+    link.href = "eateries.html";
+    link.textContent = "Campus Eateries";
+    if (isEateriesPage) link.setAttribute("aria-current", "page");
+    nav.append(link);
+  });
+  document.querySelectorAll(".campus-dropdown").forEach((nav) => {
+    if (nav.querySelector('a[href="eateries.html"]')) return;
+    const link = document.createElement("a");
+    link.className = "campus-nav-link";
+    link.href = "eateries.html";
+    link.innerHTML = '<span>Campus <b>Eateries</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+    if (isEateriesPage) link.setAttribute("aria-current", "page");
+    nav.append(link);
+  });
+};
+addEateriesNavigation();
 supabase.from("site_settings").select("value").eq("key", "chatbot_enabled").maybeSingle().then(({ data, error }) => {
   if (error) {
     console.error("Chatbot visibility could not be loaded.", error);

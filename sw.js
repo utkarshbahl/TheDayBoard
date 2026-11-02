@@ -5,6 +5,8 @@ const APP_SHELL = [
   "/chatbot.html",
   "/chatbot.css?v=1",
   "/chatbot.js?v=2",
+  "/eateries.html",
+  "/eateries.css?v=1",
   "/home.css?v=2",
   "/laundry.html",
   "/curriculum.html",
