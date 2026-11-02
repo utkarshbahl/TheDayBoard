@@ -77,14 +77,24 @@ navLayoutStyle.textContent = `
 document.head.append(navLayoutStyle);
 
 document.documentElement.classList.add("enhanced-ui");
-if (!document.querySelector(".floating-chat-link")) {
-  const floatingChat = document.createElement("a");
-  floatingChat.className = "floating-chat-link";
-  floatingChat.href = "chatbot.html";
-  floatingChat.setAttribute("aria-label", "Open AI Chat");
-  floatingChat.innerHTML = '<span aria-hidden="true">✦</span><b>AI Chat</b>';
-  document.body.append(floatingChat);
-}
+supabase.from("site_settings").select("value").eq("key", "chatbot_enabled").maybeSingle().then(({ data, error }) => {
+  if (error) {
+    console.error("Chatbot visibility could not be loaded.", error);
+    return;
+  }
+  if (data?.value === "false") {
+    document.querySelectorAll(".chat-link, .floating-chat-link").forEach((link) => link.remove());
+    return;
+  }
+  if (!document.querySelector(".floating-chat-link")) {
+    const floatingChat = document.createElement("a");
+    floatingChat.className = "floating-chat-link";
+    floatingChat.href = "chatbot.html";
+    floatingChat.setAttribute("aria-label", "Open AI Chat");
+    floatingChat.innerHTML = '<span aria-hidden="true">✦</span><b>AI Chat</b>';
+    document.body.append(floatingChat);
+  }
+}).catch((error) => console.error("Chatbot visibility could not be loaded.", error));
 document.querySelectorAll(".nav-actions").forEach((actions) => {
   if (!actions.querySelector(".chat-link")) {
     const chatLink = document.createElement("a");
