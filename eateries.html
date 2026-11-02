@@ -12,6 +12,10 @@
     <nav class="nav wrap service-nav">
       <div class="nav-start">
         <a class="brand brand-desktop" href="index.html"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span><span class="brand-byline" data-site-credit>by Ethers Club</span></span></a>
+        <details class="campus-menu">
+          <summary class="campus-trigger"><img class="brand-mark" src="assets/ethers-club-icon.png" alt=""><span class="brand-copy"><span class="brand-name" data-site-name>The<b>DayBoard</b></span></span><span class="campus-chevron" aria-hidden="true"></span></summary>
+          <nav class="campus-dropdown" aria-label="Campus services"><span class="campus-dropdown-label">Campus services</span><a class="campus-nav-link" href="laundry.html">Laundry</a><a class="campus-nav-link" href="mess-menu.html">Mess</a><a class="campus-nav-link" href="bus-timings.html">Bus</a><a class="campus-nav-link" href="curriculum.html">Academics</a><a class="campus-nav-link" href="campus-map.html">Map</a><a class="campus-nav-link" href="placements.html">Placements</a><a class="campus-nav-link" href="clubs.html">Clubs</a><a class="campus-nav-link" href="surveys.html">Opinions</a><a class="campus-nav-link" href="eateries.html" aria-current="page">Eateries</a></nav>
+        </details>
         <div class="nav-links" aria-label="Campus services">
           <a class="nav-link" href="laundry.html">Laundry</a><a class="nav-link" href="mess-menu.html">Mess</a><a class="nav-link" href="bus-timings.html">Bus</a><a class="nav-link" href="curriculum.html">Academics</a><a class="nav-link" href="campus-map.html">Map</a><a class="nav-link" href="placements.html">Placements</a><a class="nav-link" href="clubs.html">Clubs</a><a class="nav-link" href="surveys.html">Opinions</a>
         </div>
@@ -50,7 +54,9 @@
         item.setAttribute("aria-selected", String(active));
       });
       document.querySelectorAll(".eatery-card").forEach((card) => {
-        card.hidden = card.id !== tab.getAttribute("aria-controls");
+        const active = card.id === tab.getAttribute("aria-controls");
+        card.hidden = !active;
+        card.classList.toggle("eatery-card-featured", active);
       });
     }));
   </script>

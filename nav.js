@@ -93,7 +93,7 @@ const addEateriesNavigation = () => {
     const link = document.createElement("a");
     link.className = "campus-nav-link";
     link.href = "eateries.html";
-    link.innerHTML = '<span><b>Eateries</b></span><span class="campus-link-arrow" aria-hidden="true"></span>';
+    link.innerHTML = '<span>Eateries</span><span class="campus-link-arrow" aria-hidden="true"></span>';
     if (isEateriesPage) link.setAttribute("aria-current", "page");
     nav.append(link);
   });
@@ -267,7 +267,7 @@ document.querySelectorAll(".campus-dropdown").forEach((nav) => {
   nav.append(link);
 });
 
-const navOrder = ["laundry.html", "mess-menu.html", "bus-timings.html", "curriculum.html", "campus-map.html", "placements.html", "clubs.html", "surveys.html"];
+const navOrder = ["laundry.html", "mess-menu.html", "bus-timings.html", "curriculum.html", "campus-map.html", "placements.html", "clubs.html", "surveys.html", "eateries.html"];
 document.querySelectorAll(".nav-links, .campus-dropdown").forEach((nav) => {
   const links = new Map([...nav.querySelectorAll("a[href]")].map((link) => [link.getAttribute("href"), link]));
   navOrder.forEach((path) => {

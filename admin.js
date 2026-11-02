@@ -27,6 +27,7 @@ const sections = [
   ["campus-map", "Campus map"],
   ["clubs", "Campus clubs"],
   ["surveys", "Campus opinions"],
+  ["eateries", "Eateries"],
 ];
 
 const themeToggle = byId("adminThemeToggle");

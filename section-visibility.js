@@ -9,6 +9,7 @@ const sections = {
   "campus-map": { path: "/campus-map", label: "Campus map" },
   clubs: { path: "/clubs", label: "Campus clubs" },
   surveys: { path: "/surveys", label: "Campus opinions" },
+  eateries: { path: "/eateries", label: "Eateries" },
 };
 
 const normalizePath = (path) => {
