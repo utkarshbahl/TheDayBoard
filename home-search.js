@@ -40,7 +40,7 @@ const enhanceCard = (card) => {
   const button = document.createElement("button");
   button.className = "pin-service";
   button.type = "button";
-  button.textContent = readPinned().includes(path) ? "★" : "☆";
+  button.textContent = readPinned().includes(path) ? "★︎" : "☆︎";
   button.setAttribute("aria-pressed", String(readPinned().includes(path)));
   button.setAttribute("aria-label", button.getAttribute("aria-pressed") === "true" ? "Unpin service" : "Pin service");
   button.addEventListener("click", (event) => {
@@ -54,7 +54,7 @@ const enhanceCard = (card) => {
   const shareButton = document.createElement("button");
   shareButton.className = "share-service";
   shareButton.type = "button";
-  shareButton.textContent = "↗";
+  shareButton.textContent = "↗︎";
   shareButton.setAttribute("aria-label", "Share service");
   shareButton.addEventListener("click", async (event) => {
     event.preventDefault();
@@ -67,7 +67,7 @@ const enhanceCard = (card) => {
       } else {
         await navigator.clipboard.writeText(url);
         shareButton.textContent = "✓";
-        window.setTimeout(() => { shareButton.textContent = "↗"; }, 1400);
+        window.setTimeout(() => { shareButton.textContent = "↗︎"; }, 1400);
       }
     } catch (error) {
       if (error?.name !== "AbortError") console.error("Service link could not be shared.", error);
