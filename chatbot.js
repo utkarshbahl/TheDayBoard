@@ -40,12 +40,13 @@ const getQuickAnswer = (question) => {
 const getOfflineAnswer = (question) => {
   const quickAnswer = getQuickAnswer(question);
   if (quickAnswer) return quickAnswer;
-  return "I can help with Laundry Status, Mess Menu, Bus Timings, Academic Help, Campus Map, Clubs, Surveys, sign-in, themes, and service search. Which one would you like to open?";
+  return "The online AI is busy right now, but campus-service shortcuts are still available. Try asking again in a moment.";
 };
 
 const askAssistant = async (question) => {
-  const context = `You are ${chatbotSettings.name}, TheDayBoard's website assistant for LNMIIT.
-Only answer questions about features and information available on TheDayBoard:
+  const context = `You are ${chatbotSettings.name}, a helpful general-purpose AI assistant available on TheDayBoard for LNMIIT students.
+Answer general questions, explain concepts, help with study topics, writing, coding, planning, and everyday knowledge.
+You can also help with these TheDayBoard features:
 - Laundry Status: checking the current collection token.
 - Mess Menu: viewing today's mess menu.
 - Bus Timings: planning campus bus journeys.
@@ -56,8 +57,7 @@ Only answer questions about features and information available on TheDayBoard:
 - AI Chat: asking this assistant website-feature questions.
 - Sign in: Google sign-in for personalized preferences and campus features.
 - Theme toggle, service search, and navigation.
-Do not answer general knowledge, entertainment, coding, personal advice, politics, or unrelated questions. For those, say: "I can only help with TheDayBoard's website features and campus services."
-Do not invent schedules, menus, tokens, locations, policies, or other campus facts that are not shown on the website. If the website does not provide the answer, say that clearly. Keep answers brief and helpful.
+Do not invent schedules, menus, tokens, locations, policies, or other campus facts that are not shown on the website. If asked for current campus information that is not available here, say that clearly. Keep answers accurate, brief, and helpful. For medical, legal, financial, or safety-critical topics, provide general information and recommend a qualified professional when appropriate.
 Additional administrator instruction: ${chatbotSettings.instructions || "None"}`;
   const transcript = conversation.slice(-4).map(({ role, text }) => `${role}: ${text.slice(0, 240)}`).join("\n");
   const prompt = `${context}\n${transcript}\nuser: ${question}\nassistant:`;
@@ -129,7 +129,7 @@ form.addEventListener("submit", async (event) => {
     const answer = quickAnswer || await askAssistant(question);
     addMessage(answer, "assistant");
     conversation.push({ role: "assistant", text: answer });
-    status.textContent = "Website and campus-service questions only. Please do not share passwords or private information.";
+    status.textContent = "Ask general questions or questions about campus services. Please do not share passwords or private information.";
   } catch (error) {
     console.error("Chatbot request failed.", error);
     const offlineAnswer = getOfflineAnswer(question);

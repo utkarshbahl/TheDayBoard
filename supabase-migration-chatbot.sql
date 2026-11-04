@@ -6,8 +6,13 @@
       ('chatbot_name', 'TheDayBoard AI'),
       ('chatbot_welcome', 'Hi! I’m your campus assistant. What would you like to know?'),
       ('chatbot_model', 'openai'),
-      ('chatbot_instructions', 'Only answer questions about TheDayBoard website features and campus services. Do not invent facts.')
+      ('chatbot_instructions', 'Answer general questions and help with study, writing, coding, and everyday topics. For current campus facts, only use information shown on TheDayBoard. Do not invent facts.')
     on conflict (key) do nothing;
+
+    update public.site_settings
+    set value = 'Answer general questions and help with study, writing, coding, and everyday topics. For current campus facts, only use information shown on TheDayBoard. Do not invent facts.'
+    where key = 'chatbot_instructions'
+      and value = 'Only answer questions about TheDayBoard website features and campus services. Do not invent facts.';
 
     create table if not exists public.chatbot_requests (
       id bigint generated always as identity primary key,
