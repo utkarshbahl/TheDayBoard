@@ -10,7 +10,7 @@ let chatbotSettings = {
   enabled: true,
   name: "TheDayBoard AI",
   welcome: "Hi! I’m your campus assistant. What would you like to know?",
-  model: "openai-fast",
+  model: "openai",
   instructions: "",
 };
 
@@ -37,6 +37,12 @@ const getQuickAnswer = (question) => {
   return "";
 };
 
+const getOfflineAnswer = (question) => {
+  const quickAnswer = getQuickAnswer(question);
+  if (quickAnswer) return quickAnswer;
+  return "I can help with Laundry Status, Mess Menu, Bus Timings, Academic Help, Campus Map, Clubs, Surveys, sign-in, themes, and service search. Which one would you like to open?";
+};
+
 const askAssistant = async (question) => {
   const context = `You are ${chatbotSettings.name}, TheDayBoard's website assistant for LNMIIT.
 Only answer questions about features and information available on TheDayBoard:
@@ -56,10 +62,12 @@ Additional administrator instruction: ${chatbotSettings.instructions || "None"}`
   const transcript = conversation.slice(-4).map(({ role, text }) => `${role}: ${text.slice(0, 240)}`).join("\n");
   const prompt = `${context}\n${transcript}\nuser: ${question}\nassistant:`;
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 20000);
+  const timeout = window.setTimeout(() => controller.abort(), 8000);
   let response;
   try {
-    const model = chatbotSettings.model ? `?model=${encodeURIComponent(chatbotSettings.model)}` : "";
+    const model = chatbotSettings.model && chatbotSettings.model !== "openai"
+      ? `?model=${encodeURIComponent(chatbotSettings.model)}`
+      : "";
     response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}${model}`, {
       headers: { Accept: "text/plain" },
       signal: controller.signal,
@@ -86,7 +94,7 @@ const loadChatbotSettings = async () => {
     enabled: values.chatbot_enabled !== "false",
     name: values.chatbot_name || chatbotSettings.name,
     welcome: values.chatbot_welcome || chatbotSettings.welcome,
-    model: values.chatbot_model || chatbotSettings.model,
+    model: values.chatbot_model === "openai-fast" ? "openai" : values.chatbot_model || chatbotSettings.model,
     instructions: values.chatbot_instructions || "",
   };
   const welcome = messages.querySelector(".assistant");
@@ -124,8 +132,10 @@ form.addEventListener("submit", async (event) => {
     status.textContent = "Website and campus-service questions only. Please do not share passwords or private information.";
   } catch (error) {
     console.error("Chatbot request failed.", error);
-    addMessage("I could not connect right now. Please try again in a moment.", "assistant", "error");
-    status.textContent = "The free AI service is temporarily unavailable.";
+    const offlineAnswer = getOfflineAnswer(question);
+    addMessage(offlineAnswer, "assistant");
+    conversation.push({ role: "assistant", text: offlineAnswer });
+    status.textContent = "Instant campus help is available even when the online AI service is busy.";
   } finally {
     sendButton.disabled = false;
     input.focus();

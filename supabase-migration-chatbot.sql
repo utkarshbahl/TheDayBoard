@@ -5,7 +5,7 @@
       ('chatbot_enabled', 'true'),
       ('chatbot_name', 'TheDayBoard AI'),
       ('chatbot_welcome', 'Hi! I’m your campus assistant. What would you like to know?'),
-      ('chatbot_model', 'openai-fast'),
+      ('chatbot_model', 'openai'),
       ('chatbot_instructions', 'Only answer questions about TheDayBoard website features and campus services. Do not invent facts.')
     on conflict (key) do nothing;
 
