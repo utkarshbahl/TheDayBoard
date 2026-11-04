@@ -24,6 +24,13 @@ const addMessage = (text, role, extraClass = "") => {
 
 const getQuickAnswer = (question) => {
   const text = question.toLowerCase();
+  if (/^(hi|hello|hey|hiya|good morning|good afternoon|good evening)\b/.test(text)) {
+    return "Hi! I’m here to help with general questions, study topics, and campus services. What would you like to know?";
+  }
+  if (/\b(thanks|thank you|thx)\b/.test(text)) return "You’re welcome! What else can I help with?";
+  if (/\b(who are you|what can you do)\b/.test(text)) {
+    return "I’m TheDayBoard AI. I can answer general questions and help you find campus services.";
+  }
   if (/\b(laundry|token|collection)\b/.test(text)) return "Open Laundry Status from the home page to see the current collection token.";
   if (/\b(mess|food|menu)\b/.test(text)) return "Open Mess Menu from the home page to view the available mess menu.";
   if (/\b(bus|transport|timing|schedule)\b/.test(text)) return "Open Bus Timings from the home page to check campus bus information.";
@@ -40,7 +47,7 @@ const getQuickAnswer = (question) => {
 const getOfflineAnswer = (question) => {
   const quickAnswer = getQuickAnswer(question);
   if (quickAnswer) return quickAnswer;
-  return "The online AI is busy right now, but campus-service shortcuts are still available. Try asking again in a moment.";
+  return "I’m ready to help with general questions, study, writing, coding, and campus services. Could you rephrase that question?";
 };
 
 const askAssistant = async (question) => {
@@ -135,7 +142,7 @@ form.addEventListener("submit", async (event) => {
     const offlineAnswer = getOfflineAnswer(question);
     addMessage(offlineAnswer, "assistant");
     conversation.push({ role: "assistant", text: offlineAnswer });
-    status.textContent = "Instant campus help is available even when the online AI service is busy.";
+    status.textContent = "I’m using instant built-in help while the online AI service reconnects.";
   } finally {
     sendButton.disabled = false;
     input.focus();
