@@ -2,6 +2,8 @@ const input = document.querySelector("#serviceSearch");
 const status = document.querySelector("#serviceSearchStatus");
 const cards = () => [...document.querySelectorAll(".service-grid .service-card")];
 const PINNED_KEY = "dayboard-pinned-services";
+const pinIcon = (pinned) => `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" ${pinned ? 'fill="currentColor"' : 'fill="none" stroke="currentColor"'} stroke-width="1.7" stroke-linejoin="round"/></svg>`;
+const shareIcon = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 19 19 5M10 5h9v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 const readPinned = () => {
   try {
@@ -40,21 +42,26 @@ const enhanceCard = (card) => {
   const button = document.createElement("button");
   button.className = "pin-service";
   button.type = "button";
-  button.textContent = readPinned().includes(path) ? "★︎" : "☆︎";
-  button.setAttribute("aria-pressed", String(readPinned().includes(path)));
+  const isPinned = readPinned().includes(path);
+  button.innerHTML = pinIcon(isPinned);
+  button.setAttribute("aria-pressed", String(isPinned));
   button.setAttribute("aria-label", button.getAttribute("aria-pressed") === "true" ? "Unpin service" : "Pin service");
   button.addEventListener("click", (event) => {
     event.preventDefault();
     const pinned = readPinned();
     const next = pinned.includes(path) ? pinned.filter((item) => item !== path) : [...pinned, path].slice(-5);
     writePinned(next);
+    const nextPinned = next.includes(path);
+    button.innerHTML = pinIcon(nextPinned);
+    button.setAttribute("aria-pressed", String(nextPinned));
+    button.setAttribute("aria-label", nextPinned ? "Unpin service" : "Pin service");
     renderQuickAccess();
   });
   card.append(button);
   const shareButton = document.createElement("button");
   shareButton.className = "share-service";
   shareButton.type = "button";
-  shareButton.textContent = "↗︎";
+  shareButton.innerHTML = shareIcon;
   shareButton.setAttribute("aria-label", "Share service");
   shareButton.addEventListener("click", async (event) => {
     event.preventDefault();
@@ -67,7 +74,7 @@ const enhanceCard = (card) => {
       } else {
         await navigator.clipboard.writeText(url);
         shareButton.textContent = "✓";
-        window.setTimeout(() => { shareButton.textContent = "↗︎"; }, 1400);
+        window.setTimeout(() => { shareButton.innerHTML = shareIcon; }, 1400);
       }
     } catch (error) {
       if (error?.name !== "AbortError") console.error("Service link could not be shared.", error);
